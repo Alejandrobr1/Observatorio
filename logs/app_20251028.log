@@ -1,0 +1,313 @@
+2025-10-28 04:34:03,065 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:34:03,184 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:34:47,655 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:34:47,672 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:34:47,690 - __main__ - WARNING - Column TIPO_DOCUMENTO_ID not found in Personas, skipping FK fk_personas_tipo_documento
+2025-10-28 04:34:47,692 - __main__ - WARNING - Column NIVEL_MCER_ID not found in Personas, skipping FK fk_personas_nivel_mcer
+2025-10-28 04:34:47,695 - __main__ - WARNING - Column CIUDAD_ID not found in Personas, skipping FK fk_personas_ciudad
+2025-10-28 04:34:47,714 - __main__ - ERROR - Cannot create FK fk_cursos_nivel_mcer: 1 orphan values found in Cursos.NIVEL_MCER_ID
+2025-10-28 04:34:47,716 - __main__ - ERROR - Sample orphan values: ['SIN DIAGNOSTICO']
+2025-10-28 04:34:47,720 - __main__ - WARNING - Column CURSO_ID not found in Sedes_instituciones, skipping FK fk_sedes_curso
+2025-10-28 04:34:47,722 - __main__ - WARNING - Column INSTITUCION_EDUCATIVA_ID not found in Sedes_instituciones, skipping FK fk_sedes_institucion
+2025-10-28 04:34:47,751 - __main__ - ERROR - Error creating FK fk_sedes_persona: (mysql.connector.errors.ProgrammingError) 1170 (42000): BLOB/TEXT column 'PERSONA_ID' used in key specification without a key length
+[SQL: ALTER TABLE Sedes_instituciones ADD CONSTRAINT fk_sedes_persona FOREIGN KEY (PERSONA_ID) REFERENCES Personas(NUMERO_DOCUMENTO)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:35:31,317 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:35:31,335 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:36:41,252 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:36:41,271 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:36:41,408 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2023.csv
+2025-10-28 04:36:41,502 - __main__ - INFO - Columnas CSV: ['#', 'TIPO DE IDENTIFICACIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NOMBRES', 'APELLIDOS', 'FECHA DE NACIMIENTO', 'EDAD', 'TELÉFONO 1', 'TELÉFONO 2', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2022', 'Grado 2022', 'MCER (diagnóstico)', 'MCER (diagnóstico)2', 'NIVEL 2022-1', 'NIVEL 2022-2', 'POBLACIÓN 2022', 'Día', 'Jornada', 'SEDE NODAL 2022', 'GRUPO PMB 2022', 'DOCENTE PMB 2022', 'ESTADO 2022', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Nivel 2023- ETAPA 1', 'Día 2023', 'Jornada 2023', 'Sede Nodal 2023', 'Docente 2023', 'FECHA LLAMADA', 'ANOTACIÓN', 'FECHA LLAMADA2', 'ANOTACIÓN2', 'FECHA LLAMADA3', 'ANOTACIÓN3', 'ANOTACIÓN4', 'DIAG', 'Diag %', 'MCER', 'ESTADO MATRICULA', '13-may', '20-may', '27-may', '03-jun', '10-jun', '08-jul', '15-jul', '22-jul', '29-jul', '05-ago', '12-ago', 'ESTADO ETAPA 1', 'Jornada 2023.1', 'Sede Nodal 2023.1', 'Docente 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'CODIGO SAP', 'ID GRUPO', 'ESTADO MATRÍCULA ETAPA 2', '19-ago', '26-ago', '02-sep', '09-sep', '16-sep', '23-sep', '30-sep', '07-oct', '21-oct', '04-nov', 'ESTADO ETAPA 2', 'CERTIFICADO', 'DIAG2', 'Diag %2', 'MCER2', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRUPO ']
+2025-10-28 04:36:41,516 - __main__ - INFO - PERSONA_ID ya existe en Sedes_instituciones
+2025-10-28 04:36:41,926 - __main__ - INFO - Inserted 8 Tipo_documentos (if any)
+2025-10-28 04:36:41,952 - __main__ - INFO - Inserted 1 Ciudades
+2025-10-28 04:36:41,980 - __main__ - INFO - Inserted 147 Instituciones_educativas
+2025-10-28 04:40:17,474 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:40:17,512 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:40:17,684 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2023.csv
+2025-10-28 04:40:17,723 - __main__ - INFO - Columnas CSV: ['#', 'TIPO DE IDENTIFICACIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NOMBRES', 'APELLIDOS', 'FECHA DE NACIMIENTO', 'EDAD', 'TELÉFONO 1', 'TELÉFONO 2', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2022', 'Grado 2022', 'MCER (diagnóstico)', 'MCER (diagnóstico)2', 'NIVEL 2022-1', 'NIVEL 2022-2', 'POBLACIÓN 2022', 'Día', 'Jornada', 'SEDE NODAL 2022', 'GRUPO PMB 2022', 'DOCENTE PMB 2022', 'ESTADO 2022', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Nivel 2023- ETAPA 1', 'Día 2023', 'Jornada 2023', 'Sede Nodal 2023', 'Docente 2023', 'FECHA LLAMADA', 'ANOTACIÓN', 'FECHA LLAMADA2', 'ANOTACIÓN2', 'FECHA LLAMADA3', 'ANOTACIÓN3', 'ANOTACIÓN4', 'DIAG', 'Diag %', 'MCER', 'ESTADO MATRICULA', '13-may', '20-may', '27-may', '03-jun', '10-jun', '08-jul', '15-jul', '22-jul', '29-jul', '05-ago', '12-ago', 'ESTADO ETAPA 1', 'Jornada 2023.1', 'Sede Nodal 2023.1', 'Docente 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'CODIGO SAP', 'ID GRUPO', 'ESTADO MATRÍCULA ETAPA 2', '19-ago', '26-ago', '02-sep', '09-sep', '16-sep', '23-sep', '30-sep', '07-oct', '21-oct', '04-nov', 'ESTADO ETAPA 2', 'CERTIFICADO', 'DIAG2', 'Diag %2', 'MCER2', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRUPO ']
+2025-10-28 04:40:17,756 - __main__ - INFO - PERSONA_ID ya existe en Sedes_instituciones
+2025-10-28 04:40:17,767 - __main__ - INFO - Inserted 0 Tipo_documentos (if any)
+2025-10-28 04:40:17,786 - __main__ - INFO - Inserted 0 Ciudades
+2025-10-28 04:40:17,819 - __main__ - INFO - Inserted 2 Instituciones_educativas
+2025-10-28 04:40:55,974 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:40:55,994 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:40:56,116 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2023.csv
+2025-10-28 04:40:56,145 - __main__ - INFO - Columnas CSV: ['#', 'TIPO DE IDENTIFICACIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NOMBRES', 'APELLIDOS', 'FECHA DE NACIMIENTO', 'EDAD', 'TELÉFONO 1', 'TELÉFONO 2', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2022', 'Grado 2022', 'MCER (diagnóstico)', 'MCER (diagnóstico)2', 'NIVEL 2022-1', 'NIVEL 2022-2', 'POBLACIÓN 2022', 'Día', 'Jornada', 'SEDE NODAL 2022', 'GRUPO PMB 2022', 'DOCENTE PMB 2022', 'ESTADO 2022', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Nivel 2023- ETAPA 1', 'Día 2023', 'Jornada 2023', 'Sede Nodal 2023', 'Docente 2023', 'FECHA LLAMADA', 'ANOTACIÓN', 'FECHA LLAMADA2', 'ANOTACIÓN2', 'FECHA LLAMADA3', 'ANOTACIÓN3', 'ANOTACIÓN4', 'DIAG', 'Diag %', 'MCER', 'ESTADO MATRICULA', '13-may', '20-may', '27-may', '03-jun', '10-jun', '08-jul', '15-jul', '22-jul', '29-jul', '05-ago', '12-ago', 'ESTADO ETAPA 1', 'Jornada 2023.1', 'Sede Nodal 2023.1', 'Docente 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'CODIGO SAP', 'ID GRUPO', 'ESTADO MATRÍCULA ETAPA 2', '19-ago', '26-ago', '02-sep', '09-sep', '16-sep', '23-sep', '30-sep', '07-oct', '21-oct', '04-nov', 'ESTADO ETAPA 2', 'CERTIFICADO', 'DIAG2', 'Diag %2', 'MCER2', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRUPO ']
+2025-10-28 04:40:56,161 - __main__ - INFO - PERSONA_ID ya existe en Sedes_instituciones
+2025-10-28 04:40:56,168 - __main__ - INFO - Inserted 0 Tipo_documentos (if any)
+2025-10-28 04:40:56,182 - __main__ - INFO - Inserted 0 Ciudades
+2025-10-28 04:40:56,216 - __main__ - INFO - Inserted 2 Instituciones_educativas
+2025-10-28 04:40:56,884 - __main__ - INFO - Adding column TIPO_DOCUMENTO_ID to Personas
+2025-10-28 04:40:56,938 - __main__ - INFO - Adding column NIVEL_MCER_ID to Personas
+2025-10-28 04:40:56,960 - __main__ - INFO - Adding column CIUDAD_ID to Personas
+2025-10-28 04:41:26,450 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:41:26,467 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:41:26,555 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2023.csv
+2025-10-28 04:41:26,578 - __main__ - INFO - Columnas CSV: ['#', 'TIPO DE IDENTIFICACIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NOMBRES', 'APELLIDOS', 'FECHA DE NACIMIENTO', 'EDAD', 'TELÉFONO 1', 'TELÉFONO 2', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2022', 'Grado 2022', 'MCER (diagnóstico)', 'MCER (diagnóstico)2', 'NIVEL 2022-1', 'NIVEL 2022-2', 'POBLACIÓN 2022', 'Día', 'Jornada', 'SEDE NODAL 2022', 'GRUPO PMB 2022', 'DOCENTE PMB 2022', 'ESTADO 2022', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Nivel 2023- ETAPA 1', 'Día 2023', 'Jornada 2023', 'Sede Nodal 2023', 'Docente 2023', 'FECHA LLAMADA', 'ANOTACIÓN', 'FECHA LLAMADA2', 'ANOTACIÓN2', 'FECHA LLAMADA3', 'ANOTACIÓN3', 'ANOTACIÓN4', 'DIAG', 'Diag %', 'MCER', 'ESTADO MATRICULA', '13-may', '20-may', '27-may', '03-jun', '10-jun', '08-jul', '15-jul', '22-jul', '29-jul', '05-ago', '12-ago', 'ESTADO ETAPA 1', 'Jornada 2023.1', 'Sede Nodal 2023.1', 'Docente 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'CODIGO SAP', 'ID GRUPO', 'ESTADO MATRÍCULA ETAPA 2', '19-ago', '26-ago', '02-sep', '09-sep', '16-sep', '23-sep', '30-sep', '07-oct', '21-oct', '04-nov', 'ESTADO ETAPA 2', 'CERTIFICADO', 'DIAG2', 'Diag %2', 'MCER2', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRUPO ']
+2025-10-28 04:41:26,593 - __main__ - INFO - PERSONA_ID ya existe en Sedes_instituciones
+2025-10-28 04:41:26,599 - __main__ - INFO - Inserted 0 Tipo_documentos (if any)
+2025-10-28 04:41:26,611 - __main__ - INFO - Inserted 0 Ciudades
+2025-10-28 04:41:26,671 - __main__ - INFO - Inserted 2 Instituciones_educativas
+2025-10-28 04:41:58,024 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:41:58,039 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:41:58,139 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2023.csv
+2025-10-28 04:41:58,162 - __main__ - INFO - Columnas CSV: ['#', 'TIPO DE IDENTIFICACIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NOMBRES', 'APELLIDOS', 'FECHA DE NACIMIENTO', 'EDAD', 'TELÉFONO 1', 'TELÉFONO 2', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2022', 'Grado 2022', 'MCER (diagnóstico)', 'MCER (diagnóstico)2', 'NIVEL 2022-1', 'NIVEL 2022-2', 'POBLACIÓN 2022', 'Día', 'Jornada', 'SEDE NODAL 2022', 'GRUPO PMB 2022', 'DOCENTE PMB 2022', 'ESTADO 2022', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Nivel 2023- ETAPA 1', 'Día 2023', 'Jornada 2023', 'Sede Nodal 2023', 'Docente 2023', 'FECHA LLAMADA', 'ANOTACIÓN', 'FECHA LLAMADA2', 'ANOTACIÓN2', 'FECHA LLAMADA3', 'ANOTACIÓN3', 'ANOTACIÓN4', 'DIAG', 'Diag %', 'MCER', 'ESTADO MATRICULA', '13-may', '20-may', '27-may', '03-jun', '10-jun', '08-jul', '15-jul', '22-jul', '29-jul', '05-ago', '12-ago', 'ESTADO ETAPA 1', 'Jornada 2023.1', 'Sede Nodal 2023.1', 'Docente 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'CODIGO SAP', 'ID GRUPO', 'ESTADO MATRÍCULA ETAPA 2', '19-ago', '26-ago', '02-sep', '09-sep', '16-sep', '23-sep', '30-sep', '07-oct', '21-oct', '04-nov', 'ESTADO ETAPA 2', 'CERTIFICADO', 'DIAG2', 'Diag %2', 'MCER2', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRUPO ']
+2025-10-28 04:41:58,178 - __main__ - INFO - PERSONA_ID ya existe en Sedes_instituciones
+2025-10-28 04:41:58,185 - __main__ - INFO - Inserted 0 Tipo_documentos (if any)
+2025-10-28 04:41:58,198 - __main__ - INFO - Inserted 0 Ciudades
+2025-10-28 04:41:58,231 - __main__ - INFO - Inserted 2 Instituciones_educativas
+2025-10-28 04:41:58,904 - __main__ - INFO - Inserted 700 new Personas
+2025-10-28 04:41:58,904 - __main__ - INFO - Upsert process finished
+2025-10-28 04:42:09,797 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:42:09,811 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:42:09,832 - __main__ - ERROR - Error creating FK fk_personas_tipo_documento: (mysql.connector.errors.DatabaseError) 3780 (HY000): Referencing column 'TIPO_DOCUMENTO_ID' and referenced column 'ID' in foreign key constraint 'fk_personas_tipo_documento' are incompatible.
+[SQL: ALTER TABLE Personas ADD CONSTRAINT fk_personas_tipo_documento FOREIGN KEY (TIPO_DOCUMENTO_ID) REFERENCES Tipo_documentos(ID)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-10-28 04:42:09,843 - __main__ - ERROR - Error creating FK fk_personas_nivel_mcer: (mysql.connector.errors.DatabaseError) 3780 (HY000): Referencing column 'NIVEL_MCER_ID' and referenced column 'ID' in foreign key constraint 'fk_personas_nivel_mcer' are incompatible.
+[SQL: ALTER TABLE Personas ADD CONSTRAINT fk_personas_nivel_mcer FOREIGN KEY (NIVEL_MCER_ID) REFERENCES Nivel_MCER(ID)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-10-28 04:42:09,853 - __main__ - ERROR - Error creating FK fk_personas_ciudad: (mysql.connector.errors.DatabaseError) 3780 (HY000): Referencing column 'CIUDAD_ID' and referenced column 'ID' in foreign key constraint 'fk_personas_ciudad' are incompatible.
+[SQL: ALTER TABLE Personas ADD CONSTRAINT fk_personas_ciudad FOREIGN KEY (CIUDAD_ID) REFERENCES Ciudades(ID)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-10-28 04:42:09,859 - __main__ - ERROR - Cannot create FK fk_cursos_nivel_mcer: 1 orphan values found in Cursos.NIVEL_MCER_ID
+2025-10-28 04:42:09,861 - __main__ - ERROR - Sample orphan values: ['SIN DIAGNOSTICO']
+2025-10-28 04:42:09,864 - __main__ - WARNING - Column CURSO_ID not found in Sedes_instituciones, skipping FK fk_sedes_curso
+2025-10-28 04:42:09,866 - __main__ - WARNING - Column INSTITUCION_EDUCATIVA_ID not found in Sedes_instituciones, skipping FK fk_sedes_institucion
+2025-10-28 04:42:09,877 - __main__ - ERROR - Error creating FK fk_sedes_persona: (mysql.connector.errors.ProgrammingError) 1170 (42000): BLOB/TEXT column 'PERSONA_ID' used in key specification without a key length
+[SQL: ALTER TABLE Sedes_instituciones ADD CONSTRAINT fk_sedes_persona FOREIGN KEY (PERSONA_ID) REFERENCES Personas(NUMERO_DOCUMENTO)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:42:25,489 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:42:25,504 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:43:29,539 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:43:29,555 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:50:28,336 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:50:28,354 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:50:28,444 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 04:50:28,495 - __main__ - INFO - Renamed Tipo_documentos to Tipo_documentos_old
+2025-10-28 04:50:28,518 - __main__ - INFO - Renamed Nivel_MCER to Nivel_MCER_old
+2025-10-28 04:50:28,546 - __main__ - INFO - Renamed Ciudades to Ciudades_old
+2025-10-28 04:50:28,569 - __main__ - INFO - Renamed Instituciones_educativas to Instituciones_educativas_old
+2025-10-28 04:50:28,592 - __main__ - INFO - Renamed Cursos to Cursos_old
+2025-10-28 04:50:28,618 - __main__ - INFO - Renamed Personas to Personas_old
+2025-10-28 04:50:28,640 - __main__ - INFO - Renamed Sedes_instituciones to Sedes_instituciones_old
+2025-10-28 04:50:28,907 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 04:50:28,907 - __main__ - WARNING - Could not insert defaults into Tipo_documentos: List argument must consist only of dictionaries
+2025-10-28 04:50:28,907 - __main__ - WARNING - Could not insert defaults into Nivel_MCER: List argument must consist only of dictionaries
+2025-10-28 04:50:28,908 - __main__ - WARNING - Could not insert defaults into Ciudades: List argument must consist only of dictionaries
+2025-10-28 04:50:28,932 - __main__ - INFO - Migrated 19 Tipo_documentos
+2025-10-28 04:51:34,834 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:51:34,862 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:51:34,979 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 04:51:34,992 - __main__ - WARNING - Could not rename Tipo_documentos: (mysql.connector.errors.ProgrammingError) 1050 (42S01): Table 'Tipo_documentos_old' already exists
+[SQL: RENAME TABLE Tipo_documentos TO Tipo_documentos_old]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:51:34,994 - __main__ - WARNING - Could not rename Nivel_MCER: (mysql.connector.errors.ProgrammingError) 1050 (42S01): Table 'Nivel_MCER_old' already exists
+[SQL: RENAME TABLE Nivel_MCER TO Nivel_MCER_old]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:51:34,999 - __main__ - WARNING - Could not rename Ciudades: (mysql.connector.errors.ProgrammingError) 1050 (42S01): Table 'Ciudades_old' already exists
+[SQL: RENAME TABLE Ciudades TO Ciudades_old]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:51:35,002 - __main__ - WARNING - Could not rename Instituciones_educativas: (mysql.connector.errors.ProgrammingError) 1050 (42S01): Table 'Instituciones_educativas_old' already exists
+[SQL: RENAME TABLE Instituciones_educativas TO Instituciones_educativas_old]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:51:35,004 - __main__ - WARNING - Could not rename Cursos: (mysql.connector.errors.ProgrammingError) 1050 (42S01): Table 'Cursos_old' already exists
+[SQL: RENAME TABLE Cursos TO Cursos_old]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:51:35,008 - __main__ - WARNING - Could not rename Personas: (mysql.connector.errors.ProgrammingError) 1050 (42S01): Table 'Personas_old' already exists
+[SQL: RENAME TABLE Personas TO Personas_old]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:51:35,010 - __main__ - WARNING - Could not rename Sedes_instituciones: (mysql.connector.errors.ProgrammingError) 1050 (42S01): Table 'Sedes_instituciones_old' already exists
+[SQL: RENAME TABLE Sedes_instituciones TO Sedes_instituciones_old]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:51:35,030 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 04:51:35,030 - __main__ - WARNING - Could not insert defaults into Tipo_documentos: List argument must consist only of dictionaries
+2025-10-28 04:51:35,030 - __main__ - WARNING - Could not insert defaults into Nivel_MCER: List argument must consist only of dictionaries
+2025-10-28 04:51:35,031 - __main__ - WARNING - Could not insert defaults into Ciudades: List argument must consist only of dictionaries
+2025-10-28 04:52:07,633 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:52:07,648 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:52:07,740 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 04:52:07,779 - __main__ - INFO - Dropped Sedes_instituciones if existed
+2025-10-28 04:52:07,800 - __main__ - INFO - Dropped Cursos if existed
+2025-10-28 04:52:07,828 - __main__ - INFO - Dropped Personas if existed
+2025-10-28 04:52:07,850 - __main__ - INFO - Dropped Instituciones_educativas if existed
+2025-10-28 04:52:07,869 - __main__ - INFO - Dropped Ciudades if existed
+2025-10-28 04:52:07,891 - __main__ - INFO - Dropped Nivel_MCER if existed
+2025-10-28 04:52:07,917 - __main__ - INFO - Dropped Tipo_documentos if existed
+2025-10-28 04:52:08,169 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 04:52:08,170 - __main__ - WARNING - Could not insert defaults into Tipo_documentos: List argument must consist only of dictionaries
+2025-10-28 04:52:08,170 - __main__ - WARNING - Could not insert defaults into Nivel_MCER: List argument must consist only of dictionaries
+2025-10-28 04:52:08,170 - __main__ - WARNING - Could not insert defaults into Ciudades: List argument must consist only of dictionaries
+2025-10-28 04:52:08,194 - __main__ - INFO - Migrated 19 Tipo_documentos
+2025-10-28 04:52:08,215 - __main__ - INFO - Migrated 15 Nivel_MCER
+2025-10-28 04:52:08,234 - __main__ - INFO - Migrated 10 Ciudades
+2025-10-28 04:52:08,342 - __main__ - INFO - Migrated 295 Instituciones_educativas
+2025-10-28 04:52:08,727 - __main__ - INFO - Migrated 1720 Personas
+2025-10-28 04:52:08,747 - __main__ - INFO - Migrated 2 Cursos
+2025-10-28 04:52:08,975 - __main__ - INFO - Migrated 1020 Sedes_instituciones
+2025-10-28 04:52:08,977 - __main__ - INFO - Personas sin TIPO_DOCUMENTO_ID válido: 1040 registros
+2025-10-28 04:52:08,980 - __main__ - INFO - Personas sin NIVEL_MCER_ID válido: 1020 registros
+2025-10-28 04:52:08,982 - __main__ - INFO - Personas sin CIUDAD_ID válido: 1022 registros
+2025-10-28 04:52:08,983 - __main__ - INFO - Cursos sin NIVEL_MCER_ID válido: 0 registros
+2025-10-28 04:52:08,985 - __main__ - INFO - Sedes_instituciones con PERSONA_ID inválido: 0 registros
+2025-10-28 04:52:08,987 - __main__ - INFO - Database rebuild complete
+2025-10-28 04:53:51,528 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:53:51,545 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:53:51,630 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 04:53:51,689 - __main__ - INFO - Dropped Sedes_instituciones if existed
+2025-10-28 04:53:51,712 - __main__ - INFO - Dropped Cursos if existed
+2025-10-28 04:53:51,739 - __main__ - INFO - Dropped Personas if existed
+2025-10-28 04:53:51,764 - __main__ - INFO - Dropped Instituciones_educativas if existed
+2025-10-28 04:53:51,797 - __main__ - INFO - Dropped Ciudades if existed
+2025-10-28 04:53:51,820 - __main__ - INFO - Dropped Nivel_MCER if existed
+2025-10-28 04:53:51,840 - __main__ - INFO - Dropped Tipo_documentos if existed
+2025-10-28 04:53:52,118 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 04:53:52,121 - __main__ - INFO - Inserted default value into Tipo_documentos
+2025-10-28 04:53:52,125 - __main__ - INFO - Inserted default value into Nivel_MCER
+2025-10-28 04:53:52,128 - __main__ - INFO - Inserted default value into Ciudades
+2025-10-28 04:54:57,698 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:54:57,715 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:54:57,807 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 04:54:57,851 - __main__ - INFO - Dropped Sedes_instituciones if existed
+2025-10-28 04:54:57,872 - __main__ - INFO - Dropped Cursos if existed
+2025-10-28 04:54:57,893 - __main__ - INFO - Dropped Personas if existed
+2025-10-28 04:54:57,914 - __main__ - INFO - Dropped Instituciones_educativas if existed
+2025-10-28 04:54:57,931 - __main__ - INFO - Dropped Ciudades if existed
+2025-10-28 04:54:57,951 - __main__ - INFO - Dropped Nivel_MCER if existed
+2025-10-28 04:54:57,969 - __main__ - INFO - Dropped Tipo_documentos if existed
+2025-10-28 04:54:58,219 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 04:54:58,222 - __main__ - INFO - Inserted default value into Tipo_documentos
+2025-10-28 04:54:58,224 - __main__ - INFO - Inserted default value into Nivel_MCER
+2025-10-28 04:54:58,228 - __main__ - INFO - Inserted default value into Ciudades
+2025-10-28 04:54:58,259 - __main__ - INFO - Migrated 19 Tipo_documentos
+2025-10-28 04:54:58,280 - __main__ - INFO - Migrated 15 Nivel_MCER
+2025-10-28 04:54:58,297 - __main__ - INFO - Migrated 10 Ciudades
+2025-10-28 04:54:58,390 - __main__ - INFO - Migrated 295 Instituciones_educativas
+2025-10-28 04:54:58,753 - __main__ - INFO - Migrated 1699 Personas
+2025-10-28 04:54:58,771 - __main__ - INFO - Migrated 2 Cursos
+2025-10-28 04:54:58,874 - __main__ - INFO - Migrated 0 Sedes_instituciones
+2025-10-28 04:54:58,877 - __main__ - INFO - Personas sin TIPO_DOCUMENTO_ID válido: 0 registros
+2025-10-28 04:54:58,880 - __main__ - INFO - Personas sin NIVEL_MCER_ID válido: 0 registros
+2025-10-28 04:54:58,882 - __main__ - INFO - Personas sin CIUDAD_ID válido: 0 registros
+2025-10-28 04:54:58,884 - __main__ - INFO - Cursos sin NIVEL_MCER_ID válido: 0 registros
+2025-10-28 04:54:58,886 - __main__ - INFO - Sedes_instituciones con PERSONA_ID inválido: 0 registros
+2025-10-28 04:54:58,887 - __main__ - INFO - Database rebuild complete
+2025-10-28 04:55:13,200 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:55:13,215 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:56:29,634 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:56:29,651 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:56:29,738 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 04:56:29,788 - __main__ - INFO - Dropped Sedes_instituciones if existed
+2025-10-28 04:56:29,811 - __main__ - INFO - Dropped Cursos if existed
+2025-10-28 04:56:29,836 - __main__ - INFO - Dropped Personas if existed
+2025-10-28 04:56:29,858 - __main__ - INFO - Dropped Instituciones_educativas if existed
+2025-10-28 04:56:29,882 - __main__ - INFO - Dropped Ciudades if existed
+2025-10-28 04:56:29,908 - __main__ - INFO - Dropped Nivel_MCER if existed
+2025-10-28 04:56:29,930 - __main__ - INFO - Dropped Tipo_documentos if existed
+2025-10-28 04:56:30,196 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 04:56:30,198 - __main__ - INFO - Inserted default value into Tipo_documentos
+2025-10-28 04:56:30,201 - __main__ - INFO - Inserted default value into Nivel_MCER
+2025-10-28 04:56:30,204 - __main__ - INFO - Inserted default value into Ciudades
+2025-10-28 04:56:30,214 - __main__ - INFO - Inserted default Persona record
+2025-10-28 04:56:30,248 - __main__ - INFO - Migrated 19 Tipo_documentos
+2025-10-28 04:56:30,271 - __main__ - INFO - Migrated 15 Nivel_MCER
+2025-10-28 04:56:30,293 - __main__ - INFO - Migrated 10 Ciudades
+2025-10-28 04:56:30,405 - __main__ - INFO - Migrated 295 Instituciones_educativas
+2025-10-28 04:56:30,747 - __main__ - INFO - Migrated 1699 Personas
+2025-10-28 04:56:30,766 - __main__ - INFO - Migrated 2 Cursos
+2025-10-28 04:57:51,382 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:57:51,396 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 04:57:51,478 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 04:57:51,526 - __main__ - INFO - Dropped Sedes_instituciones if existed
+2025-10-28 04:57:51,548 - __main__ - INFO - Dropped Cursos if existed
+2025-10-28 04:57:51,575 - __main__ - INFO - Dropped Personas if existed
+2025-10-28 04:57:51,596 - __main__ - INFO - Dropped Instituciones_educativas if existed
+2025-10-28 04:57:51,615 - __main__ - INFO - Dropped Ciudades if existed
+2025-10-28 04:57:51,636 - __main__ - INFO - Dropped Nivel_MCER if existed
+2025-10-28 04:57:51,656 - __main__ - INFO - Dropped Tipo_documentos if existed
+2025-10-28 04:57:51,909 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 04:57:51,912 - __main__ - INFO - Inserted default value into Tipo_documentos
+2025-10-28 04:57:51,915 - __main__ - INFO - Inserted default value into Nivel_MCER
+2025-10-28 04:57:51,917 - __main__ - INFO - Inserted default value into Ciudades
+2025-10-28 04:57:51,934 - __main__ - INFO - Created default Persona record
+2025-10-28 04:57:51,961 - __main__ - INFO - Migrated 19 Tipo_documentos
+2025-10-28 04:57:51,983 - __main__ - INFO - Migrated 15 Nivel_MCER
+2025-10-28 04:57:51,999 - __main__ - INFO - Migrated 10 Ciudades
+2025-10-28 04:57:52,112 - __main__ - INFO - Migrated 295 Instituciones_educativas
+2025-10-28 04:57:52,441 - __main__ - INFO - Migrated 1699 Personas
+2025-10-28 04:57:52,460 - __main__ - INFO - Migrated 2 Cursos
+2025-10-28 04:58:25,959 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 04:58:25,972 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 05:00:23,738 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 05:00:23,752 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 05:00:23,835 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 05:00:23,878 - __main__ - INFO - Dropped Sedes_instituciones if existed
+2025-10-28 05:00:23,898 - __main__ - INFO - Dropped Cursos if existed
+2025-10-28 05:00:23,925 - __main__ - INFO - Dropped Personas if existed
+2025-10-28 05:00:23,944 - __main__ - INFO - Dropped Instituciones_educativas if existed
+2025-10-28 05:00:23,963 - __main__ - INFO - Dropped Ciudades if existed
+2025-10-28 05:00:23,981 - __main__ - INFO - Dropped Nivel_MCER if existed
+2025-10-28 05:00:23,999 - __main__ - INFO - Dropped Tipo_documentos if existed
+2025-10-28 05:00:24,246 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 05:00:24,248 - __main__ - INFO - Inserted default value into Tipo_documentos
+2025-10-28 05:00:24,251 - __main__ - INFO - Inserted default value into Nivel_MCER
+2025-10-28 05:00:24,253 - __main__ - INFO - Inserted default value into Ciudades
+2025-10-28 05:00:24,272 - __main__ - ERROR - Failed to create default person: Could not create default person with NUMERO_DOCUMENTO = 0
+2025-10-28 05:00:37,455 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 05:00:37,469 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 05:01:30,630 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 05:01:30,645 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 05:01:30,739 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 05:01:30,774 - __main__ - INFO - Dropped Sedes_instituciones if existed
+2025-10-28 05:01:30,794 - __main__ - INFO - Dropped Cursos if existed
+2025-10-28 05:01:30,817 - __main__ - INFO - Dropped Personas if existed
+2025-10-28 05:01:30,837 - __main__ - INFO - Dropped Instituciones_educativas if existed
+2025-10-28 05:01:30,859 - __main__ - INFO - Dropped Ciudades if existed
+2025-10-28 05:01:30,878 - __main__ - INFO - Dropped Nivel_MCER if existed
+2025-10-28 05:01:30,898 - __main__ - INFO - Dropped Tipo_documentos if existed
+2025-10-28 05:01:31,152 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 05:01:31,155 - __main__ - INFO - Inserted default value into Tipo_documentos
+2025-10-28 05:01:31,158 - __main__ - INFO - Inserted default value into Nivel_MCER
+2025-10-28 05:01:31,160 - __main__ - INFO - Inserted default value into Ciudades
+2025-10-28 05:01:31,174 - __main__ - INFO - Created default person with NUMERO_DOCUMENTO = 0
+2025-10-28 05:01:31,196 - __main__ - INFO - Migrated 18 Tipo_documentos
+2025-10-28 05:01:31,214 - __main__ - INFO - Migrated 14 Nivel_MCER
+2025-10-28 05:01:31,232 - __main__ - INFO - Migrated 10 Ciudades
+2025-10-28 05:01:31,324 - __main__ - INFO - Migrated 285 Instituciones_educativas
+2025-10-28 05:01:32,705 - __main__ - INFO - Migrated 1699 Personas
+2025-10-28 05:01:32,723 - __main__ - INFO - Migrated 2 Cursos
+2025-10-28 05:01:33,543 - __main__ - INFO - Migrated 1020 Sedes_instituciones
+2025-10-28 05:01:33,546 - __main__ - INFO - Personas sin TIPO_DOCUMENTO_ID válido: 0 registros
+2025-10-28 05:01:33,548 - __main__ - INFO - Personas sin NIVEL_MCER_ID válido: 0 registros
+2025-10-28 05:01:33,551 - __main__ - INFO - Personas sin CIUDAD_ID válido: 0 registros
+2025-10-28 05:01:33,553 - __main__ - INFO - Cursos sin NIVEL_MCER_ID válido: 0 registros
+2025-10-28 05:01:33,554 - __main__ - INFO - Sedes_instituciones con PERSONA_ID inválido: 0 registros
+2025-10-28 05:01:33,555 - __main__ - INFO - Database rebuild complete
+2025-10-28 05:16:28,835 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-28 05:16:28,856 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-28 05:16:28,964 - __main__ - INFO - Starting database rebuild process...
+2025-10-28 05:16:29,011 - __main__ - INFO - Dropped Sedes_instituciones if existed
+2025-10-28 05:16:29,032 - __main__ - INFO - Dropped Cursos if existed
+2025-10-28 05:16:29,055 - __main__ - INFO - Dropped Personas if existed
+2025-10-28 05:16:29,077 - __main__ - INFO - Dropped Instituciones_educativas if existed
+2025-10-28 05:16:29,100 - __main__ - INFO - Dropped Ciudades if existed
+2025-10-28 05:16:29,120 - __main__ - INFO - Dropped Nivel_MCER if existed
+2025-10-28 05:16:29,139 - __main__ - INFO - Dropped Tipo_documentos if existed
+2025-10-28 05:16:29,407 - __main__ - INFO - Created new tables with proper types and constraints
+2025-10-28 05:16:29,410 - __main__ - INFO - Inserted default value into Tipo_documentos
+2025-10-28 05:16:29,412 - __main__ - INFO - Inserted default value into Nivel_MCER
+2025-10-28 05:16:29,415 - __main__ - INFO - Inserted default value into Ciudades
+2025-10-28 05:16:29,431 - __main__ - INFO - Created default person with ID 1
+2025-10-28 05:16:29,456 - __main__ - INFO - Migrated 18 Tipo_documentos
+2025-10-28 05:16:29,477 - __main__ - INFO - Migrated 14 Nivel_MCER
+2025-10-28 05:16:29,497 - __main__ - INFO - Migrated 10 Ciudades
+2025-10-28 05:16:29,590 - __main__ - INFO - Migrated 285 Instituciones_educativas
+2025-10-28 05:16:30,899 - __main__ - INFO - Migrated 1699 Personas
+2025-10-28 05:16:30,929 - __main__ - INFO - Migrated 2 Cursos
+2025-10-28 05:16:31,672 - __main__ - INFO - Migrated 1020 Sedes_instituciones
+2025-10-28 05:16:31,674 - __main__ - INFO - Personas sin TIPO_DOCUMENTO_ID válido: 0 registros
+2025-10-28 05:16:31,676 - __main__ - INFO - Personas sin NIVEL_MCER_ID válido: 0 registros
+2025-10-28 05:16:31,679 - __main__ - INFO - Personas sin CIUDAD_ID válido: 0 registros
+2025-10-28 05:16:31,680 - __main__ - INFO - Cursos sin NIVEL_MCER_ID válido: 0 registros
+2025-10-28 05:16:31,682 - __main__ - INFO - Sedes_instituciones con PERSONA_ID inválido: 0 registros
+2025-10-28 05:16:31,684 - __main__ - INFO - Database rebuild complete

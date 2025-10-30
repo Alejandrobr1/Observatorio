@@ -1,0 +1,45 @@
+2025-10-25 16:59:34,775 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-25 16:59:34,933 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-25 17:03:56,035 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-25 17:03:56,058 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-25 17:46:18,004 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-25 17:46:18,044 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-25 19:04:22,582 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-25 19:04:22,650 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-25 19:04:22,677 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2025.csv
+2025-10-25 19:04:22,738 - __main__ - INFO - Processing reference tables...
+2025-10-25 19:04:22,772 - __main__ - INFO - Columnas disponibles en el DataFrame: ['CODIGO SEDE-POBL-NIVEL-DOC', '#', 'TIPO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'NOMBRES2', 'APELLIDOS', 'TELÉFONO 1', 'TELÉFONO 2', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'FECHA DE NACIMIENTO', 'EDAD', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Sede Nodal 2023', 'Sede Nodal 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'ESTADO ETAPA 2', 'CERTIFICADO', 'INSTITUCIÓN EDUCATIVA 2025', 'SEDE 2025', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRADO 2025', 'SEDE NODAL 2025', 'POBLACIÓN', 'NIVEL ETAPA 1 - 2025', 'NIVEL ETAPA 2 - 2025', 'JORNADA ETAPA 2025', 'DOCENTE - 2025', 'GRUPO - 2025', 'CATEGORÍA', 'ESTADO DEL ESTUDIANTE 2025', 'ESTADO MATRÍCULA 2025', '19-jul', '26-jul', '28-jul', '29-jul', '30-jul', '31-jul', '02-ago', '04-ago', '05-ago', '09-ago', '11-ago', '12-ago', '13-ago', '14-ago', '16-ago', '19-ago', '20-ago', '21-ago', '23-ago', '25-ago', '26-ago', '27-ago', '28-ago', '30-ago', '01-sep', '02-sep', '03-sep', '04-sep', '06-sep', '08-sep', '09-sep', '10-sep', '11-sep', '13-sep', '15-sep', '16-sep', 'ESTADO FINAL ETAPA 1', 'ENTREGA CONSENTIMIENTO INFORMADO', 'ENTREGA COPIA DE DOCUMENTO DE IDENTIFICACIÓN', '17-sep', '18-sep', '20-sep', '22-sep', '23-sep', '24-sep', '25-sep', '27-sep', '29-sep', '30-sep', '01-oct', '02-oct', '04-oct', '14-oct', '14-oct.1', '15-oct', '16-oct', '18-oct', '20-oct', '21-oct', '22-oct', '23-oct', '25-oct', '27-oct', '28-oct', '29-oct', '30-oct', '01-nov', '04-nov', '05-nov', '06-nov', '08-nov', '10-nov', '11-nov', '12-nov', '13-nov', '15-nov', '22-nov', 'ESTADO ETAPA 2.1', 'CERTIFICADO 2025', 'OBSERVACIONES LLAMADA 1', 'OBSERVACIONES LLAMADA 2', 'LLAMADAS', 'OBSERVACIONES', 'OBSERVACIONES LLAMADAS DE SEGUIMIENTO', 'OBSERVACION A DOCUMENTO', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL']
+2025-10-25 19:04:22,817 - __main__ - INFO - Processing main tables...
+2025-10-25 19:04:22,825 - __main__ - INFO - Preparando datos de Personas...
+2025-10-25 19:04:22,838 - __main__ - WARNING - Documentos inválidos encontrados: [nan, nan, nan, nan, nan, nan, nan, nan]
+2025-10-25 19:04:22,845 - __main__ - WARNING - Columna FECHA_NACIMIENTO no encontrada
+2025-10-25 19:04:22,851 - __main__ - ERROR - Registros con NOMBRES2 faltante: 8
+2025-10-25 19:04:22,854 - __main__ - ERROR - Registros con APELLIDOS faltante: 8
+2025-10-25 19:04:22,857 - __main__ - ERROR - Registros con NUMERO_DOCUMENTO faltante: 8
+2025-10-25 19:04:22,873 - __main__ - WARNING - Correos electrónicos inválidos encontrados: ['no tiene', 'solmilena 1234@gmail.com', 'lissac1989gmail.com', 'laura.c1020@outlook. es', 'x.londoñodelgado@gmail.com', 'pendiente', 'no tiene', 'wilderberriozapatagmail.com', '1095180757', 'pendiente', 'pendiente', 'ruamuñozsofia@gmail.com']
+2025-10-25 19:04:22,894 - __main__ - WARNING - Teléfonos inválidos en TELEFONO2: ['0', '0']
+2025-10-25 19:04:24,826 - __main__ - INFO - Preparando datos de Sedes_instituciones...
+2025-10-25 19:04:24,830 - __main__ - ERROR - Fatal error during data import: 'FECHA INICIAL'
+2025-10-25 19:06:25,832 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-25 19:06:25,884 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-25 19:06:25,912 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2025.csv
+2025-10-25 19:06:25,979 - __main__ - INFO - Columnas disponibles en el DataFrame: ['CODIGO SEDE-POBL-NIVEL-DOC', '#', 'TIPO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'NOMBRES2', 'APELLIDOS', 'TELÉFONO 1', 'TELÉFONO 2', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'FECHA DE NACIMIENTO', 'EDAD', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Sede Nodal 2023', 'Sede Nodal 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'ESTADO ETAPA 2', 'CERTIFICADO', 'INSTITUCIÓN EDUCATIVA 2025', 'SEDE 2025', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRADO 2025', 'SEDE NODAL 2025', 'POBLACIÓN', 'NIVEL ETAPA 1 - 2025', 'NIVEL ETAPA 2 - 2025', 'JORNADA ETAPA 2025', 'DOCENTE - 2025', 'GRUPO - 2025', 'CATEGORÍA', 'ESTADO DEL ESTUDIANTE 2025', 'ESTADO MATRÍCULA 2025', '19-jul', '26-jul', '28-jul', '29-jul', '30-jul', '31-jul', '02-ago', '04-ago', '05-ago', '09-ago', '11-ago', '12-ago', '13-ago', '14-ago', '16-ago', '19-ago', '20-ago', '21-ago', '23-ago', '25-ago', '26-ago', '27-ago', '28-ago', '30-ago', '01-sep', '02-sep', '03-sep', '04-sep', '06-sep', '08-sep', '09-sep', '10-sep', '11-sep', '13-sep', '15-sep', '16-sep', 'ESTADO FINAL ETAPA 1', 'ENTREGA CONSENTIMIENTO INFORMADO', 'ENTREGA COPIA DE DOCUMENTO DE IDENTIFICACIÓN', '17-sep', '18-sep', '20-sep', '22-sep', '23-sep', '24-sep', '25-sep', '27-sep', '29-sep', '30-sep', '01-oct', '02-oct', '04-oct', '14-oct', '14-oct.1', '15-oct', '16-oct', '18-oct', '20-oct', '21-oct', '22-oct', '23-oct', '25-oct', '27-oct', '28-oct', '29-oct', '30-oct', '01-nov', '04-nov', '05-nov', '06-nov', '08-nov', '10-nov', '11-nov', '12-nov', '13-nov', '15-nov', '22-nov', 'ESTADO ETAPA 2.1', 'CERTIFICADO 2025', 'OBSERVACIONES LLAMADA 1', 'OBSERVACIONES LLAMADA 2', 'LLAMADAS', 'OBSERVACIONES', 'OBSERVACIONES LLAMADAS DE SEGUIMIENTO', 'OBSERVACION A DOCUMENTO', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL']
+2025-10-25 19:06:25,980 - __main__ - INFO - Processing reference tables...
+2025-10-25 19:06:26,003 - __main__ - INFO - Processing main tables...
+2025-10-25 19:06:26,028 - __main__ - WARNING - Documentos inválidos encontrados: [nan, nan, nan, nan, nan, nan, nan, nan]
+2025-10-25 19:06:26,091 - __main__ - WARNING - Fechas de nacimiento inválidas encontradas: [NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT]
+2025-10-25 19:06:26,120 - __main__ - ERROR - Registros con NOMBRES2 faltante: 8
+2025-10-25 19:06:26,143 - __main__ - ERROR - Registros con APELLIDOS faltante: 8
+2025-10-25 19:06:26,162 - __main__ - ERROR - Registros con NUMERO_DOCUMENTO faltante: 8
+2025-10-25 19:06:26,190 - __main__ - WARNING - Correos electrónicos inválidos encontrados: ['no tiene', 'solmilena 1234@gmail.com', 'lissac1989gmail.com', 'laura.c1020@outlook. es', 'x.londoñodelgado@gmail.com', 'pendiente', 'no tiene', 'wilderberriozapatagmail.com', '1095180757', 'pendiente', 'pendiente', 'ruamuñozsofia@gmail.com']
+2025-10-25 19:06:26,202 - __main__ - WARNING - Teléfonos inválidos en TELEFONO2: ['0', '0']
+2025-10-25 19:06:26,207 - __main__ - WARNING - Fechas inválidas en FECHA_INICIAL: [NaT]
+2025-10-25 19:06:26,211 - __main__ - WARNING - Fechas inválidas en FECHA_FINAL: [NaT]
+2025-10-25 19:06:26,231 - __main__ - INFO - Inserting data into database...
+2025-10-25 19:06:26,354 - __main__ - INFO - Successfully inserted 11 rows into Tipo_documentos
+2025-10-25 19:06:26,626 - __main__ - INFO - Successfully inserted 16 rows into Nivel_MCER
+2025-10-25 19:06:26,731 - __main__ - INFO - Successfully inserted 9 rows into Ciudades
+2025-10-25 19:06:26,830 - __main__ - INFO - Successfully inserted 140 rows into Instituciones_educativas
+2025-10-25 19:06:26,891 - __main__ - INFO - Successfully inserted 2 rows into Cursos
+2025-10-25 19:06:27,102 - __main__ - INFO - Successfully inserted 1020 rows into Personas
+2025-10-25 19:06:27,338 - __main__ - INFO - Successfully inserted 1020 rows into Sedes_instituciones

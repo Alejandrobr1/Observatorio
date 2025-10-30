@@ -1,0 +1,379 @@
+2025-10-26 10:14:01,863 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 10:14:01,939 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 10:19:28,568 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 10:19:28,590 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 10:23:51,054 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 10:23:51,072 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 10:32:06,939 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 10:32:06,963 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 10:47:15,593 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 10:47:15,612 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:23:35,595 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:23:35,615 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:23:50,984 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:23:51,007 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:24:03,798 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:24:03,821 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:24:30,062 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:24:30,084 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:24:44,994 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:24:45,013 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:24:58,359 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:24:58,376 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:35:33,328 - Base_datos.conexion - ERROR - Error al conectar a la base de datos: (mysql.connector.errors.ProgrammingError) 1049 (42000): Unknown database 'observatorio_bilinguismo'
+(Background on this error at: https://sqlalche.me/e/20/f405)
+Traceback (most recent call last):
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+_mysql_connector.MySQLInterfaceError: Unknown database 'observatorio_bilinguismo'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 3301, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 711, in checkout
+    rec = pool._do_get()
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\impl.py", line 177, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\impl.py", line 175, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 673, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 899, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\default.py", line 629, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\abstracts.py", line 1604, in connect
+    self._open_connection()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+        err.errno, msg=err.msg, sqlstate=err.sqlstate
+    ) from err
+mysql.connector.errors.ProgrammingError: 1049 (42000): Unknown database 'observatorio_bilinguismo'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\Base_datos\conexion.py", line 16, in <module>
+    with engine.connect() as connection:
+         ~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 3277, in connect
+    return self._connection_cls(self)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        err, dialect, engine
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 2440, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 3301, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 711, in checkout
+    rec = pool._do_get()
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\impl.py", line 177, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\impl.py", line 175, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 673, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 899, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\default.py", line 629, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\abstracts.py", line 1604, in connect
+    self._open_connection()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+        err.errno, msg=err.msg, sqlstate=err.sqlstate
+    ) from err
+sqlalchemy.exc.ProgrammingError: (mysql.connector.errors.ProgrammingError) 1049 (42000): Unknown database 'observatorio_bilinguismo'
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-26 11:35:33,443 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:35:54,839 - conexion - ERROR - Error al conectar a la base de datos: (mysql.connector.errors.ProgrammingError) 1049 (42000): Unknown database 'observatorio_bilinguismo'
+(Background on this error at: https://sqlalche.me/e/20/f405)
+Traceback (most recent call last):
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+_mysql_connector.MySQLInterfaceError: Unknown database 'observatorio_bilinguismo'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 3301, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 711, in checkout
+    rec = pool._do_get()
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\impl.py", line 177, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\impl.py", line 175, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 673, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 899, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\default.py", line 629, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\abstracts.py", line 1604, in connect
+    self._open_connection()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+        err.errno, msg=err.msg, sqlstate=err.sqlstate
+    ) from err
+mysql.connector.errors.ProgrammingError: 1049 (42000): Unknown database 'observatorio_bilinguismo'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\Base_datos\conexion.py", line 16, in <module>
+    with engine.connect() as connection:
+         ~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 3277, in connect
+    return self._connection_cls(self)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        err, dialect, engine
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 2440, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\base.py", line 3301, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 711, in checkout
+    rec = pool._do_get()
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\impl.py", line 177, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\impl.py", line 175, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 673, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 899, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\pool\base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\sqlalchemy\engine\default.py", line 629, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\abstracts.py", line 1604, in connect
+    self._open_connection()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\env\Lib\site-packages\mysql\connector\connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+        err.errno, msg=err.msg, sqlstate=err.sqlstate
+    ) from err
+sqlalchemy.exc.ProgrammingError: (mysql.connector.errors.ProgrammingError) 1049 (42000): Unknown database 'observatorio_bilinguismo'
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-26 11:35:54,852 - conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:36:12,865 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:36:12,881 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:36:14,774 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2025.csv
+2025-10-26 11:36:14,829 - __main__ - INFO - Columnas disponibles en el DataFrame: ['CODIGO SEDE-POBL-NIVEL-DOC', '#', 'TIPO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'NOMBRES2', 'APELLIDOS', 'TELÉFONO 1', 'TELÉFONO 2', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'FECHA DE NACIMIENTO', 'EDAD', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Sede Nodal 2023', 'Sede Nodal 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'ESTADO ETAPA 2', 'CERTIFICADO', 'INSTITUCIÓN EDUCATIVA 2025', 'SEDE 2025', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRADO 2025', 'SEDE NODAL 2025', 'POBLACIÓN', 'NIVEL ETAPA 1 - 2025', 'NIVEL ETAPA 2 - 2025', 'JORNADA ETAPA 2025', 'DOCENTE - 2025', 'GRUPO - 2025', 'CATEGORÍA', 'ESTADO DEL ESTUDIANTE 2025', 'ESTADO MATRÍCULA 2025', '19-jul', '26-jul', '28-jul', '29-jul', '30-jul', '31-jul', '02-ago', '04-ago', '05-ago', '09-ago', '11-ago', '12-ago', '13-ago', '14-ago', '16-ago', '19-ago', '20-ago', '21-ago', '23-ago', '25-ago', '26-ago', '27-ago', '28-ago', '30-ago', '01-sep', '02-sep', '03-sep', '04-sep', '06-sep', '08-sep', '09-sep', '10-sep', '11-sep', '13-sep', '15-sep', '16-sep', 'ESTADO FINAL ETAPA 1', 'ENTREGA CONSENTIMIENTO INFORMADO', 'ENTREGA COPIA DE DOCUMENTO DE IDENTIFICACIÓN', '17-sep', '18-sep', '20-sep', '22-sep', '23-sep', '24-sep', '25-sep', '27-sep', '29-sep', '30-sep', '01-oct', '02-oct', '04-oct', '14-oct', '14-oct.1', '15-oct', '16-oct', '18-oct', '20-oct', '21-oct', '22-oct', '23-oct', '25-oct', '27-oct', '28-oct', '29-oct', '30-oct', '01-nov', '04-nov', '05-nov', '06-nov', '08-nov', '10-nov', '11-nov', '12-nov', '13-nov', '15-nov', '22-nov', 'ESTADO ETAPA 2.1', 'CERTIFICADO 2025', 'OBSERVACIONES LLAMADA 1', 'OBSERVACIONES LLAMADA 2', 'LLAMADAS', 'OBSERVACIONES', 'OBSERVACIONES LLAMADAS DE SEGUIMIENTO', 'OBSERVACION A DOCUMENTO', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL']
+2025-10-26 11:36:14,829 - __main__ - INFO - Processing reference tables...
+2025-10-26 11:36:14,939 - __main__ - INFO - Processing main tables...
+2025-10-26 11:36:14,943 - __main__ - WARNING - Documentos inválidos encontrados: [nan, nan, nan, nan, nan, nan, nan, nan]
+2025-10-26 11:36:14,948 - __main__ - WARNING - Fechas de nacimiento inválidas encontradas: [NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT]
+2025-10-26 11:36:14,949 - __main__ - ERROR - Registros con NOMBRES2 faltante: 8
+2025-10-26 11:36:14,949 - __main__ - ERROR - Registros con APELLIDOS faltante: 8
+2025-10-26 11:36:14,950 - __main__ - ERROR - Registros con NUMERO_DOCUMENTO faltante: 8
+2025-10-26 11:36:14,953 - __main__ - WARNING - Correos electrónicos inválidos encontrados: ['no tiene', 'solmilena 1234@gmail.com', 'lissac1989gmail.com', 'laura.c1020@outlook. es', 'x.londoñodelgado@gmail.com', 'pendiente', 'no tiene', 'wilderberriozapatagmail.com', '1095180757', 'pendiente', 'pendiente', 'ruamuñozsofia@gmail.com']
+2025-10-26 11:36:14,958 - __main__ - WARNING - Teléfonos inválidos en TELEFONO2: ['0', '0']
+2025-10-26 11:36:14,962 - __main__ - WARNING - Fechas inválidas en FECHA_INICIAL: [NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT]
+2025-10-26 11:36:14,963 - __main__ - WARNING - Fechas inválidas en FECHA_FINAL: [NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT]
+2025-10-26 11:36:14,975 - __main__ - INFO - Inserting data into database...
+2025-10-26 11:36:15,031 - __main__ - INFO - Successfully inserted 11 rows into Tipo_documentos
+2025-10-26 11:36:15,080 - __main__ - INFO - Successfully inserted 15 rows into Nivel_MCER
+2025-10-26 11:36:15,125 - __main__ - INFO - Successfully inserted 9 rows into Ciudades
+2025-10-26 11:36:15,176 - __main__ - INFO - Successfully inserted 140 rows into Instituciones_educativas
+2025-10-26 11:36:15,218 - __main__ - INFO - Successfully inserted 2 rows into Cursos
+2025-10-26 11:36:15,344 - __main__ - INFO - Successfully inserted 1020 rows into Personas
+2025-10-26 11:36:15,526 - __main__ - INFO - Successfully inserted 1020 rows into Sedes_instituciones
+2025-10-26 11:43:15,704 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:43:15,721 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:43:18,155 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:43:18,155 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:43:18,157 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:49:32,372 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:49:32,461 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:49:32,864 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:49:32,867 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:49:32,870 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:49:42,747 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:49:42,768 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:51:19,804 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:51:19,822 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:51:20,184 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:51:20,186 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:51:20,188 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:51:20,573 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:51:20,574 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:51:20,575 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-10-26 11:53:28,733 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:53:28,752 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 11:53:46,777 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 11:53:46,792 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 21:46:30,866 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 21:46:30,932 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 21:46:30,974 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2023.csv
+2025-10-26 21:46:31,001 - __main__ - INFO - Columnas disponibles en el DataFrame: ['#', 'TIPO DE IDENTIFICACIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NOMBRES', 'APELLIDOS', 'FECHA DE NACIMIENTO', 'EDAD', 'TELÉFONO 1', 'TELÉFONO 2', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2022', 'Grado 2022', 'MCER (diagnóstico)', 'MCER (diagnóstico)2', 'NIVEL 2022-1', 'NIVEL 2022-2', 'POBLACIÓN 2022', 'Día', 'Jornada', 'SEDE NODAL 2022', 'GRUPO PMB 2022', 'DOCENTE PMB 2022', 'ESTADO 2022', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Nivel 2023- ETAPA 1', 'Día 2023', 'Jornada 2023', 'Sede Nodal 2023', 'Docente 2023', 'FECHA LLAMADA', 'ANOTACIÓN', 'FECHA LLAMADA2', 'ANOTACIÓN2', 'FECHA LLAMADA3', 'ANOTACIÓN3', 'ANOTACIÓN4', 'DIAG', 'Diag %', 'MCER', 'ESTADO MATRICULA', '13-may', '20-may', '27-may', '03-jun', '10-jun', '08-jul', '15-jul', '22-jul', '29-jul', '05-ago', '12-ago', 'ESTADO ETAPA 1', 'Jornada 2023.1', 'Sede Nodal 2023.1', 'Docente 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'CODIGO SAP', 'ID GRUPO', 'ESTADO MATRÍCULA ETAPA 2', '19-ago', '26-ago', '02-sep', '09-sep', '16-sep', '23-sep', '30-sep', '07-oct', '21-oct', '04-nov', 'ESTADO ETAPA 2', 'CERTIFICADO', 'DIAG2', 'Diag %2', 'MCER2', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRUPO ']
+2025-10-26 21:46:31,001 - __main__ - INFO - Processing reference tables...
+2025-10-26 21:46:31,033 - __main__ - ERROR - Fatal error during data import: "['POBLACIÓN'] not in index"
+2025-10-26 21:47:26,947 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-10-26 21:47:26,964 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-10-26 21:47:26,978 - __main__ - INFO - Loading data from d:\Proyectos Jc Code\Archivos para BD rionegro\Observatorio\CSVs\data_2023.csv
+2025-10-26 21:47:27,000 - __main__ - INFO - Columnas disponibles en el DataFrame: ['#', 'TIPO DE IDENTIFICACIÓN', 'NÚMERO DE IDENTIFICACIÓN', 'LUGAR DE EXPEDICIÓN', 'NOMBRES', 'APELLIDOS', 'FECHA DE NACIMIENTO', 'EDAD', 'TELÉFONO 1', 'TELÉFONO 2', 'CORREO ELECTRÓNICO', 'MUNICIPIO', 'DIRECCIÓN', 'NOMBRE DEL ACUDIENTE', 'TIPO DE DOCUMENTO', 'NÚMERO DE DOCUMENTO', 'PARENTESCO', 'Institución Educativa 2022', 'Grado 2022', 'MCER (diagnóstico)', 'MCER (diagnóstico)2', 'NIVEL 2022-1', 'NIVEL 2022-2', 'POBLACIÓN 2022', 'Día', 'Jornada', 'SEDE NODAL 2022', 'GRUPO PMB 2022', 'DOCENTE PMB 2022', 'ESTADO 2022', 'Institución Educativa 2023', 'Sede I.E.', 'Grado 2023', 'Población 2023', 'Nivel 2023- ETAPA 1', 'Día 2023', 'Jornada 2023', 'Sede Nodal 2023', 'Docente 2023', 'FECHA LLAMADA', 'ANOTACIÓN', 'FECHA LLAMADA2', 'ANOTACIÓN2', 'FECHA LLAMADA3', 'ANOTACIÓN3', 'ANOTACIÓN4', 'DIAG', 'Diag %', 'MCER', 'ESTADO MATRICULA', '13-may', '20-may', '27-may', '03-jun', '10-jun', '08-jul', '15-jul', '22-jul', '29-jul', '05-ago', '12-ago', 'ESTADO ETAPA 1', 'Jornada 2023.1', 'Sede Nodal 2023.1', 'Docente 2023.1', 'Población 2023.1', 'Nivel 2023-ETAPA 2', 'CODIGO SAP', 'ID GRUPO', 'ESTADO MATRÍCULA ETAPA 2', '19-ago', '26-ago', '02-sep', '09-sep', '16-sep', '23-sep', '30-sep', '07-oct', '21-oct', '04-nov', 'ESTADO ETAPA 2', 'CERTIFICADO', 'DIAG2', 'Diag %2', 'MCER2', 'SEXO', 'FECHA ACTUAL', 'TIPO POBLACION', 'NIVEL_MCER', 'ENTIDAD', 'NOMBRE CURSO', 'IDIOMA', 'FECHA INICIAL', 'FECHA FINAL', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRUPO ']
+2025-10-26 21:47:27,001 - __main__ - INFO - Processing reference tables...
+2025-10-26 21:47:27,802 - __main__ - INFO - Processing main tables...
+2025-10-26 21:47:28,132 - __main__ - WARNING - Documentos inválidos encontrados: [nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan]
+2025-10-26 21:47:28,142 - __main__ - WARNING - Fechas de nacimiento inválidas encontradas: [NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT, NaT]
+2025-10-26 21:47:28,143 - __main__ - ERROR - Campo requerido NOMBRES no encontrado en el DataFrame
+2025-10-26 21:47:28,143 - __main__ - ERROR - Registros con APELLIDOS faltante: 1
+2025-10-26 21:47:28,144 - __main__ - ERROR - Registros con NUMERO_DOCUMENTO faltante: 13
+2025-10-26 21:47:28,147 - __main__ - WARNING - Correos electrónicos inválidos encontrados: ['pendiente', 'pendiente', 'no tiene', 'ausuga2005@gmail.com;carlos_usuga@hotmail.com', 'pendiente', 'pendiente', 'carmenariasarango@gmail.com; cgomezarias050@gmail.com', 'daniel.agudelo.castano.ietisa@gmail.com - glriaceciliac@gmailc.om', 'pendiente', 'pendiente', 'pendiente', 'brothermas64@gmail.com; maryuspi.75@gmail.com', 'geraldineosorioa@eijosefinamuñozgonzalez.edu.co', 'pendiente', 'pendiente', 'anmhiba11@gmail.com;vannibar@hotmail.com', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'no tiene', 'no tiene', 'pendiente', 'no tiene', 'cenys2009@hotmail.com; luzdary.munzonsi@iepmp.edu.co', 'no tiene', 'agudelope.mariana@ieanagomezdesierra', 'pendiente', 'no tiene', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'no tiene', 'no tiene', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'pendiente', 'mcrisgg08@gmail.com;valentynagg900@gmail.com']
+2025-10-26 21:47:28,151 - __main__ - WARNING - Fechas inválidas en FECHA_INICIAL: [NaT]
+2025-10-26 21:47:28,152 - __main__ - WARNING - Fechas inválidas en FECHA_FINAL: [NaT]
+2025-10-26 21:47:28,169 - __main__ - INFO - Inserting data into database...
+2025-10-26 21:47:28,222 - __main__ - INFO - Successfully inserted 12 rows into Tipo_documentos
+2025-10-26 21:47:28,234 - __main__ - INFO - Successfully inserted 10 rows into Nivel_MCER
+2025-10-26 21:47:28,244 - __main__ - INFO - Successfully inserted 5 rows into Ciudades
+2025-10-26 21:47:28,266 - __main__ - INFO - Successfully inserted 147 rows into Instituciones_educativas
+2025-10-26 21:47:28,277 - __main__ - INFO - Successfully inserted 2 rows into Cursos
+2025-10-26 21:47:28,401 - __main__ - ERROR - Error inserting data into Personas: (mysql.connector.errors.DatabaseError) 1366 (HY000): Incorrect DOUBLE value: 'YES' for column 'CERTIFICADO' at row 2
+[SQL: INSERT INTO `Personas` (`NOMBRES2`, `APELLIDOS`, `TELEFONO1`, `TELEFONO2`, `NUMERO_DOCUMENTO`, `CORREO_ELECTRONICO`, `DIRECCION`, `SEXO`, `FECHA_NACIMIENTO`, `CERTIFICADO`, `TIPO_PERSONA`) VALUES (%(NOMBRES2)s, %(APELLIDOS)s, %(TELEFONO1)s, %(TELEFONO2)s, %(NUMERO_DOCUMENTO)s, %(CORREO_ELECTRONICO)s, %(DIRECCION)s, %(SEXO)s, %(FECHA_NACIMIENTO)s, %(CERTIFICADO)s, %(TIPO_PERSONA)s)]
+[parameters: [{'NOMBRES2': None, 'APELLIDOS': None, 'TELEFONO1': None, 'TELEFONO2': None, 'NUMERO_DOCUMENTO': None, 'CORREO_ELECTRONICO': '', 'DIRECCION': None, 'SEXO': None, 'FECHA_NACIMIENTO': None, 'CERTIFICADO': None, 'TIPO_PERSONA': None}, {'NOMBRES2': 'AARON ', 'APELLIDOS': 'NIETO MORALES', 'TELEFONO1': '3207560348', 'TELEFONO2': None, 'NUMERO_DOCUMENTO': 1036262037.0, 'CORREO_ELECTRONICO': 'jeenieto1@gmail.com', 'DIRECCION': 'CARRERA 52D 39-46', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2015, 7, 25, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ADONIS ALEJANDRO', 'APELLIDOS': 'GONZALEZ LOPEZ', 'TELEFONO1': '3147834340', 'TELEFONO2': None, 'NUMERO_DOCUMENTO': 4170315.0, 'CORREO_ELECTRONICO': 'adonis.alejandro.gonzalez.lo@ietisarionegro.edu.co', 'DIRECCION': 'PENDIENTE', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2007, 3, 8, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ADRIAN JERONIMO', 'APELLIDOS': 'RINCON VILLAMIL', 'TELEFONO1': '3194773565', 'TELEFONO2': '3115726494', 'NUMERO_DOCUMENTO': 1053447064.0, 'CORREO_ELECTRONICO': 'angiekavi93@gmail.com', 'DIRECCION': 'CALLE 29A 32-57 TORRES SAN JUAN', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2011, 5, 17, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ADRIAN MATEO', 'APELLIDOS': 'MEDINA REYES', 'TELEFONO1': '3186180168', 'TELEFONO2': None, 'NUMERO_DOCUMENTO': 1044001030.0, 'CORREO_ELECTRONICO': 'daryreyes_1204@hotmail.com', 'DIRECCION': 'CARRERA 47 41-25', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2015, 10, 29, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ALAN GABRIEL', 'APELLIDOS': 'SANABRIA BARRETO', 'TELEFONO1': '3023192026', 'TELEFONO2': '3108614877', 'NUMERO_DOCUMENTO': 1036967980.0, 'CORREO_ELECTRONICO': 'alangabriel.sanabriaba@iecmp.edu.co', 'DIRECCION': 'PENDIENTE', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2012, 12, 9, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ALAN HAIR', 'APELLIDOS': 'MONROY AMAYA', 'TELEFONO1': '3046238293', 'TELEFONO2': None, 'NUMERO_DOCUMENTO': 1126245970.0, 'CORREO_ELECTRONICO': 'rionegrobilingue2022@gmail.com', 'DIRECCION': 'PENDIENTE', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2009, 8, 10, 0, 0), 'CERTIFICADO': 'NO', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ALEJANDRA', 'APELLIDOS': 'CASTAÑO GARCIA ', 'TELEFONO1': '3136249046', 'TELEFONO2': '3105429308', 'NUMERO_DOCUMENTO': 1036258928.0, 'CORREO_ELECTRONICO': 'dianagarcia.l1728@gmail.com', 'DIRECCION': 'PENDIENTE', 'SEXO': 'F', 'FECHA_NACIMIENTO': datetime.datetime(2010, 8, 25, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}  ... displaying 10 of 1044 total bound parameter sets ...  {'NOMBRES2': 'ZAHIRA ', 'APELLIDOS': 'GOMEZ OTALVARO ', 'TELEFONO1': '3105243946', 'TELEFONO2': '5310111', 'NUMERO_DOCUMENTO': 1036256589.0, 'CORREO_ELECTRONICO': 'patricia-otalvaro@hotmail.com', 'DIRECCION': 'PENDIENTE', 'SEXO': 'F', 'FECHA_NACIMIENTO': datetime.datetime(2008, 10, 4, 0, 0), 'CERTIFICADO': None, 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'YULIANA ANDREA', 'APELLIDOS': 'MONTOYA PINEDA ', 'TELEFONO1': '3127124615', 'TELEFONO2': '3216474460', 'NUMERO_DOCUMENTO': 1036936053.0, 'CORREO_ELECTRONICO': 'samayube-22@hotmail.com', 'DIRECCION': 'PENDIENTE', 'SEXO': 'F', 'FECHA_NACIMIENTO': datetime.datetime(2007, 12, 22, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}]]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-10-26 21:47:28,410 - __main__ - ERROR - Fatal error during data import: (mysql.connector.errors.DatabaseError) 1366 (HY000): Incorrect DOUBLE value: 'YES' for column 'CERTIFICADO' at row 2
+[SQL: INSERT INTO `Personas` (`NOMBRES2`, `APELLIDOS`, `TELEFONO1`, `TELEFONO2`, `NUMERO_DOCUMENTO`, `CORREO_ELECTRONICO`, `DIRECCION`, `SEXO`, `FECHA_NACIMIENTO`, `CERTIFICADO`, `TIPO_PERSONA`) VALUES (%(NOMBRES2)s, %(APELLIDOS)s, %(TELEFONO1)s, %(TELEFONO2)s, %(NUMERO_DOCUMENTO)s, %(CORREO_ELECTRONICO)s, %(DIRECCION)s, %(SEXO)s, %(FECHA_NACIMIENTO)s, %(CERTIFICADO)s, %(TIPO_PERSONA)s)]
+[parameters: [{'NOMBRES2': None, 'APELLIDOS': None, 'TELEFONO1': None, 'TELEFONO2': None, 'NUMERO_DOCUMENTO': None, 'CORREO_ELECTRONICO': '', 'DIRECCION': None, 'SEXO': None, 'FECHA_NACIMIENTO': None, 'CERTIFICADO': None, 'TIPO_PERSONA': None}, {'NOMBRES2': 'AARON ', 'APELLIDOS': 'NIETO MORALES', 'TELEFONO1': '3207560348', 'TELEFONO2': None, 'NUMERO_DOCUMENTO': 1036262037.0, 'CORREO_ELECTRONICO': 'jeenieto1@gmail.com', 'DIRECCION': 'CARRERA 52D 39-46', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2015, 7, 25, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ADONIS ALEJANDRO', 'APELLIDOS': 'GONZALEZ LOPEZ', 'TELEFONO1': '3147834340', 'TELEFONO2': None, 'NUMERO_DOCUMENTO': 4170315.0, 'CORREO_ELECTRONICO': 'adonis.alejandro.gonzalez.lo@ietisarionegro.edu.co', 'DIRECCION': 'PENDIENTE', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2007, 3, 8, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ADRIAN JERONIMO', 'APELLIDOS': 'RINCON VILLAMIL', 'TELEFONO1': '3194773565', 'TELEFONO2': '3115726494', 'NUMERO_DOCUMENTO': 1053447064.0, 'CORREO_ELECTRONICO': 'angiekavi93@gmail.com', 'DIRECCION': 'CALLE 29A 32-57 TORRES SAN JUAN', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2011, 5, 17, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ADRIAN MATEO', 'APELLIDOS': 'MEDINA REYES', 'TELEFONO1': '3186180168', 'TELEFONO2': None, 'NUMERO_DOCUMENTO': 1044001030.0, 'CORREO_ELECTRONICO': 'daryreyes_1204@hotmail.com', 'DIRECCION': 'CARRERA 47 41-25', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2015, 10, 29, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ALAN GABRIEL', 'APELLIDOS': 'SANABRIA BARRETO', 'TELEFONO1': '3023192026', 'TELEFONO2': '3108614877', 'NUMERO_DOCUMENTO': 1036967980.0, 'CORREO_ELECTRONICO': 'alangabriel.sanabriaba@iecmp.edu.co', 'DIRECCION': 'PENDIENTE', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2012, 12, 9, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ALAN HAIR', 'APELLIDOS': 'MONROY AMAYA', 'TELEFONO1': '3046238293', 'TELEFONO2': None, 'NUMERO_DOCUMENTO': 1126245970.0, 'CORREO_ELECTRONICO': 'rionegrobilingue2022@gmail.com', 'DIRECCION': 'PENDIENTE', 'SEXO': 'M', 'FECHA_NACIMIENTO': datetime.datetime(2009, 8, 10, 0, 0), 'CERTIFICADO': 'NO', 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'ALEJANDRA', 'APELLIDOS': 'CASTAÑO GARCIA ', 'TELEFONO1': '3136249046', 'TELEFONO2': '3105429308', 'NUMERO_DOCUMENTO': 1036258928.0, 'CORREO_ELECTRONICO': 'dianagarcia.l1728@gmail.com', 'DIRECCION': 'PENDIENTE', 'SEXO': 'F', 'FECHA_NACIMIENTO': datetime.datetime(2010, 8, 25, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}  ... displaying 10 of 1044 total bound parameter sets ...  {'NOMBRES2': 'ZAHIRA ', 'APELLIDOS': 'GOMEZ OTALVARO ', 'TELEFONO1': '3105243946', 'TELEFONO2': '5310111', 'NUMERO_DOCUMENTO': 1036256589.0, 'CORREO_ELECTRONICO': 'patricia-otalvaro@hotmail.com', 'DIRECCION': 'PENDIENTE', 'SEXO': 'F', 'FECHA_NACIMIENTO': datetime.datetime(2008, 10, 4, 0, 0), 'CERTIFICADO': None, 'TIPO_PERSONA': 'Estudiante'}, {'NOMBRES2': 'YULIANA ANDREA', 'APELLIDOS': 'MONTOYA PINEDA ', 'TELEFONO1': '3127124615', 'TELEFONO2': '3216474460', 'NUMERO_DOCUMENTO': 1036936053.0, 'CORREO_ELECTRONICO': 'samayube-22@hotmail.com', 'DIRECCION': 'PENDIENTE', 'SEXO': 'F', 'FECHA_NACIMIENTO': datetime.datetime(2007, 12, 22, 0, 0), 'CERTIFICADO': 'YES', 'TIPO_PERSONA': 'Estudiante'}]]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)

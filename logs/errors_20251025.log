@@ -1,0 +1,7 @@
+2025-10-25 19:04:22,851 - __main__ - ERROR - Registros con NOMBRES2 faltante: 8
+2025-10-25 19:04:22,854 - __main__ - ERROR - Registros con APELLIDOS faltante: 8
+2025-10-25 19:04:22,857 - __main__ - ERROR - Registros con NUMERO_DOCUMENTO faltante: 8
+2025-10-25 19:04:24,830 - __main__ - ERROR - Fatal error during data import: 'FECHA INICIAL'
+2025-10-25 19:06:26,120 - __main__ - ERROR - Registros con NOMBRES2 faltante: 8
+2025-10-25 19:06:26,143 - __main__ - ERROR - Registros con APELLIDOS faltante: 8
+2025-10-25 19:06:26,162 - __main__ - ERROR - Registros con NUMERO_DOCUMENTO faltante: 8

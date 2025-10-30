@@ -1,0 +1,20 @@
+2025-10-28 04:34:47,714 - __main__ - ERROR - Cannot create FK fk_cursos_nivel_mcer: 1 orphan values found in Cursos.NIVEL_MCER_ID
+2025-10-28 04:34:47,716 - __main__ - ERROR - Sample orphan values: ['SIN DIAGNOSTICO']
+2025-10-28 04:34:47,751 - __main__ - ERROR - Error creating FK fk_sedes_persona: (mysql.connector.errors.ProgrammingError) 1170 (42000): BLOB/TEXT column 'PERSONA_ID' used in key specification without a key length
+[SQL: ALTER TABLE Sedes_instituciones ADD CONSTRAINT fk_sedes_persona FOREIGN KEY (PERSONA_ID) REFERENCES Personas(NUMERO_DOCUMENTO)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 04:42:09,832 - __main__ - ERROR - Error creating FK fk_personas_tipo_documento: (mysql.connector.errors.DatabaseError) 3780 (HY000): Referencing column 'TIPO_DOCUMENTO_ID' and referenced column 'ID' in foreign key constraint 'fk_personas_tipo_documento' are incompatible.
+[SQL: ALTER TABLE Personas ADD CONSTRAINT fk_personas_tipo_documento FOREIGN KEY (TIPO_DOCUMENTO_ID) REFERENCES Tipo_documentos(ID)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-10-28 04:42:09,843 - __main__ - ERROR - Error creating FK fk_personas_nivel_mcer: (mysql.connector.errors.DatabaseError) 3780 (HY000): Referencing column 'NIVEL_MCER_ID' and referenced column 'ID' in foreign key constraint 'fk_personas_nivel_mcer' are incompatible.
+[SQL: ALTER TABLE Personas ADD CONSTRAINT fk_personas_nivel_mcer FOREIGN KEY (NIVEL_MCER_ID) REFERENCES Nivel_MCER(ID)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-10-28 04:42:09,853 - __main__ - ERROR - Error creating FK fk_personas_ciudad: (mysql.connector.errors.DatabaseError) 3780 (HY000): Referencing column 'CIUDAD_ID' and referenced column 'ID' in foreign key constraint 'fk_personas_ciudad' are incompatible.
+[SQL: ALTER TABLE Personas ADD CONSTRAINT fk_personas_ciudad FOREIGN KEY (CIUDAD_ID) REFERENCES Ciudades(ID)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-10-28 04:42:09,859 - __main__ - ERROR - Cannot create FK fk_cursos_nivel_mcer: 1 orphan values found in Cursos.NIVEL_MCER_ID
+2025-10-28 04:42:09,861 - __main__ - ERROR - Sample orphan values: ['SIN DIAGNOSTICO']
+2025-10-28 04:42:09,877 - __main__ - ERROR - Error creating FK fk_sedes_persona: (mysql.connector.errors.ProgrammingError) 1170 (42000): BLOB/TEXT column 'PERSONA_ID' used in key specification without a key length
+[SQL: ALTER TABLE Sedes_instituciones ADD CONSTRAINT fk_sedes_persona FOREIGN KEY (PERSONA_ID) REFERENCES Personas(NUMERO_DOCUMENTO)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-28 05:00:24,272 - __main__ - ERROR - Failed to create default person: Could not create default person with NUMERO_DOCUMENTO = 0
