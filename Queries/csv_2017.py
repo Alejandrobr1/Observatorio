@@ -115,7 +115,7 @@ df['NOMBRE_CURSO_PROCESADO'] = df.apply(
 TIPO_DOCUMENTOS_2017 = df[["TIPO DE IDENTIFICACIÓN"]].drop_duplicates().reset_index(drop=True)
 TIPO_DOCUMENTOS_2017 = TIPO_DOCUMENTOS_2017[TIPO_DOCUMENTOS_2017["TIPO DE IDENTIFICACIÓN"] != 'SIN INFORMACION']
 
-NIVEL_MCER_2017 = df[["NIVEL_MCER","POBLACIÓN","ESTADO ETAPA 2","ANIO","IDIOMA","CERTIFICADO","GRADO"]].drop_duplicates().reset_index(drop=True)
+NIVEL_MCER_2017 = df[["NIVEL_MCER","TIPO POBLACION","ESTADO ETAPA 2","ANIO","IDIOMA","CERTIFICADO","GRADO"]].drop_duplicates().reset_index(drop=True)
 
 INSTITUCIONES_2017 = df[["INSTITUCIÓN EDUCATIVA","COLEGIO ABREVIADO PARA LISTADOS"]].drop_duplicates().reset_index(drop=True)
 INSTITUCIONES_2017 = INSTITUCIONES_2017[INSTITUCIONES_2017["INSTITUCIÓN EDUCATIVA"] != 'SIN INFORMACION']
@@ -130,7 +130,7 @@ PERSONAS_2017 = df[["NOMBRES","APELLIDOS","TELÉFONO 1","TELÉFONO 2","NÚMERO D
                     "DIRECCIÓN","SEXO","FECHA DE NACIMIENTO","TIPO POBLACION","TIPO DE IDENTIFICACIÓN",
                     "MUNICIPIO","INSTITUCIÓN EDUCATIVA"]].copy()
 
-PERSONA_NIVEL_2017 = df[["NÚMERO DE IDENTIFICACIÓN","NIVEL_MCER","POBLACIÓN","ANIO"]].copy()
+PERSONA_NIVEL_2017 = df[["NÚMERO DE IDENTIFICACIÓN","NIVEL_MCER","TIPO POBLACION","ANIO"]].copy()
 
 # DEBUG: Información de NIVEL_MCER
 print(f"\n🔍 DEBUG - Datos de NIVEL_MCER en CSV:")
@@ -226,7 +226,7 @@ with engine.connect() as connection:
     niveles_insertados = 0
     for _, row in NIVEL_MCER_2017.iterrows():
         nivel = limpiar_valor(row['NIVEL_MCER'])
-        tipo_pob = limpiar_valor(row['POBLACIÓN'])
+        tipo_pob = limpiar_valor(row['TIPO POBLACION'])
         estado = limpiar_valor(row['ESTADO ETAPA 2'])
         anio = int(row['ANIO']) if pd.notna(row['ANIO']) else None
         idioma = limpiar_valor(row.get('IDIOMA'))
@@ -358,7 +358,7 @@ with engine.connect() as connection:
     for _, row in PERSONA_NIVEL_2017.iterrows():
         numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
         nivel_mcer_valor = limpiar_valor(row['NIVEL_MCER'])
-        poblacion_valor = limpiar_valor(row['POBLACIÓN'])
+        poblacion_valor = limpiar_valor(row['TIPO POBLACION'])
         anio_registro = int(row['ANIO']) if pd.notna(row['ANIO']) else None
         
         nivel_mcer_valor = None if nivel_mcer_valor == 'SIN INFORMACION' else nivel_mcer_valor
