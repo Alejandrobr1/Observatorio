@@ -73,8 +73,28 @@ with engine.connect() as connection:
 
     # Filtro de año
     selected_year = st.sidebar.selectbox(
-        '📅 Seleccionar Año',
+        '📅 Año',
         available_years,
+        index=0
+    )
+    
+    # NUEVO: Obtener instituciones disponibles
+    query_instituciones = text("""
+        SELECT DISTINCT i.NOMBRE_INSTITUCION
+        FROM Instituciones i
+        INNER JOIN Personas p ON p.INSTITUCION_ID = i.ID
+        INNER JOIN Persona_Nivel_MCER pnm ON pnm.PERSONA_ID = p.ID
+        WHERE i.NOMBRE_INSTITUCION IS NOT NULL
+        AND i.NOMBRE_INSTITUCION != ''
+        ORDER BY i.NOMBRE_INSTITUCION
+    """)
+    result_instituciones = connection.execute(query_instituciones)
+    available_instituciones = ['TODAS'] + [row[0] for row in result_instituciones.fetchall()]
+    
+    # NUEVO: Filtro de institución
+    selected_institucion = st.sidebar.selectbox(
+        '🏫 Institución Educativa',
+        available_instituciones,
         index=0
     )
 
@@ -87,7 +107,7 @@ with engine.connect() as connection:
     # Total personas en BD
     query_total = text("SELECT COUNT(*) as total FROM Personas")
     total_personas = connection.execute(query_total).fetchone()[0]
-    st.sidebar.metric("Total Personas en BD", f"{total_personas:,}")
+    st.sidebar.metric("Total Personas", f"{total_personas:,}")
 
     # Personas con nivel MCER
     query_con_nivel = text("""
@@ -100,37 +120,27 @@ with engine.connect() as connection:
     """)
     total_con_nivel = connection.execute(query_con_nivel).fetchone()[0]
     st.sidebar.metric("Con Nivel MCER", f"{total_con_nivel:,}")
-    
-    # Ver tipos de persona en la BD
-    query_tipos_stats = text("""
-        SELECT DISTINCT p.TIPO_PERSONA, COUNT(*) as cantidad
-        FROM Personas p
-        WHERE p.TIPO_PERSONA IS NOT NULL
-        GROUP BY p.TIPO_PERSONA
-        ORDER BY cantidad DESC
-    """)
-    result_tipos_stats = connection.execute(query_tipos_stats)
-    tipos_persona = result_tipos_stats.fetchall()
-    
-    if tipos_persona:
-        st.sidebar.write("**Tipos de población:**")
-        for tipo, cantidad in tipos_persona:
-            st.sidebar.write(f"• {tipo}: {cantidad:,}")
 
 st.sidebar.divider()
 
-# Consulta principal CON filtro de TIPO_PERSONA
+# Consulta principal CON filtros de TIPO_PERSONA e INSTITUCION
 try:
     with engine.connect() as connection:
-        # Construir filtro de tipo de persona
-        tipo_filter = ""
+        # Construir filtros dinámicos
+        filtros = []
         query_params = {"año": int(selected_year)}
         
         if selected_tipo != 'TODOS':
-            tipo_filter = "AND p.TIPO_PERSONA = :tipo"
+            filtros.append("AND p.TIPO_PERSONA = :tipo")
             query_params["tipo"] = selected_tipo
         
-        # Consulta con filtro opcional de TIPO_PERSONA
+        if selected_institucion != 'TODAS':
+            filtros.append("AND i.NOMBRE_INSTITUCION = :institucion")
+            query_params["institucion"] = selected_institucion
+        
+        filtros_sql = " ".join(filtros)
+        
+        # Consulta principal
         query = text(f"""
             SELECT 
                 n.NIVEL_MCER,
@@ -139,13 +149,14 @@ try:
             FROM Persona_Nivel_MCER pnm
             INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
             INNER JOIN Nivel_MCER n ON pnm.NIVEL_MCER_ID = n.ID
+            LEFT JOIN Instituciones i ON p.INSTITUCION_ID = i.ID
             WHERE pnm.ANIO_REGISTRO = :año
             AND n.NIVEL_MCER IS NOT NULL
             AND n.NIVEL_MCER != 'SIN INFORMACION'
             AND p.SEXO IS NOT NULL
             AND p.SEXO != ''
             AND p.SEXO != 'SIN INFORMACION'
-            {tipo_filter}
+            {filtros_sql}
             GROUP BY n.NIVEL_MCER, p.SEXO
             ORDER BY n.NIVEL_MCER, p.SEXO
         """)
@@ -153,49 +164,26 @@ try:
         result = connection.execute(query, query_params)
         df = pd.DataFrame(result.fetchall(), columns=["NIVEL_MCER", "SEXO", "cantidad"])
 
-        # Debug: Mostrar datos crudos
-        st.sidebar.write("**Debug - Datos encontrados:**")
-        st.sidebar.write(f"Filas retornadas: {len(df)}")
-        if not df.empty:
-            st.sidebar.write(f"Total personas: {int(df['cantidad'].sum())}")
-
         if df.empty:
-            st.warning(f"⚠️ No hay datos disponibles para {selected_tipo} en el año {selected_year}")
-            
-            # Mostrar información de diagnóstico
-            with st.expander("🔍 Diagnóstico detallado"):
-                # Ver si hay datos sin filtrar
-                query_debug = text("""
-                    SELECT COUNT(*) as total
-                    FROM Persona_Nivel_MCER pnm
-                    INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
-                    INNER JOIN Nivel_MCER n ON pnm.NIVEL_MCER_ID = n.ID
-                    WHERE pnm.ANIO_REGISTRO = :año
-                """)
-                total_sin_filtro = connection.execute(query_debug, {"año": int(selected_year)}).fetchone()[0]
-                st.write(f"Total registros sin filtros: {total_sin_filtro}")
-                
-                # Ver tipos de persona para ese año
-                query_tipos_year = text("""
-                    SELECT DISTINCT p.TIPO_PERSONA, COUNT(*) as cantidad
-                    FROM Persona_Nivel_MCER pnm
-                    INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
-                    WHERE pnm.ANIO_REGISTRO = :año
-                    GROUP BY p.TIPO_PERSONA
-                """)
-                result_tipos_year = connection.execute(query_tipos_year, {"año": int(selected_year)})
-                st.write(f"**Tipos de persona en {selected_year}:**")
-                for row in result_tipos_year:
-                    st.write(f"- '{row[0]}': {row[1]} personas")
-            
+            st.warning(f"⚠️ No hay datos disponibles con los filtros seleccionados")
+            st.info(f"""
+            **Filtros aplicados:**
+            - Tipo de población: {selected_tipo}
+            - Año: {selected_year}
+            - Institución: {selected_institucion}
+            """)
             st.stop()
 
         # Obtener niveles únicos
         niveles_disponibles = sorted(df['NIVEL_MCER'].unique())
         total_estudiantes = df['cantidad'].sum()
 
-        # Mostrar estadísticas del año actual
-        st.sidebar.header(f"📊 {selected_tipo} - {selected_year}")
+        # Mostrar estadísticas del filtro actual
+        titulo_filtros = f"{selected_tipo} - {selected_year}"
+        if selected_institucion != 'TODAS':
+            titulo_filtros += f" - {selected_institucion}"
+            
+        st.sidebar.header(f"📊 Filtros Activos")
         st.sidebar.metric("Total con Nivel MCER", f"{int(total_estudiantes):,}")
         
         # Desglose por nivel
@@ -225,8 +213,8 @@ try:
             femenino_por_nivel[nivel] = fem_data['cantidad'].sum() if not fem_data.empty else 0
 
         # Crear el gráfico de barras apiladas
-        titulo_tipo = selected_tipo if selected_tipo != 'TODOS' else 'Todas las poblaciones'
-        st.header(f"📊 Distribución por Nivel MCER - {titulo_tipo} ({selected_year})")
+        st.header(f"📊 Distribución por Nivel MCER")
+        st.subheader(titulo_filtros)
         
         fig, ax = plt.subplots(figsize=(14, 8))
 
@@ -266,8 +254,14 @@ try:
         # Configuración del gráfico
         ax.set_xlabel('Nivel MCER', fontsize=14, fontweight='bold')
         ax.set_ylabel('Cantidad de Personas', fontsize=14, fontweight='bold')
-        ax.set_title(f'Distribución por Nivel MCER y Sexo\n{titulo_tipo} - Año {selected_year}',
-                    fontsize=16, fontweight='bold', pad=20)
+        
+        titulo_grafico = f'Distribución por Nivel MCER y Sexo'
+        if selected_institucion != 'TODAS':
+            # Acortar nombre si es muy largo
+            nombre_corto = selected_institucion[:40] + '...' if len(selected_institucion) > 40 else selected_institucion
+            titulo_grafico += f'\n{nombre_corto}'
+        
+        ax.set_title(titulo_grafico, fontsize=16, fontweight='bold', pad=20)
         ax.set_xticks(x)
         ax.set_xticklabels(niveles_disponibles, fontsize=12)
         ax.legend(loc='upper right', fontsize=12, framealpha=0.9)
@@ -341,11 +335,12 @@ try:
         st.success(f"""
         ✅ **Datos cargados exitosamente**
         
-        📌 **Información del reporte:**
+        📌 **Filtros aplicados:**
         - **Tipo de población**: {selected_tipo}
         - **Año**: {selected_year}
-        - **Total personas con nivel MCER**: {int(total_estudiantes):,}
-        - **Niveles MCER disponibles**: {', '.join(niveles_disponibles)}
+        - **Institución**: {selected_institucion}
+        - **Total personas**: {int(total_estudiantes):,}
+        - **Niveles MCER**: {', '.join(niveles_disponibles)}
         """)
 
 except Exception as e:
