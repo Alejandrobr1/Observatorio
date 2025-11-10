@@ -1,22 +1,16 @@
-import sys
-import os
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine, text
-from datetime import datetime
 
-
-# Configurar streamlit primero
-st.set_page_config(layout="wide")
-st.title("Estudiantes por Nivel MCER y Sexo")
-
+# Configurar streamlit
+st.set_page_config(layout="wide", page_title="Dashboard MCER por Sexo")
+st.title("📊 Estudiantes por Nivel MCER y Sexo")
 
 # Configuración de la conexión a la base de datos
 @st.cache_resource
 def get_database_connection():
-    """Crear y cachear la conexión a la base de datos"""
     try:
         engine = create_engine("mysql+mysqlconnector://root:123456@localhost:3308/observatorio_bilinguismo")
         with engine.connect() as conn:
@@ -24,257 +18,263 @@ def get_database_connection():
         return engine
     except Exception as e:
         st.error(f"Error al conectar a la base de datos: {str(e)}")
-        st.error("""
-        Verifica que:
-        1. El servidor MySQL esté corriendo en el puerto 3308
-        2. Las credenciales sean correctas (usuario: root, contraseña: 123456)
-        3. La base de datos 'observatorio_bilinguismo' exista
-        """)
         raise e
 
-
-# Inicializar la conexión
+# Inicializar conexión
 try:
     engine = get_database_connection()
-    st.sidebar.success("✅ Conexión a la base de datos establecida")
+    st.sidebar.success("✅ Conexión establecida")
 except Exception as e:
-    st.error("No se pudo establecer la conexión a la base de datos")
+    st.error("❌ No se pudo conectar a la base de datos")
     st.exception(e)
     st.stop()
 
-
-# --- Diagnóstico en Sidebar ---
-st.sidebar.header("📊 Diagnóstico General")
-
+# Sidebar - Diagnóstico y filtros
+st.sidebar.header("🔍 Filtros")
 
 with engine.connect() as connection:
-    # Verificar total de personas
-    query_total = text("SELECT COUNT(*) as total FROM Personas WHERE TIPO_PERSONA = 'Estudiante'")
-    total_personas = connection.execute(query_total).fetchone()[0]
-    st.sidebar.metric("Total estudiantes en BD", f"{total_personas:,}")
-    
-    # Verificar personas con nivel MCER
-    query_nivel = text("""
-        SELECT COUNT(DISTINCT p.NUMERO_DOCUMENTO) as total 
-        FROM Personas p
-        INNER JOIN Nivel_MCER n ON p.NIVEL_MCER_ID = n.ID
-        WHERE p.TIPO_PERSONA = 'Estudiante' 
-        AND n.NIVEL_MCER IS NOT NULL
+    # Obtener años disponibles
+    query_years = text("""
+        SELECT DISTINCT pnm.ANIO_REGISTRO as año
+        FROM Persona_Nivel_MCER pnm
+        WHERE pnm.ANIO_REGISTRO IS NOT NULL
+        ORDER BY año DESC
     """)
-    personas_con_nivel = connection.execute(query_nivel).fetchone()[0]
-    st.sidebar.metric("Estudiantes con nivel MCER", f"{personas_con_nivel:,}")
+    result_years = connection.execute(query_years)
+    available_years = [str(row[0]) for row in result_years.fetchall()]
 
+    if not available_years:
+        st.error("No se encontraron años en la base de datos")
+        st.stop()
+
+    # Filtro de año
+    selected_year = st.sidebar.selectbox(
+        '📅 Seleccionar Año',
+        available_years,
+        index=0
+    )
 
 st.sidebar.divider()
 
+# Información general
+st.sidebar.header("📈 Estadísticas Generales")
 
-# --- Distribución por Nivel MCER y Año ---
-st.header("Distribución por Nivel MCER, Sexo y Año")
+with engine.connect() as connection:
+    # Total estudiantes en BD
+    query_total = text("SELECT COUNT(*) as total FROM Personas WHERE TIPO_PERSONA = 'Estudiante'")
+    total_personas = connection.execute(query_total).fetchone()[0]
+    st.sidebar.metric("Total Estudiantes", f"{total_personas:,}")
 
+    # Estudiantes con nivel MCER
+    query_con_nivel = text("""
+        SELECT COUNT(DISTINCT pnm.PERSONA_ID) as total 
+        FROM Persona_Nivel_MCER pnm
+        INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
+        INNER JOIN Nivel_MCER n ON pnm.NIVEL_MCER_ID = n.ID
+        WHERE p.TIPO_PERSONA = 'Estudiante' 
+        AND n.NIVEL_MCER IS NOT NULL
+        AND n.NIVEL_MCER != 'SIN INFORMACION'
+    """)
+    total_con_nivel = connection.execute(query_con_nivel).fetchone()[0]
+    st.sidebar.metric("Con Nivel MCER", f"{total_con_nivel:,}")
 
+st.sidebar.divider()
+
+# Consulta principal SIN filtro de entidad
 try:
     with engine.connect() as connection:
-        # Filtro solo con 2025 y 2023
-        available_years = ['2025', '2023']
-        selected_year = st.selectbox(
-            'Seleccionar año',
-            available_years,
-            index=0,  # Por defecto muestra 2025
-            help="Selecciona un año para ver la distribución de estudiantes por nivel MCER y sexo"
-        )
-
-
-        # Consulta para obtener estudiantes por nivel MCER y SEXO del año seleccionado
-        query = text(f"""
-            WITH RankedRecords AS (
-                SELECT 
-                    p.NUMERO_DOCUMENTO,
-                    p.SEXO,
-                    n.NIVEL_MCER,
-                    YEAR(n.FECHA_ACTUAL) AS AÑO,
-                    ROW_NUMBER() OVER(
-                        PARTITION BY p.NUMERO_DOCUMENTO, YEAR(n.FECHA_ACTUAL) 
-                        ORDER BY n.FECHA_ACTUAL DESC
-                    ) as rn
-                FROM Personas p
-                INNER JOIN Nivel_MCER n ON p.NIVEL_MCER_ID = n.ID
-                WHERE p.TIPO_PERSONA = 'Estudiante'
-                    AND n.NIVEL_MCER IS NOT NULL
-                    AND p.SEXO IS NOT NULL
-                    AND p.SEXO != ''
-                    AND n.FECHA_ACTUAL IS NOT NULL
-                    AND YEAR(n.FECHA_ACTUAL) = {selected_year}
-            )
+        # Consulta simplificada SIN JOIN con Cursos
+        query = text("""
             SELECT 
-                NIVEL_MCER,
-                SEXO,
-                COUNT(DISTINCT NUMERO_DOCUMENTO) as cantidad
-            FROM RankedRecords 
-            WHERE rn = 1
-            GROUP BY NIVEL_MCER, SEXO
-            ORDER BY NIVEL_MCER, SEXO
+                n.NIVEL_MCER,
+                p.SEXO,
+                COUNT(DISTINCT p.NUMERO_DOCUMENTO) as cantidad
+            FROM Persona_Nivel_MCER pnm
+            INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
+            INNER JOIN Nivel_MCER n ON pnm.NIVEL_MCER_ID = n.ID
+            WHERE pnm.ANIO_REGISTRO = :año
+            AND p.TIPO_PERSONA = 'Estudiante'
+            AND n.NIVEL_MCER IS NOT NULL
+            AND n.NIVEL_MCER != 'SIN INFORMACION'
+            AND p.SEXO IS NOT NULL
+            AND p.SEXO != ''
+            GROUP BY n.NIVEL_MCER, p.SEXO
+            ORDER BY n.NIVEL_MCER, p.SEXO
         """)
         
-        result = connection.execute(query)
+        result = connection.execute(query, {"año": int(selected_year)})
         df = pd.DataFrame(result.fetchall(), columns=["NIVEL_MCER", "SEXO", "cantidad"])
 
-
-        # Verificar si hay datos
         if df.empty:
             st.warning(f"⚠️ No hay datos disponibles para el año {selected_year}")
-            st.info("Por favor, selecciona otro año o verifica que existan registros en la base de datos.")
-        else:
-            # Filtrar solo A1, A2 y SIN DIAGNOSTICO
-            df_filtrado = df[df['NIVEL_MCER'].isin(['A1', 'A2', 'SIN DIAGNOSTICO'])]
+            st.stop()
+
+        # Obtener niveles únicos
+        niveles_disponibles = sorted(df['NIVEL_MCER'].unique())
+        total_estudiantes = df['cantidad'].sum()
+
+        # Mostrar estadísticas del año actual
+        st.sidebar.header(f"📊 Año {selected_year}")
+        st.sidebar.metric("Total Estudiantes", f"{int(total_estudiantes):,}")
+        
+        # Desglose por nivel
+        st.sidebar.write("**Por Nivel MCER:**")
+        for nivel in niveles_disponibles:
+            nivel_data = df[df['NIVEL_MCER'] == nivel]
+            total_nivel = nivel_data['cantidad'].sum()
+            st.sidebar.write(f"• **{nivel}**: {int(total_nivel):,}")
+
+        # Preparar datos para el gráfico
+        masculino_por_nivel = {}
+        femenino_por_nivel = {}
+
+        for nivel in niveles_disponibles:
+            nivel_data = df[df['NIVEL_MCER'] == nivel]
             
-            if df_filtrado.empty:
-                st.warning(f"⚠️ No hay estudiantes clasificados como A1, A2 o SIN DIAGNOSTICO en el año {selected_year}")
-            else:
-                # Calcular totales
-                total_estudiantes = df_filtrado['cantidad'].sum()
-                
-                # --- ESTADÍSTICAS EN EL SIDEBAR ---
-                st.sidebar.header(f"📈 Estadísticas - {selected_year}")
-                st.sidebar.metric(
-                    f"Total estudiantes {selected_year}", 
-                    f"{int(total_estudiantes):,}",
-                    help=f"Estudiantes A1, A2 y Sin Diagnóstico en {selected_year}"
-                )
-                
-                # Mostrar desglose por nivel y sexo
-                st.sidebar.write("**Desglose por nivel y sexo:**")
-                for nivel in ['A1', 'A2', 'SIN DIAGNOSTICO']:
-                    nivel_data = df_filtrado[df_filtrado['NIVEL_MCER'] == nivel]
-                    if not nivel_data.empty:
-                        total_nivel = nivel_data['cantidad'].sum()
-                        st.sidebar.write(f"**{nivel}:** {int(total_nivel):,}")
-                        
-                        for _, row in nivel_data.iterrows():
-                            sexo = row['SEXO']
-                            cantidad = int(row['cantidad'])
-                            st.sidebar.write(f"  • {sexo}: {cantidad:,}")
-                
-                
-                st.success(f"✅ Se encontraron datos de estudiantes para el año {selected_year}")
+            # Filtrar masculinos (M, Masculino, etc.)
+            masc_data = nivel_data[
+                nivel_data['SEXO'].str.contains('Masculino|^M$|MASCULINO|Hombre', case=False, na=False, regex=True)
+            ]
+            masculino_por_nivel[nivel] = masc_data['cantidad'].sum() if not masc_data.empty else 0
+            
+            # Filtrar femeninos (F, Femenino, etc.)
+            fem_data = nivel_data[
+                nivel_data['SEXO'].str.contains('Femenino|^F$|FEMENINO|Mujer', case=False, na=False, regex=True)
+            ]
+            femenino_por_nivel[nivel] = fem_data['cantidad'].sum() if not fem_data.empty else 0
 
+        # Crear el gráfico de barras apiladas
+        st.header(f"📊 Distribución por Nivel MCER - Año {selected_year}")
+        
+        fig, ax = plt.subplots(figsize=(14, 8))
 
-                # Preparar datos para el gráfico de barras apiladas
-                niveles_orden = ['A1', 'A2', 'SIN DIAGNOSTICO']
-                niveles_disponibles = [n for n in niveles_orden if n in df_filtrado['NIVEL_MCER'].values]
-                
-                # Crear diccionarios para masculino y femenino por nivel
-                masculino_por_nivel = {}
-                femenino_por_nivel = {}
-                
-                for nivel in niveles_disponibles:
-                    nivel_data = df_filtrado[df_filtrado['NIVEL_MCER'] == nivel]
-                    
-                    # Buscar masculino
-                    masc_data = nivel_data[
-                        nivel_data['SEXO'].str.contains('Masculino|^M$', case=False, na=False, regex=True)
-                    ]
-                    masculino_por_nivel[nivel] = masc_data['cantidad'].sum() if not masc_data.empty else 0
-                    
-                    # Buscar femenino
-                    fem_data = nivel_data[
-                        nivel_data['SEXO'].str.contains('Femenino|^F$', case=False, na=False, regex=True)
-                    ]
-                    femenino_por_nivel[nivel] = fem_data['cantidad'].sum() if not fem_data.empty else 0
+        x = np.arange(len(niveles_disponibles))
+        width = 0.65
 
+        masculino_vals = [masculino_por_nivel[n] for n in niveles_disponibles]
+        femenino_vals = [femenino_por_nivel[n] for n in niveles_disponibles]
 
-                # Crear gráfico de barras apiladas
-                fig, ax = plt.subplots(figsize=(12, 7))
-                
-                x = np.arange(len(niveles_disponibles))
-                width = 0.6
-                
-                # Obtener valores para masculino y femenino
-                masculino_vals = [masculino_por_nivel[n] for n in niveles_disponibles]
-                femenino_vals = [femenino_por_nivel[n] for n in niveles_disponibles]
-                
-                # Crear barras apiladas
-                bars1 = ax.bar(x, masculino_vals, width, label='Masculino', 
-                             color='#3498db', edgecolor='black', linewidth=1.5)
-                bars2 = ax.bar(x, femenino_vals, width, bottom=masculino_vals, 
-                             label='Femenino', color='#e74c3c', edgecolor='black', linewidth=1.5)
-                
-                # Añadir etiquetas en las barras
-                for i, nivel in enumerate(niveles_disponibles):
-                    masc_val = masculino_vals[i]
-                    fem_val = femenino_vals[i]
-                    total_val = masc_val + fem_val
-                    
-                    # Etiqueta para masculino (parte inferior)
-                    if masc_val > 0:
-                        ax.text(i, masc_val/2, f'{int(masc_val)}',
-                               ha='center', va='center',
-                               color='white', fontsize=12, fontweight='bold')
-                    
-                    # Etiqueta para femenino (parte superior)
-                    if fem_val > 0:
-                        ax.text(i, masc_val + fem_val/2, f'{int(fem_val)}',
-                               ha='center', va='center',
-                               color='white', fontsize=12, fontweight='bold')
-                    
-                    # Total encima de la barra
-                    ax.text(i, total_val, f'Total: {int(total_val)}',
-                           ha='center', va='bottom',
-                           fontsize=11, fontweight='bold')
-                
-                # Configurar ejes y título
-                ax.set_xlabel('Nivel MCER', fontsize=13, fontweight='bold')
-                ax.set_ylabel('Cantidad de Estudiantes', fontsize=13, fontweight='bold')
-                ax.set_title(f'Distribución por Nivel MCER y Sexo - Año {selected_year}', 
-                           fontsize=16, fontweight='bold', pad=20)
-                ax.set_xticks(x)
-                ax.set_xticklabels(niveles_disponibles)
-                ax.legend(loc='upper right', fontsize=11)
-                ax.grid(axis='y', alpha=0.3, linestyle='--')
-                
-                # Ajustar límite del eje Y
-                max_val = max([masculino_vals[i] + femenino_vals[i] for i in range(len(niveles_disponibles))])
-                ax.set_ylim(0, max_val * 1.15)
-                
-                plt.tight_layout()
-                st.pyplot(fig)
-                
-                # Tabla de datos detallados
-                st.subheader(f"Datos detallados - Año {selected_year}")
-                
-                # Crear tabla resumen con columnas para cada sexo
-                tabla_data = []
-                for nivel in niveles_disponibles:
-                    masc = masculino_por_nivel[nivel]
-                    fem = femenino_por_nivel[nivel]
-                    total = masc + fem
-                    
-                    tabla_data.append({
-                        'Nivel MCER': nivel,
-                        'Masculino': int(masc),
-                        'Femenino': int(fem),
-                        'Total': int(total),
-                        'Porcentaje': f"{(total/total_estudiantes*100):.1f}%"
-                    })
-                
-                df_resumen = pd.DataFrame(tabla_data)
-                
-                # Añadir fila de totales
-                total_masc = sum(masculino_vals)
-                total_fem = sum(femenino_vals)
-                df_resumen.loc[len(df_resumen)] = ['TOTAL', int(total_masc), int(total_fem), 
-                                                    int(total_estudiantes), '100.0%']
-                
-                st.dataframe(df_resumen, use_container_width=True, hide_index=True)
-                
-                # Mostrar todos los datos originales (información adicional)
-                with st.expander("Ver datos completos por nivel y sexo"):
-                    st.dataframe(df_filtrado, use_container_width=True, hide_index=True)
+        # Barras apiladas: Masculino arriba, Femenino abajo
+        bars_masc = ax.bar(x, masculino_vals, width, label='Masculino',
+                          color='#3498db', edgecolor='black', linewidth=1.5)
+        bars_fem = ax.bar(x, femenino_vals, width, bottom=masculino_vals,
+                         label='Femenino', color='#e74c3c', edgecolor='black', linewidth=1.5)
 
+        # Añadir valores en las barras
+        for i, nivel in enumerate(niveles_disponibles):
+            masc_val = masculino_vals[i]
+            fem_val = femenino_vals[i]
+            total_val = masc_val + fem_val
+
+            # Texto en barra masculino
+            if masc_val > 0:
+                ax.text(i, masc_val / 2, f'{int(masc_val)}',
+                       ha='center', va='center',
+                       color='white', fontsize=11, fontweight='bold')
+
+            # Texto en barra femenino
+            if fem_val > 0:
+                ax.text(i, masc_val + fem_val / 2, f'{int(fem_val)}',
+                       ha='center', va='center',
+                       color='white', fontsize=11, fontweight='bold')
+
+            # Total encima de la barra
+            if total_val > 0:
+                ax.text(i, total_val, f'Total: {int(total_val)}',
+                       ha='center', va='bottom',
+                       fontsize=10, fontweight='bold', color='#2c3e50')
+
+        # Configuración del gráfico
+        ax.set_xlabel('Nivel MCER', fontsize=14, fontweight='bold')
+        ax.set_ylabel('Cantidad de Estudiantes', fontsize=14, fontweight='bold')
+        ax.set_title(f'Distribución por Nivel MCER y Sexo - Año {selected_year}',
+                    fontsize=16, fontweight='bold', pad=20)
+        ax.set_xticks(x)
+        ax.set_xticklabels(niveles_disponibles, fontsize=12)
+        ax.legend(loc='upper right', fontsize=12, framealpha=0.9)
+        ax.grid(axis='y', alpha=0.3, linestyle='--', linewidth=0.7)
+
+        # Ajustar límites del eje Y
+        max_val = max([masculino_vals[i] + femenino_vals[i] for i in range(len(niveles_disponibles))]) if niveles_disponibles else 1
+        ax.set_ylim(0, max_val * 1.2)
+
+        plt.tight_layout()
+        st.pyplot(fig)
+
+        # Tabla resumen
+        st.header("📋 Tabla Resumen")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.subheader("Datos por Nivel")
+            tabla_data = []
+            for nivel in niveles_disponibles:
+                masc = masculino_por_nivel[nivel]
+                fem = femenino_por_nivel[nivel]
+                total = masc + fem
+                porcentaje = (total / total_estudiantes * 100) if total_estudiantes > 0 else 0
+
+                tabla_data.append({
+                    'Nivel MCER': nivel,
+                    'Masculino': int(masc),
+                    'Femenino': int(fem),
+                    'Total': int(total),
+                    'Porcentaje': f"{porcentaje:.1f}%"
+                })
+
+            df_resumen = pd.DataFrame(tabla_data)
+            
+            # Agregar fila de totales
+            total_masc = sum(masculino_vals)
+            total_fem = sum(femenino_vals)
+            df_resumen.loc[len(df_resumen)] = ['TOTAL', int(total_masc), int(total_fem),
+                                               int(total_estudiantes), '100.0%']
+            
+            st.dataframe(df_resumen, use_container_width=True, hide_index=True)
+
+        with col2:
+            st.subheader("Distribución por Sexo")
+            
+            total_masc = sum(masculino_vals)
+            total_fem = sum(femenino_vals)
+            
+            if total_estudiantes > 0:
+                porc_masc = (total_masc / total_estudiantes * 100)
+                porc_fem = (total_fem / total_estudiantes * 100)
+                
+                st.metric("Total Masculino", f"{int(total_masc):,}", 
+                         f"{porc_masc:.1f}%")
+                st.metric("Total Femenino", f"{int(total_fem):,}", 
+                         f"{porc_fem:.1f}%")
+                
+                # Gráfico de torta pequeño
+                fig_pie, ax_pie = plt.subplots(figsize=(6, 6))
+                ax_pie.pie([total_masc, total_fem], 
+                          labels=['Masculino', 'Femenino'],
+                          autopct='%1.1f%%',
+                          colors=['#3498db', '#e74c3c'],
+                          startangle=90,
+                          textprops={'fontsize': 12, 'fontweight': 'bold'})
+                ax_pie.set_title('Distribución por Sexo', fontsize=14, fontweight='bold', pad=20)
+                st.pyplot(fig_pie)
+
+        # Datos completos (expandible)
+        with st.expander("🔍 Ver datos detallados"):
+            st.dataframe(df.sort_values(['NIVEL_MCER', 'SEXO']), use_container_width=True, hide_index=True)
+        
+        # Información adicional
+        st.info(f"""
+        📌 **Información del reporte:**
+        - **Año**: {selected_year}
+        - **Total estudiantes**: {int(total_estudiantes):,}
+        - **Niveles MCER disponibles**: {', '.join(niveles_disponibles)}
+        """)
 
 except Exception as e:
-    st.error("Error al cargar los datos")
+    st.error("❌ Error al cargar los datos")
     st.exception(e)
     
-    # Mostrar más detalles del error
-    import traceback
-    st.code(traceback.format_exc())
+    with st.expander("Ver detalles técnicos del error"):
+        import traceback
+        st.code(traceback.format_exc())

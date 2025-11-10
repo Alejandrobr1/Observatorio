@@ -1,96 +1,80 @@
-from sqlalchemy import Column, Integer, String, Date, Enum, ForeignKey
+from sqlalchemy import Column, BigInteger, String, ForeignKey, Integer, Table
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-import enum
+from sqlalchemy.types import Date
 
 Base = declarative_base()
 
-# Enum para nivel MCER
-class NivelMCERType(enum.Enum):
-    A1 = "A1"
-    A2 = "A2"
-    B1 = "B1"
-    B2 = "B2"
-    C1 = "C1"
-    C2 = "C2"
-    SIN_DIAGNOSTICO = "SIN DIAGNOSTICO"
-
-# Enum para tipo persona
-class TipoPersonaType(enum.Enum):
-    Docente = "Docente"
-    Estudiante = "Estudiante"
+# ==========================================
+# TABLA DE ASOCIACIÓN PARA RELACIÓN MUCHOS-A-MUCHOS
+# ==========================================
+# Esta tabla intermedia conecta Personas con Nivel_MCER
+Persona_Nivel_MCER = Table(
+    'Persona_Nivel_MCER',
+    Base.metadata,
+    Column('ID', BigInteger, primary_key=True, autoincrement=True),
+    Column('PERSONA_ID', BigInteger, ForeignKey('Personas.ID'), nullable=False),
+    Column('NIVEL_MCER_ID', BigInteger, ForeignKey('Nivel_MCER.ID'), nullable=False),
+    Column('ANIO_REGISTRO', Integer),  # Año en que la persona obtuvo este nivel
+)
 
 class Tipo_documentos(Base):
     __tablename__ = 'Tipo_documentos'
-    ID = Column(Integer, primary_key=True)
-    TIPO_DOCUMENTO = Column(String(50), nullable=False)
+    ID = Column(BigInteger, primary_key=True, autoincrement=True)
+    TIPO_DOCUMENTO = Column(String(100), nullable=False)
 
 class Nivel_MCER(Base):
     __tablename__ = 'Nivel_MCER'
-    ID = Column(Integer, primary_key=True)
-    NIVEL_MCER = Column(Enum(NivelMCERType), nullable=False)
-    TIPO_POBLACION = Column(String(50))
-    ESTADO_ESTUDIANTE = Column(String(50))
-    FECHA_ACTUAL = Column(Date)
-    personas = relationship("Personas", back_populates="nivel_mcer")
-    cursos = relationship("Cursos", back_populates="nivel_mcer")
-
-class Instituciones_educativas(Base):
-    __tablename__ = 'Instituciones_educativas'
-    ID = Column(Integer, primary_key=True)
-    INSTITUCION_EDUCATIVA = Column(String(100))
-    COLEGIO_ABREVIADO = Column(String(100))
-    GRADO = Column(String(20))
-    sedes_instituciones = relationship("Sedes_instituciones", back_populates="institucion_educativa")
+    ID = Column(BigInteger, primary_key=True, autoincrement=True)
+    NIVEL_MCER = Column(String(100), nullable=False)
+    TIPO_POBLACION = Column(String(100))
+    ESTADO_ESTUDIANTE = Column(String(100))
+    ANIO = Column(Integer)
+    IDIOMA = Column(String(100))
+    CERTIFICADO = Column(String(50))
+    GRADO = Column(String(50))  # NUEVO: Movido desde Instituciones
 
 class Ciudades(Base):
     __tablename__ = 'Ciudades'
-    ID = Column(Integer, primary_key=True)
+    ID = Column(BigInteger, primary_key=True, autoincrement=True)
     MUNICIPIO = Column(String(100), nullable=False)
-    personas = relationship("Personas", back_populates="ciudad")
+
+class Instituciones(Base):
+    __tablename__ = 'Instituciones'
+    ID = Column(BigInteger, primary_key=True, autoincrement=True)
+    NOMBRE_INSTITUCION = Column(String(200))
+    COLEGIO_ABREVIADO = Column(String(100))
+    # GRADO eliminado de aquí
 
 class Personas(Base):
     __tablename__ = 'Personas'
+    ID = Column(BigInteger, primary_key=True, autoincrement=True)
     NOMBRES = Column(String(100))
     APELLIDOS = Column(String(100))
-    TELEFONO1 = Column(String(20))
-    TELEFONO2 = Column(String(20))
-    NUMERO_DOCUMENTO = Column(Integer, primary_key=True)
-    CORREO_ELECTRONICO = Column(String(100))
+    TELEFONO1 = Column(String(50))
+    TELEFONO2 = Column(String(50))
+    NUMERO_DOCUMENTO = Column(String(50), unique=True)
+    CORREO_ELECTRONICO = Column(String(200))
     DIRECCION = Column(String(200))
     SEXO = Column(String(20))
     FECHA_NACIMIENTO = Column(Date)
-    CERTIFICADO = Column(String(100))
-    TIPO_PERSONA = Column(Enum(TipoPersonaType), nullable=False)
-    TIPO_DOCUMENTO_ID = Column(Integer, ForeignKey('Tipo_documentos.ID'))
-    NIVEL_MCER_ID = Column(Integer, ForeignKey('Nivel_MCER.ID'))
-    CIUDAD_ID = Column(Integer, ForeignKey('Ciudades.ID'))
-    nivel_mcer = relationship("Nivel_MCER", back_populates="personas")
-    ciudad = relationship("Ciudades", back_populates="personas")
-    tipo_documento = relationship("Tipo_documentos")
+    TIPO_PERSONA = Column(String(50))
+    TIPO_DOCUMENTO_ID = Column(BigInteger, ForeignKey('Tipo_documentos.ID'))
+    # NIVEL_MCER_ID eliminado (ahora es relación muchos-a-muchos)
+    CIUDAD_ID = Column(BigInteger, ForeignKey('Ciudades.ID'))
+    INSTITUCION_ID = Column(BigInteger, ForeignKey('Instituciones.ID'))
 
 class Cursos(Base):
     __tablename__ = 'Cursos'
-    ID = Column(Integer, primary_key=True)
-    ENTIDAD = Column(String(100))
-    NOMBRE_CURSO = Column(String(100))
+    ID = Column(BigInteger, primary_key=True, autoincrement=True)
+    NOMBRE_CURSO = Column(String(200))
+    ENTIDAD = Column(String(200))
     IDIOMA = Column(String(50))
-    NIVEL_MCER_ID = Column(Integer, ForeignKey('Nivel_MCER.ID'))
-    SEDE = Column(String(100))
-    nivel_mcer = relationship("Nivel_MCER", back_populates="cursos")
-    sedes_instituciones = relationship("Sedes_instituciones", back_populates="curso")
+    INSTITUCION_ID = Column(BigInteger, ForeignKey('Instituciones.ID'))
 
-class Sedes_instituciones(Base):
-    __tablename__ = 'Sedes_instituciones'
-    ID = Column(Integer, primary_key=True)
-    CURSO_ID = Column(Integer, ForeignKey('Cursos.ID'))
-    PERSONA_ID = Column(Integer, ForeignKey('Personas.NUMERO_DOCUMENTO'))  # AÑADIR ESTA LÍNEA
-    GRUPO = Column(String(50))
-    JORNADA = Column(String(50))
-    FECHA_INICIAL = Column(Date)
-    FECHA_FINAL = Column(Date)
-    INSTITUCION_EDUCATIVA_ID = Column(Integer, ForeignKey('Instituciones_educativas.ID'))
-    curso = relationship("Cursos", back_populates="sedes_instituciones")
-    institucion_educativa = relationship("Instituciones_educativas", back_populates="sedes_instituciones")
-    persona = relationship("Personas")  # AÑADIR ESTA LÍNEA
-
+class Sedes(Base):
+    __tablename__ = 'Sedes'
+    ID = Column(BigInteger, primary_key=True, autoincrement=True)
+    GRUPO = Column(String(255))
+    JORNADA = Column(String(255))
+    SEDE_NODAL = Column(String(200))
+    PERSONA_ID = Column(BigInteger, ForeignKey('Personas.ID'))

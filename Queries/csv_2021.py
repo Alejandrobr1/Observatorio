@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Base_datos.conexion import engine
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-ruta_archivo = os.path.join(project_root, "CSVs", "data_2025.csv")
+ruta_archivo = os.path.join(project_root, "CSVs", "data_2021.csv")
 
 # Leer CSV
 df = pd.read_csv(ruta_archivo, sep=';', encoding='utf-8-sig')
@@ -124,49 +124,49 @@ df['NOMBRE_CURSO_PROCESADO'] = df.apply(
 )
 
 # Clean and prepare data for lookup tables - AHORA SIN dropna() para no perder filas
-TIPO_DOCUMENTOS_2025 = df[["TIPO DE IDENTIFICACIÓN"]].drop_duplicates().reset_index(drop=True)
-TIPO_DOCUMENTOS_2025 = TIPO_DOCUMENTOS_2025[TIPO_DOCUMENTOS_2025["TIPO DE IDENTIFICACIÓN"] != 'SIN INFORMACION']
+TIPO_DOCUMENTOS_2021 = df[["TIPO DE IDENTIFICACIÓN"]].drop_duplicates().reset_index(drop=True)
+TIPO_DOCUMENTOS_2021 = TIPO_DOCUMENTOS_2021[TIPO_DOCUMENTOS_2021["TIPO DE IDENTIFICACIÓN"] != 'SIN INFORMACION']
 
 # MODIFICADO: Ahora incluye GRADO en NIVEL_MCER
-NIVEL_MCER_2025 = df[["NIVEL_MCER","POBLACIÓN","ESTADO ETAPA 2","ANIO","IDIOMA","CERTIFICADO","GRADO"]].drop_duplicates().reset_index(drop=True)
+NIVEL_MCER_2021 = df[["NIVEL_MCER","POBLACIÓN","ESTADO ETAPA 2","ANIO","IDIOMA","CERTIFICADO","GRADO"]].drop_duplicates().reset_index(drop=True)
 
 # MODIFICADO: Instituciones SIN GRADO
-INSTITUCIONES_2025 = df[["INSTITUCIÓN EDUCATIVA","COLEGIO ABREVIADO PARA LISTADOS"]].drop_duplicates().reset_index(drop=True)
-INSTITUCIONES_2025 = INSTITUCIONES_2025[INSTITUCIONES_2025["INSTITUCIÓN EDUCATIVA"] != 'SIN INFORMACION']
+INSTITUCIONES_2021 = df[["INSTITUCIÓN EDUCATIVA","COLEGIO ABREVIADO PARA LISTADOS"]].drop_duplicates().reset_index(drop=True)
+INSTITUCIONES_2021 = INSTITUCIONES_2021[INSTITUCIONES_2021["INSTITUCIÓN EDUCATIVA"] != 'SIN INFORMACION']
 
-CIUDADES_2025 = df[["MUNICIPIO"]].drop_duplicates().reset_index(drop=True)
-CIUDADES_2025 = CIUDADES_2025[CIUDADES_2025["MUNICIPIO"] != 'SIN INFORMACION']
+CIUDADES_2021 = df[["MUNICIPIO"]].drop_duplicates().reset_index(drop=True)
+CIUDADES_2021 = CIUDADES_2021[CIUDADES_2021["MUNICIPIO"] != 'SIN INFORMACION']
 
 # MODIFICADO: Ahora NO elimina filas con "SIN INFORMACION"
-CURSOS_2025 = df[["ENTIDAD","IDIOMA","INSTITUCIÓN EDUCATIVA","NOMBRE_CURSO_PROCESADO","TIPO POBLACION"]].copy()
-CURSOS_2025 = CURSOS_2025[CURSOS_2025["INSTITUCIÓN EDUCATIVA"] != 'SIN INFORMACION'].drop_duplicates().reset_index(drop=True)
+CURSOS_2021 = df[["ENTIDAD","IDIOMA","INSTITUCIÓN EDUCATIVA","NOMBRE_CURSO_PROCESADO","TIPO POBLACION"]].copy()
+CURSOS_2021 = CURSOS_2021[CURSOS_2021["INSTITUCIÓN EDUCATIVA"] != 'SIN INFORMACION'].drop_duplicates().reset_index(drop=True)
 
 # Prepare data for main tables - MANTENER TODAS LAS FILAS
 # MODIFICADO: Personas sin NIVEL_MCER_ID directo
-PERSONAS_2025 = df[["NOMBRES","APELLIDOS","TELÉFONO 1","TELÉFONO 2","NÚMERO DE IDENTIFICACIÓN","CORREO ELECTRÓNICO",
+PERSONAS_2021 = df[["NOMBRES","APELLIDOS","TELÉFONO 1","TELÉFONO 2","NÚMERO DE IDENTIFICACIÓN","CORREO ELECTRÓNICO",
                     "DIRECCIÓN","SEXO","FECHA DE NACIMIENTO","TIPO POBLACION","TIPO DE IDENTIFICACIÓN",
                     "MUNICIPIO","INSTITUCIÓN EDUCATIVA"]].copy()
 
 # NUEVO: Preparar datos para tabla de asociación Persona_Nivel_MCER
-PERSONA_NIVEL_2025 = df[["NÚMERO DE IDENTIFICACIÓN","NIVEL_MCER","POBLACIÓN","ANIO"]].copy()
+PERSONA_NIVEL_2021 = df[["NÚMERO DE IDENTIFICACIÓN","NIVEL_MCER","POBLACIÓN","ANIO"]].copy()
 
-SEDES_2025 = df[["GRUPO","JORNADA","SEDE NODAL","NÚMERO DE IDENTIFICACIÓN"]].copy()
+SEDES_2021 = df[["GRUPO","JORNADA","SEDE NODAL","NÚMERO DE IDENTIFICACIÓN"]].copy()
 
 # Convertir NUMERO_DOCUMENTO a string - si está vacío usar "Sin información"
-PERSONAS_2025['NÚMERO DE IDENTIFICACIÓN'] = PERSONAS_2025['NÚMERO DE IDENTIFICACIÓN'].apply(
+PERSONAS_2021['NÚMERO DE IDENTIFICACIÓN'] = PERSONAS_2021['NÚMERO DE IDENTIFICACIÓN'].apply(
     lambda x: 'Sin información' if pd.isna(x) or str(x).strip().lower() in ['nan', 'none', '', 'sin informacion'] else str(x).strip()
 )
 
-PERSONA_NIVEL_2025['NÚMERO DE IDENTIFICACIÓN'] = PERSONA_NIVEL_2025['NÚMERO DE IDENTIFICACIÓN'].apply(
+PERSONA_NIVEL_2021['NÚMERO DE IDENTIFICACIÓN'] = PERSONA_NIVEL_2021['NÚMERO DE IDENTIFICACIÓN'].apply(
     lambda x: 'Sin información' if pd.isna(x) or str(x).strip().lower() in ['nan', 'none', '', 'sin informacion'] else str(x).strip()
 )
 
-SEDES_2025['NÚMERO DE IDENTIFICACIÓN'] = SEDES_2025['NÚMERO DE IDENTIFICACIÓN'].apply(
+SEDES_2021['NÚMERO DE IDENTIFICACIÓN'] = SEDES_2021['NÚMERO DE IDENTIFICACIÓN'].apply(
     lambda x: 'Sin información' if pd.isna(x) or str(x).strip().lower() in ['nan', 'none', '', 'sin informacion'] else str(x).strip()
 )
 
 print("\nIniciando inserción de datos...")
-print(f"Total personas a procesar: {len(PERSONAS_2025)}")
+print(f"Total personas a procesar: {len(PERSONAS_2021)}")
 print(f"\nVerificando columna ANIO:")
 print(f"  - Valores únicos: {sorted(df['ANIO'].dropna().unique())}")
 print(f"  - Valores nulos: {df['ANIO'].isna().sum()}")
@@ -178,7 +178,7 @@ with engine.connect() as connection:
     # ==========================================
     
     print("\n1. Procesando Tipo_documentos...")
-    for _, row in TIPO_DOCUMENTOS_2025.iterrows():
+    for _, row in TIPO_DOCUMENTOS_2021.iterrows():
         tipo_doc = row['TIPO DE IDENTIFICACIÓN']
         
         if tipo_doc == 'SIN INFORMACION':
@@ -197,7 +197,7 @@ with engine.connect() as connection:
     print("✓ Tipo_documentos actualizado")
     
     print("\n2. Procesando Ciudades...")
-    for _, row in CIUDADES_2025.iterrows():
+    for _, row in CIUDADES_2021.iterrows():
         municipio = row['MUNICIPIO']
         
         if municipio == 'SIN INFORMACION':
@@ -216,7 +216,7 @@ with engine.connect() as connection:
     print("✓ Ciudades actualizado")
     
     print("\n3. Procesando Instituciones...")
-    for _, row in INSTITUCIONES_2025.iterrows():
+    for _, row in INSTITUCIONES_2021.iterrows():
         nombre = row['INSTITUCIÓN EDUCATIVA']
         colegio_abrev = row['COLEGIO ABREVIADO PARA LISTADOS']
         
@@ -239,7 +239,7 @@ with engine.connect() as connection:
     print("✓ Instituciones actualizado")
     
     print("\n4. Procesando Nivel_MCER...")
-    for _, row in NIVEL_MCER_2025.iterrows():
+    for _, row in NIVEL_MCER_2021.iterrows():
         nivel = limpiar_valor(row['NIVEL_MCER'])
         tipo_pob = limpiar_valor(row['POBLACIÓN'])
         estado = limpiar_valor(row['ESTADO ETAPA 2'])
@@ -281,7 +281,7 @@ with engine.connect() as connection:
     personas_actualizadas = 0
     personas_sin_doc = 0
     
-    for idx, row in PERSONAS_2025.iterrows():
+    for idx, row in PERSONAS_2021.iterrows():
         numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
         
         if numero_doc == 'Sin información':
@@ -386,7 +386,7 @@ with engine.connect() as connection:
     print("\n5.5. Procesando relaciones Persona-Nivel_MCER...")
     relaciones_nuevas = 0
     
-    for _, row in PERSONA_NIVEL_2025.iterrows():
+    for _, row in PERSONA_NIVEL_2021.iterrows():
         numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
         nivel_mcer_valor = limpiar_valor(row['NIVEL_MCER'])
         poblacion_valor = limpiar_valor(row['POBLACIÓN'])
@@ -440,7 +440,7 @@ with engine.connect() as connection:
     print("\n6. Procesando Sedes...")
     sedes_nuevas = 0
     
-    for _, row in SEDES_2025.iterrows():
+    for _, row in SEDES_2021.iterrows():
         numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
         
         # Obtener ID de la persona (ahora incluye "Sin información")
@@ -486,7 +486,7 @@ with engine.connect() as connection:
     cursos_nuevos = 0
     docentes_procesados = 0
     
-    for _, row in CURSOS_2025.iterrows():
+    for _, row in CURSOS_2021.iterrows():
         entidad = limpiar_valor(row['ENTIDAD'])
         idioma = limpiar_valor(row['IDIOMA'])
         institucion = limpiar_valor(row['INSTITUCIÓN EDUCATIVA'])
