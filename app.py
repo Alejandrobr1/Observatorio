@@ -179,7 +179,7 @@ with tab2:
     st.markdown("")
     
     # Formación Sábados
-    st.markdown("#### 📚 Formación Sábados (5 Dashboards)")
+    st.markdown("#### 📚 Formación Sábados (6 Dashboards)")
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown("[📊 Estudiantes](/1_%F0%9F%93%8A_Estudiantes_Sabados)")
@@ -189,17 +189,20 @@ with tab2:
         st.markdown("[📚 Niveles MCER](/8_%F0%9F%93%9A_Niveles_MCER_Sabados)")
     with col3:
         st.markdown("[🏫 Instituciones](/10_%F0%9F%8F%AB_Instituciones_Sabados)")
+        st.markdown("[📍 Asistencia x Institución](/14_%F0%9F%93%9A_Asistencia_Institucion_Sabados)")
     st.divider()
     
     # Formación Docentes
-    st.markdown("#### 🎓 Formación Docentes (1 Dashboard)")
+    st.markdown("#### 🎓 Formación Docentes (2 Dashboards)")
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("[👥 Sexo y Grado](/3_%F0%9F%91%A5_Sexo_Grado_Docentes)")
+    with col2:
+        st.markdown("[📍 Asistencia x Institución](/12_%F0%9F%8F%AB_Asistencia_Institucion_Docentes)")
     st.divider()
     
     # Formación Intensificación
-    st.markdown("#### ⚡ Formación Intensificación (5 Dashboards)")
+    st.markdown("#### ⚡ Formación Intensificación (6 Dashboards)")
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown("[⚡ Estudiantes](/4_%F0%9F%93%8A_Estudiantes_Intensificacion)")
@@ -209,6 +212,7 @@ with tab2:
         st.markdown("[📚 Niveles MCER](/9_%F0%9F%93%9A_Niveles_MCER_Intensificacion)")
     with col3:
         st.markdown("[🏫 Instituciones](/11_%F0%9F%8F%AB_Instituciones_Intensificacion)")
+        st.markdown("[📍 Asistencia x Institución](/13_%E2%9A%A1_Asistencia_Institucion_Intensificacion)")
     st.divider()
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")

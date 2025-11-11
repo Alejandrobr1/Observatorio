@@ -78,8 +78,8 @@ with engine.connect() as connection:
             p.NOMBRES,
             p.APELLIDOS,
             p.SEXO,
-            pnm.NIVEL_MCER,
-            pnm.GRADO,
+            nm.NIVEL_MCER,
+            p.GRADO,
             pnm.ANIO_REGISTRO,
             pnm.NOMBRE_CURSO,
             i.NOMBRE_INSTITUCION,
@@ -91,7 +91,6 @@ with engine.connect() as connection:
         LEFT JOIN Ciudades ci ON i.CIUDAD_ID = ci.ID
         WHERE pnm.ANIO_REGISTRO = :year
         AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%intensif%')
-        AND p.TIPO_PERSONA = 'Estudiante'
         ORDER BY p.NOMBRES
     """)
     

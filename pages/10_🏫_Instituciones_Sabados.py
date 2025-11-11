@@ -70,9 +70,10 @@ with engine.connect() as connection:
             COUNT(DISTINCT p.ID) as cantidad
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
-        LEFT JOIN Instituciones i ON p.INSTITUCION_ID = i.ID
+        LEFT JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
+        LEFT JOIN Instituciones i ON nm.INSTITUCION_ID = i.ID
         WHERE pnm.ANIO_REGISTRO = :year
-        AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%sabado%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%sabados%')
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%sabado%'
         GROUP BY COALESCE(i.NOMBRE_INSTITUCION, 'SIN ESPECIFICAR')
         ORDER BY cantidad DESC
     """)
@@ -103,13 +104,15 @@ if data:
         st.plotly_chart(fig_pie, use_container_width=True)
     
     with col2:
+        df_sorted = df.sort_values('Cantidad', ascending=True)
         fig_bar = px.barh(
-            df.sort_values('Cantidad'),
+            df_sorted,
             y='Institución',
             x='Cantidad',
             title=f"Estudiantes por Institución - {selected_year}",
             color='Cantidad',
-            color_continuous_scale='viridis'
+            color_continuous_scale='viridis',
+            labels={'Cantidad': 'Cantidad', 'Institución': 'Institución'}
         )
         st.plotly_chart(fig_bar, use_container_width=True)
     

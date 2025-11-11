@@ -37,19 +37,19 @@ def get_estudiantes_sabados():
         p.NOMBRES,
         p.APELLIDOS,
         p.SEXO,
-        pnm.NIVEL_MCER,
-        pnm.GRADO,
+        nm.NIVEL_MCER,
+        p.GRADO,
         pnm.ANIO_REGISTRO,
         pnm.NOMBRE_CURSO,
         i.NOMBRE_INSTITUCION,
         ci.NOMBRE_CIUDAD,
-        pnm.TIPO_POBLACION
+        p.TIPO_POBLACION
     FROM Persona_Nivel_MCER pnm
     JOIN Personas p ON pnm.PERSONA_ID = p.ID
     JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
     JOIN Instituciones i ON nm.INSTITUCION_ID = i.ID
     JOIN Ciudades ci ON i.CIUDAD_ID = ci.ID
-    WHERE pnm.NOMBRE_CURSO LIKE '%Sabados%' OR pnm.NOMBRE_CURSO LIKE '%sabados%'
+    WHERE LOWER(pnm.NOMBRE_CURSO) LIKE '%sabados%'
     ORDER BY pnm.ANIO_REGISTRO DESC, p.NOMBRES
     """
     return pd.read_sql(text(query), engine)

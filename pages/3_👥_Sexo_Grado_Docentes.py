@@ -75,16 +75,15 @@ with engine.connect() as connection:
     # Query principal
     query = text("""
         SELECT 
-            p.SEXO,
-            p.GRADO,
+            COALESCE(p.SEXO, 'SIN ESPECIFICAR') as sexo,
+            COALESCE(p.GRADO, 'SIN ESPECIFICAR') as grado,
             COUNT(DISTINCT p.ID) as cantidad
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO = :year
         AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%docentes%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%docente%')
-        AND p.TIPO_PERSONA = 'Estudiante'
-        GROUP BY p.SEXO, p.GRADO
-        ORDER BY p.SEXO, p.GRADO
+        GROUP BY COALESCE(p.SEXO, 'SIN ESPECIFICAR'), COALESCE(p.GRADO, 'SIN ESPECIFICAR')
+        ORDER BY cantidad DESC
     """)
     
     result = connection.execute(query, {"year": int(selected_year)})
