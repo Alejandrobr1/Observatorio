@@ -1,69 +1,68 @@
 import streamlit as st
-import os
-import sys
-import subprocess
-import webbrowser
-import socket
 import io
 import zipfile
 import pandas as pd
 from sqlalchemy import create_engine, text, inspect
+import os
 
-# Página principal que lanza los otros dashboards y permite exportar la BD a CSV(s)
+# Configuración de la página
+st.set_page_config(
+    page_title="Observatorio Bilinguismo - Panel Principal",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.set_page_config(layout="wide", page_title="Panel Principal - Dashboards")
-st.title("📌 Panel Principal - Dashboards del Observatorio")
+# Estilos personalizados
+st.markdown("""
+    <style>
+    .main-header {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    .dashboard-card {
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #f0f2f6;
+        margin: 10px 0;
+        border-left: 5px solid #667eea;
+    }
+    .section-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #667eea;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+st.markdown(
+    """<div class="main-header">
+    <h1>📊 Observatorio de Bilingüismo</h1>
+    <p>Sistema de Monitoreo y Análisis de Programas Educativos</p>
+    </div>""",
+    unsafe_allow_html=True
+)
 
-# Rutas a los scripts de dashboards (relativas a este archivo)
-DASHBOARDS = {
-    'Estudiantes por Sexo y Grado': os.path.join(ROOT, 'estudiantes_grado_sexo.py'),
-    'Asistencia por Institución': os.path.join(ROOT, 'asistencia_institucion.py'),
-    'Estudiantes por Nivel MCER': os.path.join(ROOT, 'estudiantes_niveles.py'),
-    'Aprobación de Estudiantes': os.path.join(ROOT, 'Estado_estudiantes.py')
-}
-
-# Puerto por defecto para lanzar cada dashboard si el usuario pulsa "Abrir"
-DEFAULT_PORTS = [8501, 8502, 8503, 8504, 8505]
-
+# Obtener conexión a la base de datos
 @st.cache_resource
 def get_engine():
-    # Ajusta la cadena de conexión si fuera necesario
-    return create_engine("mysql+mysqlconnector://root:123456@localhost:3308/observatorio_bilinguismo")
-
-def is_port_in_use(port: int) -> bool:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        try:
-            s.bind(("127.0.0.1", port))
-            return False
-        except OSError:
-            return True
-
-def start_streamlit(script_path: str, port: int):
-    """Start a streamlit process for the given script on the given port in background."""
-    # If already in session state, don't start again
-    servers = st.session_state.get('servers', {})
-    if script_path in servers:
-        proc = servers[script_path]
-        if proc.poll() is None:
-            return port, proc
-
-    cmd = [sys.executable, '-m', 'streamlit', 'run', script_path, '--server.port', str(port), '--server.headless', 'true']
-    # Start process in background
-    try:
-        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception as e:
-        st.error(f"No se pudo iniciar el servidor Streamlit: {e}")
-        return None, None
-
-    # store
-    servers[script_path] = proc
-    st.session_state['servers'] = servers
-    return port, proc
+    db_user = os.getenv('DB_USER', 'root')
+    db_pass = os.getenv('DB_PASS', '123456')
+    db_host = os.getenv('DB_HOST', 'localhost')
+    db_port = os.getenv('DB_PORT', '3308')
+    db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')
+    
+    connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+    return create_engine(connection_string)
 
 def export_all_tables_to_zip(engine):
-    """Export all tables in the current database to a zip file (each table as a csv). Returns bytes."""
+    """Exporta todas las tablas de la base de datos a un ZIP con CSVs."""
     inspector = inspect(engine)
     tables = inspector.get_table_names()
 
@@ -72,58 +71,177 @@ def export_all_tables_to_zip(engine):
         for table in tables:
             try:
                 df = pd.read_sql(text(f"SELECT * FROM `{table}`"), engine)
-            except Exception:
-                # skip tables that cannot be read
+                csv_bytes = df.to_csv(index=False).encode('utf-8')
+                zf.writestr(f"{table}.csv", csv_bytes)
+            except Exception as e:
+                st.warning(f"No se pudo exportar la tabla {table}: {e}")
                 continue
-
-            csv_bytes = df.to_csv(index=False).encode('utf-8')
-            zf.writestr(f"{table}.csv", csv_bytes)
 
     mem_zip.seek(0)
     return mem_zip.read()
 
+def export_combined_data(engine):
+    """Exporta los datos principales combinados en un único CSV."""
+    try:
+        query = """
+        SELECT 
+            p.NÚMERO_DE_IDENTIFICACIÓN,
+            p.NOMBRES,
+            p.APELLIDOS,
+            p.SEXO,
+            pnm.NIVEL_MCER,
+            pnm.GRADO,
+            pnm.ANIO_REGISTRO,
+            pnm.NOMBRE_CURSO,
+            pnm.TIPO_POBLACION,
+            i.NOMBRE_INSTITUCION,
+            ci.NOMBRE_CIUDAD
+        FROM Persona_Nivel_MCER pnm
+        JOIN Personas p ON pnm.PERSONA_ID = p.ID
+        JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
+        JOIN Instituciones i ON nm.INSTITUCION_ID = i.ID
+        JOIN Ciudades ci ON i.CIUDAD_ID = ci.ID
+        ORDER BY p.NÚMEROS_DE_IDENTIFICACIÓN, pnm.ANIO_REGISTRO
+        """
+        df = pd.read_sql(text(query), engine)
+        return df.to_csv(index=False).encode('utf-8')
+    except Exception as e:
+        st.error(f"Error al exportar datos combinados: {e}")
+        return None
 
-st.markdown(
-    "Selecciona uno de los dashboards para abrirlo o usa el botón de exportar para descargar la base de datos completa en un ZIP con CSVs por tabla."
-)
+# Contenido principal
+tab1, tab2, tab3 = st.tabs(["🏠 Inicio", "📈 Dashboards", "📥 Descargas"])
 
-cols = st.columns(4)
-for i, (label, path) in enumerate(DASHBOARDS.items()):
-    with cols[i % 4]:
-        if st.button(f"Abrir: {label}"):
-            # Find a free port among defaults
-            chosen_port = None
-            for p in DEFAULT_PORTS:
-                if not is_port_in_use(p):
-                    chosen_port = p
-                    break
-            if chosen_port is None:
-                st.warning("No hay puertos libres en la lista de puertos. Elige uno manualmente en la configuración.")
-            else:
-                port, proc = start_streamlit(path, chosen_port)
-                if proc is not None:
-                    url = f"http://localhost:{port}"
-                    st.success(f"Servidor iniciado en {url} (script: {os.path.basename(path)})")
-                    # Intentar abrir el navegador
-                    try:
-                        webbrowser.open(url)
-                    except Exception:
-                        pass
-
-st.divider()
-
-st.header("Exportar base de datos")
-st.write("Descarga un ZIP que contiene un CSV por cada tabla de la base de datos.")
-
-engine = get_engine()
-
-if st.button("📥 Exportar DB a ZIP (CSV por tabla)"):
-    with st.spinner("Generando exportación, esto puede tardar unos segundos..."):
+with tab1:
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### 📋 Acerca del Observatorio")
+        st.markdown("""
+        Este sistema permite monitorear y analizar los programas educativos de bilingüismo
+        con datos actualizados desde 2016.
+        
+        **Características:**
+        - 📊 Múltiples dashboards analíticos
+        - 👥 Análisis de estudiantes y docentes
+        - 🏫 Estadísticas por institución
+        - 📉 Seguimiento de niveles MCER
+        - 💾 Exportación de datos completos
+        """)
+    
+    with col2:
         try:
-            data_bytes = export_all_tables_to_zip(engine)
-            st.success("Exportación lista")
-            st.download_button("Descargar ZIP con CSVs", data=data_bytes, file_name="observatorio_export.zip", mime="application/zip")
+            engine = get_engine()
+            with engine.connect() as conn:
+                # Contar registros
+                personas_result = conn.execute(text("SELECT COUNT(*) as total FROM Personas"))
+                personas_count = personas_result.fetchone()[0]
+                
+                pnm_result = conn.execute(text("SELECT COUNT(*) as total FROM Persona_Nivel_MCER"))
+                pnm_count = pnm_result.fetchone()[0]
+                
+                inst_result = conn.execute(text("SELECT COUNT(*) as total FROM Instituciones"))
+                inst_count = inst_result.fetchone()[0]
+                
+            col2.metric("👥 Total de Personas", personas_count)
+            col2.metric("📊 Registros Nivel MCER", pnm_count)
+            col2.metric("🏫 Instituciones", inst_count)
         except Exception as e:
-            st.error(f"Error al exportar la base de datos: {e}")
+            st.warning(f"No se pudo conectar a la base de datos: {e}")
 
-st.info("Nota: Los dashboards se lanzan en procesos Streamlit separados en puertos locales. Si ya tienes instancias corriendo, puede que el puerto esté ocupado; el script intentará usar los puertos 8501-8504.")
+with tab2:
+    st.markdown("### 📈 Dashboards Disponibles")
+    st.markdown("""
+    Accede a los diferentes dashboards usando el menú lateral. Cada dashboard proporciona
+    análisis específicos sobre los programas educativos.
+    """)
+    
+    dashboards_info = {
+        "Formación Sábados": {
+            "icon": "🎓",
+            "description": "Análisis de estudiantes en programas de Formación Sábados",
+            "pages": [
+                "1_📊_Estudiantes_Sabados",
+                "2_👥_Sexo_Grado_Sabados",
+                "3_🏫_Instituciones_Sabados"
+            ]
+        },
+        "Formación Docentes": {
+            "icon": "👨‍🏫",
+            "description": "Análisis de docentes en formación",
+            "pages": [
+                "4_📊_Estudiantes_Docentes",
+                "5_👥_Sexo_Grado_Docentes"
+            ]
+        },
+        "Intensificación": {
+            "icon": "⚡",
+            "description": "Análisis de programas de intensificación",
+            "pages": [
+                "6_📊_Estudiantes_Intensificacion",
+                "7_👥_Sexo_Grado_Intensificacion"
+            ]
+        }
+    }
+    
+    for category, info in dashboards_info.items():
+        with st.container():
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.markdown(f"#### {info['icon']} {category}")
+                st.markdown(f"*{info['description']}*")
+                st.markdown(f"Páginas: {', '.join([p.split('_')[1] for p in info['pages']])}")
+            st.divider()
+
+with tab3:
+    st.markdown("### 📥 Centro de Descargas")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### Exportar Base de Datos Completa")
+        st.markdown("Descarga un ZIP con todos los datos de cada tabla en formato CSV.")
+        
+        if st.button("� Generar ZIP con todas las tablas", key="export_zip"):
+            with st.spinner("Generando exportación..."):
+                try:
+                    engine = get_engine()
+                    data_bytes = export_all_tables_to_zip(engine)
+                    st.download_button(
+                        label="⬇️ Descargar ZIP",
+                        data=data_bytes,
+                        file_name="observatorio_bilinguismo_completo.zip",
+                        mime="application/zip"
+                    )
+                    st.success("✅ Exportación lista para descargar")
+                except Exception as e:
+                    st.error(f"Error al exportar: {e}")
+    
+    with col2:
+        st.markdown("#### Exportar Datos Combinados")
+        st.markdown("Descarga un CSV con los datos principales de estudiantes y niveles.")
+        
+        if st.button("📄 Generar CSV combinado", key="export_csv"):
+            with st.spinner("Generando exportación..."):
+                try:
+                    engine = get_engine()
+                    data_bytes = export_combined_data(engine)
+                    if data_bytes:
+                        st.download_button(
+                            label="⬇️ Descargar CSV",
+                            data=data_bytes,
+                            file_name="observatorio_bilinguismo_datos.csv",
+                            mime="text/csv"
+                        )
+                        st.success("✅ Exportación lista para descargar")
+                except Exception as e:
+                    st.error(f"Error al exportar: {e}")
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### ℹ️ Información")
+st.sidebar.markdown("""
+**Observatorio de Bilingüismo**
+- Versión: 1.0
+- Última actualización: 2025
+- [Contacto](mailto:info@observatorio.edu)
+""")
