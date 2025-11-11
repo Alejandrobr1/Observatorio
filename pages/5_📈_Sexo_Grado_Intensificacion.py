@@ -56,10 +56,8 @@ with engine.connect() as connection:
     query_years = text("""
         SELECT DISTINCT pnm.ANIO_REGISTRO as año
         FROM Persona_Nivel_MCER pnm
-        INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO IS NOT NULL
         AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%intensif%')
-        AND p.TIPO_PERSONA = 'Estudiante'
         ORDER BY año DESC
     """)
     result_years = connection.execute(query_years)
@@ -71,19 +69,18 @@ with engine.connect() as connection:
 
     selected_year = st.sidebar.selectbox('📅 Año', available_years, index=0)
 
-    # Query principal
+    # Query principal - SIMPLE Y COMPATIBLE
     query = text("""
         SELECT 
-            p.SEXO,
-            p.GRADO,
+            COALESCE(p.SEXO, 'SIN ESPECIFICAR') as sexo,
+            COALESCE(p.GRADO, 'SIN ESPECIFICAR') as grado,
             COUNT(DISTINCT p.ID) as cantidad
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO = :year
         AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%intensif%')
-        AND p.TIPO_PERSONA = 'Estudiante'
-        GROUP BY p.SEXO, p.GRADO
-        ORDER BY p.SEXO, p.GRADO
+        GROUP BY COALESCE(p.SEXO, 'SIN ESPECIFICAR'), COALESCE(p.GRADO, 'SIN ESPECIFICAR')
+        ORDER BY sexo, grado
     """)
     
     result = connection.execute(query, {"year": int(selected_year)})
