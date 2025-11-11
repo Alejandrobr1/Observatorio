@@ -152,46 +152,35 @@ with tab1:
 with tab2:
     st.markdown("### 📈 Dashboards Disponibles")
     st.markdown("""
-    Accede a los diferentes dashboards usando el menú lateral. Cada dashboard proporciona
-    análisis específicos sobre los programas educativos.
+    Haz clic en cualquier dashboard para acceder a análisis específicos sobre los programas educativos.
     """)
+    st.markdown("")
     
-    dashboards_info = {
-        "Formación Sábados": {
-            "icon": "🎓",
-            "description": "Análisis de estudiantes en programas de Formación Sábados",
-            "pages": [
-                "1_📊_Estudiantes_Sabados",
-                "2_👥_Sexo_Grado_Sabados",
-                "3_🏫_Instituciones_Sabados"
-            ]
-        },
-        "Formación Docentes": {
-            "icon": "👨‍🏫",
-            "description": "Análisis de docentes en formación",
-            "pages": [
-                "4_📊_Estudiantes_Docentes",
-                "5_👥_Sexo_Grado_Docentes"
-            ]
-        },
-        "Intensificación": {
-            "icon": "⚡",
-            "description": "Análisis de programas de intensificación",
-            "pages": [
-                "6_📊_Estudiantes_Intensificacion",
-                "7_👥_Sexo_Grado_Intensificacion"
-            ]
-        }
-    }
+    # Dashboard 1: Estudiantes Sábados
+    col1, col2, col3 = st.columns([2, 2, 1])
+    with col1:
+        st.markdown("#### 📊 Estudiantes Sábados")
+        st.markdown("Análisis detallado de estudiantes en programas de Formación Sábados")
+    with col2:
+        pass
+    with col3:
+        if st.button("Abrir →", key="btn_dashboard_1", use_container_width=True):
+            st.switch_page("pages/1_📊_Estudiantes_Sabados.py")
+    st.divider()
     
-    for category, info in dashboards_info.items():
-        with st.container():
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.markdown(f"#### {info['icon']} {category}")
-                st.markdown(f"*{info['description']}*")
-                st.markdown(f"Páginas: {', '.join([p.split('_')[1] for p in info['pages']])}")
-            st.divider()
+    # Dashboard 2: Sexo/Grado Sábados
+    col1, col2, col3 = st.columns([2, 2, 1])
+    with col1:
+        st.markdown("#### 👥 Sexo y Grado - Sábados")
+        st.markdown("Análisis de distribución por sexo y nivel de grado en Formación Sábados")
+    with col2:
+        pass
+    with col3:
+        if st.button("Abrir →", key="btn_dashboard_2", use_container_width=True):
+            st.switch_page("pages/2_👥_Sexo_Grado_Sabados.py")
+    st.divider()
+    
+    st.info("💡 Más dashboards serán agregados próximamente")
 
 with tab3:
     st.markdown("### 📥 Centro de Descargas")
