@@ -179,30 +179,36 @@ with tab2:
     st.markdown("")
     
     # Formación Sábados
-    st.markdown("#### 📚 Formación Sábados")
-    col1, col2 = st.columns(2)
+    st.markdown("#### 📚 Formación Sábados (5 Dashboards)")
+    col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown("[📊 Estudiantes Sábados](/1_%F0%9F%93%8A_Estudiantes_Sabados) - Análisis detallado de estudiantes")
+        st.markdown("[📊 Estudiantes](/1_%F0%9F%93%8A_Estudiantes_Sabados)")
+        st.markdown("[📊 Estado](/6_%F0%9F%93%8A_Estado_Estudiantes_Sabados)")
     with col2:
-        st.markdown("[👥 Sexo y Grado - Sábados](/2_%F0%9F%91%A5_Sexo_Grado_Sabados) - Distribución por sexo y grado")
+        st.markdown("[👥 Sexo y Grado](/2_%F0%9F%91%A5_Sexo_Grado_Sabados)")
+        st.markdown("[📚 Niveles MCER](/8_%F0%9F%93%9A_Niveles_MCER_Sabados)")
+    with col3:
+        st.markdown("[🏫 Instituciones](/10_%F0%9F%8F%AB_Instituciones_Sabados)")
     st.divider()
     
     # Formación Docentes
-    st.markdown("#### 🎓 Formación Docentes")
+    st.markdown("#### 🎓 Formación Docentes (1 Dashboard)")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("[👥 Sexo y Grado - Docentes](/3_%F0%9F%91%A5_Sexo_Grado_Docentes) - Análisis de docentes")
-    with col2:
-        st.markdown("*Más dashboards próximamente*")
+        st.markdown("[👥 Sexo y Grado](/3_%F0%9F%91%A5_Sexo_Grado_Docentes)")
     st.divider()
     
     # Formación Intensificación
-    st.markdown("#### ⚡ Formación Intensificación")
-    col1, col2 = st.columns(2)
+    st.markdown("#### ⚡ Formación Intensificación (5 Dashboards)")
+    col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown("[⚡ Estudiantes Intensificación](/4_%F0%9F%93%8A_Estudiantes_Intensificacion) - Análisis detallado de estudiantes")
+        st.markdown("[⚡ Estudiantes](/4_%F0%9F%93%8A_Estudiantes_Intensificacion)")
+        st.markdown("[⚡ Estado](/7_%E2%9A%A1_Estado_Estudiantes_Intensificacion)")
     with col2:
-        st.markdown("[📊 Sexo y Grado - Intensificación](/5_%F0%9F%93%88_Sexo_Grado_Intensificacion) - Distribución por sexo y grado")
+        st.markdown("[📊 Sexo y Grado](/5_%F0%9F%93%88_Sexo_Grado_Intensificacion)")
+        st.markdown("[📚 Niveles MCER](/9_%F0%9F%93%9A_Niveles_MCER_Intensificacion)")
+    with col3:
+        st.markdown("[🏫 Instituciones](/11_%F0%9F%8F%AB_Instituciones_Intensificacion)")
     st.divider()
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")
