@@ -164,8 +164,7 @@ with tab2:
     with col2:
         pass
     with col3:
-        if st.button("Abrir →", key="btn_dashboard_1", use_container_width=True):
-            st.switch_page("pages/1_📊_Estudiantes_Sabados.py")
+        st.markdown("[**Abrir →**](1_%F0%9F%93%8A_Estudiantes_Sabados)")
     st.divider()
     
     # Dashboard 2: Sexo/Grado Sábados
@@ -176,9 +175,10 @@ with tab2:
     with col2:
         pass
     with col3:
-        if st.button("Abrir →", key="btn_dashboard_2", use_container_width=True):
-            st.switch_page("pages/2_👥_Sexo_Grado_Sabados.py")
+        st.markdown("[**Abrir →**](2_%F0%9F%91%A5_Sexo_Grado_Sabados)")
     st.divider()
+    
+    st.info("💡 Los dashboards también están disponibles en el menú lateral de Streamlit")
     
     st.info("💡 Más dashboards serán agregados próximamente")
 
