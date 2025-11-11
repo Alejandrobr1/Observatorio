@@ -168,16 +168,16 @@ with tab2:
     st.markdown("#### 📚 Formación Sábados")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("[📊 Estudiantes Sábados](1_%F0%9F%93%8A_Estudiantes_Sabados) - Análisis detallado de estudiantes")
+        st.markdown("[📊 Estudiantes Sábados](/1_%F0%9F%93%8A_Estudiantes_Sabados) - Análisis detallado de estudiantes")
     with col2:
-        st.markdown("[👥 Sexo y Grado - Sábados](2_%F0%9F%91%A5_Sexo_Grado_Sabados) - Distribución por sexo y grado")
+        st.markdown("[👥 Sexo y Grado - Sábados](/2_%F0%9F%91%A5_Sexo_Grado_Sabados) - Distribución por sexo y grado")
     st.divider()
     
     # Formación Docentes
     st.markdown("#### 🎓 Formación Docentes")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("[👥 Sexo y Grado - Docentes](3_%F0%9F%91%A5_Sexo_Grado_Docentes) - Análisis de docentes")
+        st.markdown("[👥 Sexo y Grado - Docentes](/3_%F0%9F%91%A5_Sexo_Grado_Docentes) - Análisis de docentes")
     with col2:
         st.markdown("*Más dashboards próximamente*")
     st.divider()
@@ -186,9 +186,9 @@ with tab2:
     st.markdown("#### ⚡ Formación Intensificación")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("[⚡ Estudiantes Intensificación](4_%F0%9F%93%8A_Estudiantes_Intensificacion) - Análisis detallado de estudiantes")
+        st.markdown("[⚡ Estudiantes Intensificación](/4_%F0%9F%93%8A_Estudiantes_Intensificacion) - Análisis detallado de estudiantes")
     with col2:
-        st.markdown("[📊 Sexo y Grado - Intensificación](5_%F0%9F%93%88_Sexo_Grado_Intensificacion) - Distribución por sexo y grado")
+        st.markdown("[📊 Sexo y Grado - Intensificación](/5_%F0%9F%93%88_Sexo_Grado_Intensificacion) - Distribución por sexo y grado")
     st.divider()
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")
