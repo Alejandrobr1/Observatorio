@@ -1,11 +1,6 @@
-streamlit==1.28.1
-pandas==2.1.4
-sqlalchemy==2.0.44
-mysql-connector-python==9.5.0
-numpy==1.26.4
-matplotlib==3.8.2
-plotly==5.17.0
-pytz==2024.1
-python-dateutil==2.8.2
-pillow==9.5.0
-python-dotenv==1.0.0
+streamlit>=1.40.0
+pandas>=2.0.0
+sqlalchemy>=2.0.0
+mysql-connector-python>=9.0.0
+plotly>=5.0.0
+python-dotenv>=1.0.0
