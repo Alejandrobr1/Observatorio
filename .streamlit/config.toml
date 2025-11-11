@@ -16,3 +16,10 @@ level = "info"
 maxUploadSize = 200
 enableXsrfProtection = true
 headless = true
+# Punto de entrada principal
+runOnSave = true
+runOnOpen = true
+
+[runner]
+# Asegurar que se ejecuta desde la raíz
+magicEnabled = true
