@@ -8,10 +8,14 @@ import zipfile
 import pandas as pd
 from sqlalchemy import create_engine, text, inspect
 import os
-from dotenv import load_dotenv
 
-# Cargar variables de entorno
-load_dotenv()
+# Intenta cargar variables de entorno (funciona en desarrollo local)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # Si no está instalado, continúa (Streamlit Cloud usa secrets)
+    pass
 
 # Configuración de la página
 st.set_page_config(

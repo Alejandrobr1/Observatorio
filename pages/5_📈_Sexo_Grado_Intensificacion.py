@@ -7,6 +7,14 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 import plotly.express as px
 
+# Intenta cargar variables de entorno (funciona en desarrollo local)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # Si no está instalado, continúa (Streamlit Cloud usa secrets)
+    pass
+
 st.set_page_config(page_title="Sexo y Grado - Intensificación", layout="wide", page_icon="📊")
 
 st.title("📊 Distribución por Sexo y Grado - Formación Intensificación")
