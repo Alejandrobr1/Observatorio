@@ -9,6 +9,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text, inspect
 import os
 
+
 # Intenta cargar variables de entorno (funciona en desarrollo local)
 try:
     from dotenv import load_dotenv
@@ -17,6 +18,7 @@ except ImportError:
     # Si no está instalado, continúa (Streamlit Cloud usa secrets)
     pass
 
+
 # Configuración de la página
 st.set_page_config(
     page_title="Observatorio Bilinguismo - Panel Principal",
@@ -24,6 +26,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
 
 # Estilos personalizados
 st.markdown("""
@@ -53,6 +56,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+
 st.markdown(
     """<div class="main-header">
     <h1>📊 Observatorio de Bilingüismo</h1>
@@ -60,6 +64,7 @@ st.markdown(
     </div>""",
     unsafe_allow_html=True
 )
+
 
 # Obtener conexión a la base de datos
 @st.cache_resource
@@ -83,10 +88,12 @@ def get_engine():
     connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
     return create_engine(connection_string)
 
+
 def export_all_tables_to_zip(engine):
     """Exporta todas las tablas de la base de datos a un ZIP con CSVs."""
     inspector = inspect(engine)
     tables = inspector.get_table_names()
+
 
     mem_zip = io.BytesIO()
     with zipfile.ZipFile(mem_zip, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
@@ -99,8 +106,10 @@ def export_all_tables_to_zip(engine):
                 st.warning(f"No se pudo exportar la tabla {table}: {e}")
                 continue
 
+
     mem_zip.seek(0)
     return mem_zip.read()
+
 
 def export_combined_data(engine):
     """Exporta los datos principales combinados en un único CSV."""
@@ -131,8 +140,10 @@ def export_combined_data(engine):
         st.error(f"Error al exportar datos combinados: {e}")
         return None
 
+
 # Contenido principal
 tab1, tab2, tab3 = st.tabs(["🏠 Inicio", "📈 Dashboards", "📥 Descargas"])
+
 
 with tab1:
     col1, col2 = st.columns(2)
@@ -171,6 +182,7 @@ with tab1:
         except Exception as e:
             st.warning(f"No se pudo conectar a la base de datos: {e}")
 
+
 with tab2:
     st.markdown("### 📈 Dashboards Disponibles")
     st.markdown("""
@@ -182,40 +194,41 @@ with tab2:
     st.markdown("#### 📚 Formación Sábados (6 Dashboards)")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown("[📊 Estudiantes](/1_%F0%9F%93%8A_Estudiantes_Sabados)")
-        st.markdown("[📊 Estado](/6_%F0%9F%93%8A_Estado_Estudiantes_Sabados)")
+        st.page_link("pages/1_📊_Estudiantes_Sabados.py", label="📊 Estudiantes", icon="📊")
+        st.page_link("pages/6_📊_Estado_Estudiantes_Sabados.py", label="📊 Estado", icon="📊")
     with col2:
-        st.markdown("[👥 Sexo y Grado](/2_%F0%9F%91%A5_Sexo_Grado_Sabados)")
-        st.markdown("[📚 Niveles MCER](/8_%F0%9F%93%9A_Niveles_MCER_Sabados)")
+        st.page_link("pages/2_👥_Sexo_Grado_Sabados.py", label="👥 Sexo y Grado", icon="👥")
+        st.page_link("pages/8_📚_Niveles_MCER_Sabados.py", label="📚 Niveles MCER", icon="📚")
     with col3:
-        st.markdown("[🏫 Instituciones](/10_%F0%9F%8F%AB_Instituciones_Sabados)")
-        st.markdown("[📍 Asistencia x Institución](/14_%F0%9F%93%9A_Asistencia_Institucion_Sabados)")
+        st.page_link("pages/10_🏫_Instituciones_Sabados.py", label="🏫 Instituciones", icon="🏫")
+        st.page_link("pages/14_📚_Asistencia_Institucion_Sabados.py", label="📍 Asistencia x Institución", icon="📍")
     st.divider()
     
     # Formación Docentes
     st.markdown("#### 🎓 Formación Docentes (2 Dashboards)")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("[👥 Sexo y Grado](/3_%F0%9F%91%A5_Sexo_Grado_Docentes)")
+        st.page_link("pages/3_👥_Sexo_Grado_Docentes.py", label="👥 Sexo y Grado", icon="👥")
     with col2:
-        st.markdown("[📍 Asistencia x Institución](/12_%F0%9F%8F%AB_Asistencia_Institucion_Docentes)")
+        st.page_link("pages/12_🏫_Asistencia_Institucion_Docentes.py", label="📍 Asistencia x Institución", icon="📍")
     st.divider()
     
     # Formación Intensificación
     st.markdown("#### ⚡ Formación Intensificación (6 Dashboards)")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown("[⚡ Estudiantes](/4_%F0%9F%93%8A_Estudiantes_Intensificacion)")
-        st.markdown("[⚡ Estado](/7_%E2%9A%A1_Estado_Estudiantes_Intensificacion)")
+        st.page_link("pages/4_📊_Estudiantes_Intensificacion.py", label="⚡ Estudiantes", icon="⚡")
+        st.page_link("pages/7_⚡_Estado_Estudiantes_Intensificacion.py", label="⚡ Estado", icon="⚡")
     with col2:
-        st.markdown("[📊 Sexo y Grado](/5_%F0%9F%93%88_Sexo_Grado_Intensificacion)")
-        st.markdown("[📚 Niveles MCER](/9_%F0%9F%93%9A_Niveles_MCER_Intensificacion)")
+        st.page_link("pages/5_📈_Sexo_Grado_Intensificacion.py", label="📊 Sexo y Grado", icon="📊")
+        st.page_link("pages/9_📚_Niveles_MCER_Intensificacion.py", label="📚 Niveles MCER", icon="📚")
     with col3:
-        st.markdown("[🏫 Instituciones](/11_%F0%9F%8F%AB_Instituciones_Intensificacion)")
-        st.markdown("[📍 Asistencia x Institución](/13_%E2%9A%A1_Asistencia_Institucion_Intensificacion)")
+        st.page_link("pages/11_🏫_Instituciones_Intensificacion.py", label="🏫 Instituciones", icon="🏫")
+        st.page_link("pages/13_⚡_Asistencia_Institucion_Intensificacion.py", label="📍 Asistencia x Institución", icon="📍")
     st.divider()
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")
+
 
 with tab3:
     st.markdown("### 📥 Centro de Descargas")
@@ -260,6 +273,7 @@ with tab3:
                         st.success("✅ Exportación lista para descargar")
                 except Exception as e:
                     st.error(f"Error al exportar: {e}")
+
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### ℹ️ Información")
