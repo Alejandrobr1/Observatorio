@@ -7,6 +7,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 import plotly.express as px
 
+
 # Intenta cargar variables de entorno (funciona en desarrollo local)
 try:
     from dotenv import load_dotenv
@@ -15,9 +16,12 @@ except ImportError:
     # Si no está instalado, continúa (Streamlit Cloud usa secrets)
     pass
 
+
 st.set_page_config(page_title="Sexo y Grado - Docentes", layout="wide", page_icon="👥")
 
+
 st.title("👥 Distribución por Sexo y Grado - Formación Docentes")
+
 
 @st.cache_resource
 def get_engine():
@@ -40,6 +44,7 @@ def get_engine():
     connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
     return create_engine(connection_string)
 
+
 try:
     engine = get_engine()
     with engine.connect() as conn:
@@ -49,7 +54,9 @@ except Exception as e:
     st.error(f"❌ Error de conexión: {e}")
     st.stop()
 
+
 st.sidebar.header("🔍 Filtros")
+
 
 with engine.connect() as connection:
     # Obtener años disponibles
@@ -65,12 +72,15 @@ with engine.connect() as connection:
     result_years = connection.execute(query_years)
     available_years = [str(int(row[0])) for row in result_years.fetchall() if row[0]]
 
+
     if not available_years:
         st.warning("⚠️ No se encontraron datos para Formación Docentes")
         st.info("Selecciona 'Sábados' en el menú lateral para ver otros dashboards")
         st.stop()
 
+
     selected_year = st.sidebar.selectbox('📅 Año', available_years, index=0)
+
 
     # Query principal
     query = text("""
@@ -86,18 +96,23 @@ with engine.connect() as connection:
         ORDER BY cantidad DESC
     """)
     
+    # ✅ CORRECCIÓN: Ya no envuelves 'query' en text() porque ya lo está
     result = connection.execute(query, {"year": int(selected_year)})
     data = result.fetchall()
+
 
 if not data:
     st.warning(f"⚠️ No hay datos para el año {selected_year}")
     st.stop()
 
+
 df = pd.DataFrame(data, columns=['Sexo', 'Grado', 'Cantidad'])
+
 
 # Limpiar datos
 df['Sexo_Label'] = df['Sexo'].apply(lambda x: 'Femenino' if x.lower() == 'f' else ('Masculino' if x.lower() == 'm' else 'No especificado'))
 df['Grado'] = df['Grado'].fillna('Sin especificar')
+
 
 # Métricas
 col1, col2, col3 = st.columns(3)
@@ -108,10 +123,13 @@ with col2:
 with col3:
     st.metric("👨 Hombres", df[df['Sexo'].str.lower() == 'm']['Cantidad'].sum())
 
+
 st.divider()
+
 
 # Visualizaciones
 col1, col2 = st.columns(2)
+
 
 with col1:
     st.subheader("📊 Distribución por Sexo")
@@ -123,6 +141,7 @@ with col1:
         color_discrete_sequence=['#FF69B4', '#4169E1']
     )
     st.plotly_chart(fig_sex, use_container_width=True)
+
 
 with col2:
     st.subheader("📈 Distribución por Grado")
@@ -137,8 +156,9 @@ with col2:
     )
     st.plotly_chart(fig_grade, use_container_width=True)
 
+
 st.subheader("📋 Datos Detallados")
 st.dataframe(df[['Sexo_Label', 'Grado', 'Cantidad']], use_container_width=True)
 
-st.info("💡 Este dashboard muestra la distribución de estudiantes por sexo y grado en Formación Docentes")
 
+st.info("💡 Este dashboard muestra la distribución de estudiantes por sexo y grado en Formación Docentes")
