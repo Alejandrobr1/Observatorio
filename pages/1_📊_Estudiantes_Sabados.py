@@ -10,11 +10,21 @@ st.title("📊 Estudiantes - Formación Sábados")
 
 @st.cache_resource
 def get_engine():
-    db_user = os.getenv('DB_USER', 'root')
-    db_pass = os.getenv('DB_PASS', '123456')
-    db_host = os.getenv('DB_HOST', 'localhost')
-    db_port = os.getenv('DB_PORT', '3308')
-    db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')
+    # Primero intenta obtener de st.secrets (Streamlit Cloud)
+    # Si no está disponible, usa variables de entorno
+    try:
+        db_user = st.secrets.get("DB_USER", os.getenv('DB_USER', 'root'))
+        db_pass = st.secrets.get("DB_PASS", os.getenv('DB_PASS', '123456'))
+        db_host = st.secrets.get("DB_HOST", os.getenv('DB_HOST', 'localhost'))
+        db_port = st.secrets.get("DB_PORT", os.getenv('DB_PORT', '3308'))
+        db_name = st.secrets.get("DB_NAME", os.getenv('DB_NAME', 'observatorio_bilinguismo'))
+    except FileNotFoundError:
+        # Si secrets.toml no existe, usa solo variables de entorno
+        db_user = os.getenv('DB_USER', 'root')
+        db_pass = os.getenv('DB_PASS', '123456')
+        db_host = os.getenv('DB_HOST', 'localhost')
+        db_port = os.getenv('DB_PORT', '3308')
+        db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')
     
     connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
     return create_engine(connection_string)
