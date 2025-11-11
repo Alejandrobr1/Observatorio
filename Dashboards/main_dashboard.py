@@ -25,7 +25,7 @@ DASHBOARDS = {
 }
 
 # Puerto por defecto para lanzar cada dashboard si el usuario pulsa "Abrir"
-DEFAULT_PORTS = [8501, 8502, 8503, 8504]
+DEFAULT_PORTS = [8501, 8502, 8503, 8504, 8505]
 
 @st.cache_resource
 def get_engine():

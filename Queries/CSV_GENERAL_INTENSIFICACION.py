@@ -5,43 +5,12 @@ from sqlalchemy import text
 import numpy as np
 from datetime import datetime
 
-# Añadir el directorio raíz del proyecto a sys.path
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from Base_datos.conexion import engine
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-# ==========================================
-# LEER Y COMBINAR MÚLTIPLES ARCHIVOS CSV
-# ==========================================
-
-# Lista de años a procesar (de 2016 a 2025)
-years = range(2016, 2026)  # 2016 hasta 2025
-dfs_list = []
-
-print("Leyendo archivos CSV...")
-for year in years:
-    ruta_archivo = os.path.join(project_root, "CSVs", f"data_{year}_intensificacion.csv")
-    
-    # Verificar si el archivo existe
-    if os.path.exists(ruta_archivo):
-        try:
-            df_temp = pd.read_csv(ruta_archivo, sep=';', encoding='utf-8-sig')
-            dfs_list.append(df_temp)
-            print(f"  ✓ Archivo data_{year}.csv cargado ({len(df_temp)} registros)")
-        except Exception as e:
-            print(f"  ⚠ Error al leer data_{year}.csv: {e}")
-    else:
-        print(f"  ⚠ Archivo data_{year}.csv no encontrado, se omite")
-
-# Combinar todos los DataFrames en uno solo
-if len(dfs_list) == 0:
-    print("Error: No se encontraron archivos CSV para procesar")
-    sys.exit(1)
-
-df = pd.concat(dfs_list, ignore_index=True)
-print(f"\n✓ Total de registros combinados: {len(df)}")
 
 # ==========================================
 # FUNCIONES AUXILIARES
@@ -51,51 +20,35 @@ def extraer_anio(fecha):
     """Extrae el año de diferentes formatos de fecha"""
     if pd.isna(fecha):
         return None
-    
     fecha_str = str(fecha).strip()
-    
     if fecha_str.isdigit() and len(fecha_str) == 4:
         return int(fecha_str)
-    
     try:
         fecha_parsed = pd.to_datetime(fecha_str, errors='coerce')
         if not pd.isna(fecha_parsed):
             return fecha_parsed.year
     except:
         pass
-    
     import re
     match = re.search(r'\b(19|20)\d{2}\b', fecha_str)
     if match:
         return int(match.group())
-    
     return None
 
 def convertir_fecha_mysql(fecha):
     """Convierte fecha a formato MySQL (YYYY-MM-DD)"""
     if pd.isna(fecha):
         return None
-    
     fecha_str = str(fecha).strip()
-    
     if fecha_str.lower() in ['nan', 'none', '']:
         return None
-    
-    formatos = [
-        '%d/%m/%Y',
-        '%Y-%m-%d',
-        '%d-%m-%Y',
-        '%m/%d/%Y',
-        '%Y/%m/%d',
-    ]
-    
+    formatos = ['%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y', '%Y/%m/%d']
     for formato in formatos:
         try:
             fecha_obj = datetime.strptime(fecha_str, formato)
             return fecha_obj.strftime('%Y-%m-%d')
         except ValueError:
             continue
-    
     return None
 
 def limpiar_valor(valor):
@@ -109,298 +62,397 @@ def limpiar_valor(valor):
         return None
     return valor_str
 
-# ==========================================
-# PREPARACIÓN DE DATOS
-# ==========================================
-
-df['ANIO'] = df['FECHA'].apply(extraer_anio)
-
-TIPO_DOCUMENTOS_2025 = df[["TIPO DE IDENTIFICACIÓN"]].drop_duplicates().dropna().reset_index(drop=True)
-NIVEL_MCER_2025 = df[["NIVEL_MCER","POBLACIÓN","ESTADO ETAPA 2","ANIO","IDIOMA","CERTIFICADO"]].drop_duplicates().dropna(subset=["NIVEL_MCER"]).reset_index(drop=True)
-INSTITUCIONES_2025 = df[["INSTITUCIÓN EDUCATIVA","COLEGIO ABREVIADO PARA LISTADOS","GRADO"]].drop_duplicates().dropna().reset_index(drop=True)
-CIUDADES_2025 = df[["MUNICIPIO"]].drop_duplicates().dropna().reset_index(drop=True)
-CURSOS_2025 = df[["ENTIDAD","IDIOMA","INSTITUCIÓN EDUCATIVA"]].drop_duplicates().dropna().reset_index(drop=True)
-
-PERSONAS_2025 = df[["NOMBRES","APELLIDOS","TELÉFONO 1","TELÉFONO 2","NÚMERO DE IDENTIFICACIÓN","CORREO ELECTRÓNICO",
-                    "DIRECCIÓN","SEXO","FECHA DE NACIMIENTO","TIPO POBLACION","TIPO DE IDENTIFICACIÓN",
-                    "NIVEL_MCER","POBLACIÓN","ESTADO ETAPA 2","ANIO","MUNICIPIO","INSTITUCIÓN EDUCATIVA"]].copy()
-
-SEDES_2025 = df[["GRUPO","JORNADA","SEDE NODAL","NÚMERO DE IDENTIFICACIÓN"]].copy()
-
-PERSONAS_2025['NÚMERO DE IDENTIFICACIÓN'] = PERSONAS_2025['NÚMERO DE IDENTIFICACIÓN'].apply(
-    lambda x: 'Sin información' if pd.isna(x) or str(x).strip().lower() in ['nan', 'none', ''] else str(x).strip()
-)
-
-SEDES_2025['NÚMERO DE IDENTIFICACIÓN'] = SEDES_2025['NÚMERO DE IDENTIFICACIÓN'].apply(
-    lambda x: 'Sin información' if pd.isna(x) or str(x).strip().lower() in ['nan', 'none', ''] else str(x).strip()
-)
-
-print("Iniciando inserción de datos...")
-print(f"Total personas a procesar: {len(PERSONAS_2025)}")
-print(f"\nVerificando columna ANIO:")
-print(f"  - Valores únicos: {sorted(PERSONAS_2025['ANIO'].dropna().unique())}")
-print(f"  - Valores nulos: {PERSONAS_2025['ANIO'].isna().sum()}")
 
 # ==========================================
-# INSERCIÓN EN BASE DE DATOS
+# FUNCIÓN PRINCIPAL DE IMPORTACIÓN
 # ==========================================
 
-with engine.connect() as connection:
+def procesar_csv_anio(anio):
+    """Procesa el CSV de un año específico"""
     
-    print("\n1. Procesando Tipo_documentos...")
-    for _, row in TIPO_DOCUMENTOS_2025.iterrows():
-        tipo_doc = row['TIPO DE IDENTIFICACIÓN']
-        result = connection.execute(text(
-            "SELECT ID FROM Tipo_documentos WHERE TIPO_DOCUMENTO = :tipo_doc"
-        ), {'tipo_doc': tipo_doc})
-        
-        if result.fetchone() is None:
-            connection.execute(text(
-                "INSERT INTO Tipo_documentos (TIPO_DOCUMENTO) VALUES (:tipo_doc)"
-            ), {'tipo_doc': tipo_doc})
+    print(f"\n{'='*70}")
+    print(f"PROCESANDO AÑO {anio}")
+    print(f"{'='*70}")
     
-    connection.commit()
-    print("✓ Tipo_documentos actualizado")
+    # Buscar archivo CSV del año
+    ruta_archivo = os.path.join(project_root, "CSVs", f"data_{anio}_intensificacion.csv")
     
-    print("\n2. Procesando Ciudades...")
-    for _, row in CIUDADES_2025.iterrows():
-        municipio = row['MUNICIPIO']
-        result = connection.execute(text(
-            "SELECT ID FROM Ciudades WHERE MUNICIPIO = :municipio"
-        ), {'municipio': municipio})
-        
-        if result.fetchone() is None:
-            connection.execute(text(
-                "INSERT INTO Ciudades (MUNICIPIO) VALUES (:municipio)"
-            ), {'municipio': municipio})
+    if not os.path.exists(ruta_archivo):
+        print(f"⚠️ Archivo no encontrado: {ruta_archivo}")
+        return False
     
-    connection.commit()
-    print("✓ Ciudades actualizado")
+    try:
+        df = pd.read_csv(ruta_archivo, sep=';', encoding='utf-8-sig')
+    except Exception as e:
+        print(f"❌ Error al leer CSV: {e}")
+        return False
     
-    print("\n3. Procesando Instituciones...")
-    for _, row in INSTITUCIONES_2025.iterrows():
-        nombre = row['INSTITUCIÓN EDUCATIVA']
-        colegio_abrev = row['COLEGIO ABREVIADO PARA LISTADOS']
-        grado = row.get('GRADO')
-        
-        result = connection.execute(text(
-            "SELECT ID FROM Instituciones WHERE NOMBRE_INSTITUCION = :nombre"
-        ), {'nombre': nombre})
-        
-        if result.fetchone() is None:
-            connection.execute(text(
-                "INSERT INTO Instituciones (NOMBRE_INSTITUCION, COLEGIO_ABREVIADO, GRADO) "
-                "VALUES (:nombre, :colegio_abrev, :grado)"
-            ), {'nombre': nombre, 'colegio_abrev': colegio_abrev, 'grado': grado})
+    print(f"✓ CSV leído: {len(df)} filas, {len(df.columns)} columnas")
     
-    connection.commit()
-    print("✓ Instituciones actualizado")
+    # Rellenar valores faltantes
+    columnas_texto = [
+        'TIPO DE IDENTIFICACIÓN', 'NOMBRES', 'APELLIDOS', 'TELÉFONO 1', 'TELÉFONO 2',
+        'CORREO ELECTRÓNICO', 'DIRECCIÓN', 'SEXO', 'TIPO POBLACION', 'NIVEL_MCER',
+        'POBLACIÓN', 'ESTADO ETAPA 2', 'IDIOMA', 'CERTIFICADO', 'MUNICIPIO',
+        'INSTITUCIÓN EDUCATIVA', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRADO',
+        'GRUPO', 'JORNADA', 'SEDE NODAL', 'ENTIDAD', 'NOMBRE CURSO'
+    ]
     
-    print("\n4. Procesando Nivel_MCER...")
-    for _, row in NIVEL_MCER_2025.iterrows():
-        nivel = limpiar_valor(row['NIVEL_MCER'])
-        tipo_pob = limpiar_valor(row['POBLACIÓN'])
-        estado = limpiar_valor(row['ESTADO ETAPA 2'])
-        anio = int(row['ANIO']) if pd.notna(row['ANIO']) else None
-        idioma = limpiar_valor(row.get('IDIOMA'))
-        certificado = limpiar_valor(row.get('CERTIFICADO'))
-        
-        if nivel is None or tipo_pob is None:
-            continue
-        
-        result = connection.execute(text(
-            "SELECT ID FROM Nivel_MCER WHERE NIVEL_MCER = :nivel AND TIPO_POBLACION = :tipo_pob"
-        ), {'nivel': nivel, 'tipo_pob': tipo_pob})
-        
-        if result.fetchone() is None:
-            connection.execute(text(
-                "INSERT INTO Nivel_MCER (NIVEL_MCER, TIPO_POBLACION, ESTADO_ESTUDIANTE, ANIO, IDIOMA, CERTIFICADO) "
-                "VALUES (:nivel, :tipo_pob, :estado, :anio, :idioma, :certificado)"
-            ), {'nivel': nivel, 'tipo_pob': tipo_pob, 'estado': estado, 'anio': anio, 'idioma': idioma, 'certificado': certificado})
+    for columna in columnas_texto:
+        if columna in df.columns:
+            df[columna] = df[columna].fillna('SIN INFORMACION')
     
-    connection.commit()
-    print("✓ Nivel_MCER actualizado")
+    df['ANIO'] = df['FECHA'].apply(extraer_anio) if 'FECHA' in df.columns else anio
     
-    print("\n5. Procesando Personas...")
-    personas_nuevas = 0
-    personas_actualizadas = 0
-    personas_sin_doc = 0
-    personas_saltadas = 0
+    # Si no hay columna FECHA, usar el año del archivo
+    if 'ANIO' not in df.columns or df['ANIO'].isna().all():
+        df['ANIO'] = anio
     
-    for idx, row in PERSONAS_2025.iterrows():
-        numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
+    df['NOMBRE_CURSO_PROCESADO'] = df.apply(
+        lambda row: 'Formación Docente' if limpiar_valor(row.get('TIPO POBLACION')) == 'Docente' 
+        else (limpiar_valor(row.get('NOMBRE CURSO')) if limpiar_valor(row.get('NOMBRE CURSO')) else 'SIN INFORMACION'), 
+        axis=1
+    )
+    
+    # Verificar columna GRADO
+    grado_col = None
+    for col in df.columns:
+        if col.upper() == 'GRADO':
+            grado_col = col
+            break
+    
+    if grado_col is None:
+        df['GRADO'] = 'SIN INFORMACION'
+        grado_col = 'GRADO'
+    
+    print(f"  - Grados únicos: {sorted(df[grado_col].unique())[:15]}")
+    
+    # Preparar DataFrames
+    TIPO_DOCUMENTOS = df[["TIPO DE IDENTIFICACIÓN"]].drop_duplicates().reset_index(drop=True)
+    TIPO_DOCUMENTOS = TIPO_DOCUMENTOS[TIPO_DOCUMENTOS["TIPO DE IDENTIFICACIÓN"] != 'SIN INFORMACION']
+    
+    NIVEL_MCER_DF = df[[
+        "NIVEL_MCER", "TIPO POBLACION", "ESTADO ETAPA 2", "ANIO", "IDIOMA", "CERTIFICADO", grado_col
+    ]].copy()
+    
+    if grado_col != 'GRADO':
+        NIVEL_MCER_DF = NIVEL_MCER_DF.rename(columns={grado_col: 'GRADO'})
+    
+    NIVEL_MCER_DF = NIVEL_MCER_DF.drop_duplicates().reset_index(drop=True)
+    
+    INSTITUCIONES = df[["INSTITUCIÓN EDUCATIVA","COLEGIO ABREVIADO PARA LISTADOS"]].drop_duplicates().reset_index(drop=True)
+    INSTITUCIONES = INSTITUCIONES[INSTITUCIONES["INSTITUCIÓN EDUCATIVA"] != 'SIN INFORMACION']
+    
+    CIUDADES = df[["MUNICIPIO"]].drop_duplicates().reset_index(drop=True)
+    CIUDADES = CIUDADES[CIUDADES["MUNICIPIO"] != 'SIN INFORMACION']
+    
+    CURSOS = df[["ENTIDAD","IDIOMA","INSTITUCIÓN EDUCATIVA","NOMBRE_CURSO_PROCESADO","TIPO POBLACION"]].copy()
+    CURSOS = CURSOS[CURSOS["INSTITUCIÓN EDUCATIVA"] != 'SIN INFORMACION'].drop_duplicates().reset_index(drop=True)
+    
+    PERSONAS = df[["NOMBRES","APELLIDOS","TELÉFONO 1","TELÉFONO 2","NÚMERO DE IDENTIFICACIÓN","CORREO ELECTRÓNICO",
+                        "DIRECCIÓN","SEXO","FECHA DE NACIMIENTO","TIPO POBLACION","TIPO DE IDENTIFICACIÓN",
+                        "MUNICIPIO","INSTITUCIÓN EDUCATIVA"]].copy()
+    
+    PERSONA_NIVEL = df[["NÚMERO DE IDENTIFICACIÓN","NIVEL_MCER","TIPO POBLACION","ANIO","GRADO"]].copy()
+    
+    SEDES = df[["GRUPO","JORNADA","SEDE NODAL","NÚMERO DE IDENTIFICACIÓN"]].copy()
+    
+    # Limpiar números de documento
+    for df_temp in [PERSONAS, PERSONA_NIVEL, SEDES]:
+        df_temp['NÚMERO DE IDENTIFICACIÓN'] = df_temp['NÚMERO DE IDENTIFICACIÓN'].apply(
+            lambda x: 'Sin información' if pd.isna(x) or str(x).strip().lower() in ['nan', 'none', '', 'sin informacion'] else str(x).strip()
+        )
+    
+    # ==========================================
+    # INSERCIÓN EN BASE DE DATOS
+    # ==========================================
+    
+    estadisticas = {
+        'tipo_docs': 0,
+        'ciudades': 0,
+        'instituciones': 0,
+        'niveles': 0,
+        'personas_nuevas': 0,
+        'personas_actualizadas': 0,
+        'relaciones': 0,
+        'sedes': 0,
+        'cursos': 0
+    }
+    
+    with engine.connect() as connection:
         
-        if numero_doc == 'Sin información':
-            personas_sin_doc += 1
+        # 1. Tipo_documentos
+        for _, row in TIPO_DOCUMENTOS.iterrows():
+            tipo_doc = row['TIPO DE IDENTIFICACIÓN']
+            if tipo_doc == 'SIN INFORMACION':
+                continue
+            result = connection.execute(text("SELECT ID FROM Tipo_documentos WHERE TIPO_DOCUMENTO = :tipo_doc"), {'tipo_doc': tipo_doc})
+            if result.fetchone() is None:
+                connection.execute(text("INSERT INTO Tipo_documentos (TIPO_DOCUMENTO) VALUES (:tipo_doc)"), {'tipo_doc': tipo_doc})
+                estadisticas['tipo_docs'] += 1
+        connection.commit()
         
-        tipo_doc_valor = limpiar_valor(row['TIPO DE IDENTIFICACIÓN'])
-        if tipo_doc_valor is None:
-            personas_saltadas += 1
-            continue
+        # 2. Ciudades
+        for _, row in CIUDADES.iterrows():
+            municipio = row['MUNICIPIO']
+            if municipio == 'SIN INFORMACION':
+                continue
+            result = connection.execute(text("SELECT ID FROM Ciudades WHERE MUNICIPIO = :municipio"), {'municipio': municipio})
+            if result.fetchone() is None:
+                connection.execute(text("INSERT INTO Ciudades (MUNICIPIO) VALUES (:municipio)"), {'municipio': municipio})
+                estadisticas['ciudades'] += 1
+        connection.commit()
         
-        nivel_mcer_valor = limpiar_valor(row['NIVEL_MCER'])
-        poblacion_valor = limpiar_valor(row['POBLACIÓN'])
-        municipio_valor = limpiar_valor(row['MUNICIPIO'])
-        institucion_valor = limpiar_valor(row['INSTITUCIÓN EDUCATIVA'])
+        # 3. Instituciones
+        for _, row in INSTITUCIONES.iterrows():
+            nombre = row['INSTITUCIÓN EDUCATIVA']
+            colegio_abrev = row['COLEGIO ABREVIADO PARA LISTADOS']
+            if nombre == 'SIN INFORMACION':
+                continue
+            colegio_abrev = None if colegio_abrev == 'SIN INFORMACION' else colegio_abrev
+            result = connection.execute(text("SELECT ID FROM Instituciones WHERE NOMBRE_INSTITUCION = :nombre"), {'nombre': nombre})
+            if result.fetchone() is None:
+                connection.execute(text("INSERT INTO Instituciones (NOMBRE_INSTITUCION, COLEGIO_ABREVIADO) VALUES (:nombre, :colegio_abrev)"), 
+                                 {'nombre': nombre, 'colegio_abrev': colegio_abrev})
+                estadisticas['instituciones'] += 1
+        connection.commit()
         
-        tipo_doc_id = None
-        if tipo_doc_valor:
-            tipo_doc_id = connection.execute(text(
-                "SELECT ID FROM Tipo_documentos WHERE TIPO_DOCUMENTO = :tipo_doc"
-            ), {'tipo_doc': tipo_doc_valor}).fetchone()
+        # 4. Nivel_MCER
+        for _, row in NIVEL_MCER_DF.iterrows():
+            nivel = limpiar_valor(row['NIVEL_MCER'])
+            tipo_pob = limpiar_valor(row['TIPO POBLACION'])
+            estado = limpiar_valor(row['ESTADO ETAPA 2'])
+            anio_val = int(row['ANIO']) if pd.notna(row['ANIO']) else None
+            idioma = limpiar_valor(row.get('IDIOMA'))
+            certificado = limpiar_valor(row.get('CERTIFICADO'))
+            grado = limpiar_valor(row.get('GRADO'))
+            
+            nivel = None if nivel == 'SIN INFORMACION' else nivel
+            tipo_pob = None if tipo_pob == 'SIN INFORMACION' else tipo_pob
+            estado = None if estado == 'SIN INFORMACION' else estado
+            idioma = None if idioma == 'SIN INFORMACION' else idioma
+            certificado = None if certificado == 'SIN INFORMACION' else certificado
+            grado = None if grado == 'SIN INFORMACION' else grado
+            
+            if nivel is None and tipo_pob is None and grado is None:
+                continue
+            
+            result = connection.execute(text(
+                """SELECT ID FROM Nivel_MCER 
+                   WHERE (NIVEL_MCER <=> :nivel) AND (TIPO_POBLACION <=> :tipo_pob) 
+                   AND (ANIO <=> :anio) AND (GRADO <=> :grado)"""
+            ), {'nivel': nivel, 'tipo_pob': tipo_pob, 'anio': anio_val, 'grado': grado})
+            
+            if result.fetchone() is None:
+                connection.execute(text(
+                    """INSERT INTO Nivel_MCER (NIVEL_MCER, TIPO_POBLACION, ESTADO_ESTUDIANTE, ANIO, IDIOMA, CERTIFICADO, GRADO) 
+                       VALUES (:nivel, :tipo_pob, :estado, :anio, :idioma, :certificado, :grado)"""
+                ), {'nivel': nivel, 'tipo_pob': tipo_pob, 'estado': estado, 'anio': anio_val, 'idioma': idioma, 'certificado': certificado, 'grado': grado})
+                estadisticas['niveles'] += 1
+        connection.commit()
         
-        ciudad_id = None
-        if municipio_valor:
-            ciudad_id = connection.execute(text(
-                "SELECT ID FROM Ciudades WHERE MUNICIPIO = :municipio"
-            ), {'municipio': municipio_valor}).fetchone()
+        # 5. Personas
+        for idx, row in PERSONAS.iterrows():
+            numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
+            tipo_doc_valor = limpiar_valor(row['TIPO DE IDENTIFICACIÓN'])
+            if tipo_doc_valor == 'SIN INFORMACION':
+                tipo_doc_valor = None
+            municipio_valor = limpiar_valor(row['MUNICIPIO'])
+            institucion_valor = limpiar_valor(row['INSTITUCIÓN EDUCATIVA'])
+            municipio_valor = None if municipio_valor == 'SIN INFORMACION' else municipio_valor
+            institucion_valor = None if institucion_valor == 'SIN INFORMACION' else institucion_valor
+            
+            tipo_doc_id = None
+            if tipo_doc_valor:
+                tipo_doc_id = connection.execute(text("SELECT ID FROM Tipo_documentos WHERE TIPO_DOCUMENTO = :tipo_doc"), 
+                                                {'tipo_doc': tipo_doc_valor}).fetchone()
+            ciudad_id = None
+            if municipio_valor:
+                ciudad_id = connection.execute(text("SELECT ID FROM Ciudades WHERE MUNICIPIO = :municipio"), 
+                                              {'municipio': municipio_valor}).fetchone()
+            institucion_id = None
+            if institucion_valor:
+                institucion_id = connection.execute(text("SELECT ID FROM Instituciones WHERE NOMBRE_INSTITUCION = :nombre"), 
+                                                   {'nombre': institucion_valor}).fetchone()
+            
+            persona_existe = connection.execute(text("SELECT ID FROM Personas WHERE NUMERO_DOCUMENTO = :numero_doc"), 
+                                               {'numero_doc': numero_doc}).fetchone()
+            
+            datos_persona = {
+                'nombres': None if limpiar_valor(row['NOMBRES']) == 'SIN INFORMACION' else limpiar_valor(row['NOMBRES']),
+                'apellidos': None if limpiar_valor(row['APELLIDOS']) == 'SIN INFORMACION' else limpiar_valor(row['APELLIDOS']),
+                'telefono1': None if limpiar_valor(row['TELÉFONO 1']) == 'SIN INFORMACION' else limpiar_valor(row['TELÉFONO 1']),
+                'telefono2': None if limpiar_valor(row['TELÉFONO 2']) == 'SIN INFORMACION' else limpiar_valor(row['TELÉFONO 2']),
+                'numero_doc': numero_doc,
+                'correo': None if limpiar_valor(row['CORREO ELECTRÓNICO']) == 'SIN INFORMACION' else limpiar_valor(row['CORREO ELECTRÓNICO']),
+                'direccion': None if limpiar_valor(row['DIRECCIÓN']) == 'SIN INFORMACION' else limpiar_valor(row['DIRECCIÓN']),
+                'sexo': None if limpiar_valor(row['SEXO']) == 'SIN INFORMACION' else limpiar_valor(row['SEXO']),
+                'fecha_nac': convertir_fecha_mysql(row['FECHA DE NACIMIENTO']),
+                'tipo_persona': None if limpiar_valor(row['TIPO POBLACION']) == 'SIN INFORMACION' else limpiar_valor(row['TIPO POBLACION']),
+                'tipo_doc_id': tipo_doc_id[0] if tipo_doc_id else None,
+                'ciudad_id': ciudad_id[0] if ciudad_id else None,
+                'institucion_id': institucion_id[0] if institucion_id else None
+            }
+            
+            if persona_existe:
+                connection.execute(text(
+                    """UPDATE Personas SET NOMBRES = :nombres, APELLIDOS = :apellidos, TELEFONO1 = :telefono1, 
+                       TELEFONO2 = :telefono2, CORREO_ELECTRONICO = :correo, DIRECCION = :direccion, SEXO = :sexo,
+                       FECHA_NACIMIENTO = :fecha_nac, TIPO_PERSONA = :tipo_persona, TIPO_DOCUMENTO_ID = :tipo_doc_id,
+                       CIUDAD_ID = :ciudad_id, INSTITUCION_ID = :institucion_id WHERE NUMERO_DOCUMENTO = :numero_doc"""
+                ), datos_persona)
+                estadisticas['personas_actualizadas'] += 1
+            else:
+                connection.execute(text(
+                    """INSERT INTO Personas (NOMBRES, APELLIDOS, TELEFONO1, TELEFONO2, NUMERO_DOCUMENTO, CORREO_ELECTRONICO,
+                       DIRECCION, SEXO, FECHA_NACIMIENTO, TIPO_PERSONA, TIPO_DOCUMENTO_ID, CIUDAD_ID, INSTITUCION_ID)
+                       VALUES (:nombres, :apellidos, :telefono1, :telefono2, :numero_doc, :correo, :direccion, :sexo,
+                       :fecha_nac, :tipo_persona, :tipo_doc_id, :ciudad_id, :institucion_id)"""
+                ), datos_persona)
+                estadisticas['personas_nuevas'] += 1
+        connection.commit()
         
-        nivel_id = None
-        if nivel_mcer_valor and poblacion_valor:
+        # 6. Persona_Nivel_MCER
+        for _, row in PERSONA_NIVEL.iterrows():
+            numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
+            nivel_mcer_valor = limpiar_valor(row['NIVEL_MCER'])
+            poblacion_valor = limpiar_valor(row['TIPO POBLACION'])
+            anio_registro = int(row['ANIO']) if pd.notna(row['ANIO']) else None
+            grado_valor = limpiar_valor(row['GRADO'])
+            
+            nivel_mcer_valor = None if nivel_mcer_valor == 'SIN INFORMACION' else nivel_mcer_valor
+            poblacion_valor = None if poblacion_valor == 'SIN INFORMACION' else poblacion_valor
+            grado_valor = None if grado_valor == 'SIN INFORMACION' else grado_valor
+            
+            persona_id = connection.execute(text("SELECT ID FROM Personas WHERE NUMERO_DOCUMENTO = :numero_doc"), 
+                                           {'numero_doc': numero_doc}).fetchone()
+            
+            if persona_id is None:
+                continue
+            
             nivel_id = connection.execute(text(
-                "SELECT ID FROM Nivel_MCER WHERE NIVEL_MCER = :nivel AND TIPO_POBLACION = :tipo_pob"
-            ), {'nivel': nivel_mcer_valor, 'tipo_pob': poblacion_valor}).fetchone()
+                """SELECT ID FROM Nivel_MCER 
+                   WHERE (NIVEL_MCER <=> :nivel) AND (TIPO_POBLACION <=> :tipo_pob)
+                   AND (ANIO <=> :anio) AND (GRADO <=> :grado) LIMIT 1"""
+            ), {'nivel': nivel_mcer_valor, 'tipo_pob': poblacion_valor, 'anio': anio_registro, 'grado': grado_valor}).fetchone()
+            
+            if nivel_id is None:
+                continue
+            
+            relacion_existe = connection.execute(text(
+                """SELECT ID FROM Persona_Nivel_MCER 
+                   WHERE PERSONA_ID = :persona_id AND NIVEL_MCER_ID = :nivel_id AND (ANIO_REGISTRO <=> :anio)"""
+            ), {'persona_id': persona_id[0], 'nivel_id': nivel_id[0], 'anio': anio_registro}).fetchone()
+            
+            if relacion_existe is None:
+                connection.execute(text(
+                    """INSERT INTO Persona_Nivel_MCER (PERSONA_ID, NIVEL_MCER_ID, ANIO_REGISTRO)
+                       VALUES (:persona_id, :nivel_id, :anio)"""
+                ), {'persona_id': persona_id[0], 'nivel_id': nivel_id[0], 'anio': anio_registro})
+                estadisticas['relaciones'] += 1
+        connection.commit()
         
-        institucion_id = None
-        if institucion_valor:
-            institucion_id = connection.execute(text(
-                "SELECT ID FROM Instituciones WHERE NOMBRE_INSTITUCION = :nombre"
-            ), {'nombre': institucion_valor}).fetchone()
+        # 7. Sedes
+        for _, row in SEDES.iterrows():
+            numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
+            persona_id = connection.execute(text("SELECT ID FROM Personas WHERE NUMERO_DOCUMENTO = :numero_doc"), 
+                                           {'numero_doc': numero_doc}).fetchone()
+            if persona_id is None:
+                continue
+            grupo = limpiar_valor(row['GRUPO'])
+            jornada = limpiar_valor(row['JORNADA'])
+            sede = limpiar_valor(row['SEDE NODAL'])
+            grupo = None if grupo == 'SIN INFORMACION' else grupo
+            jornada = None if jornada == 'SIN INFORMACION' else jornada
+            sede = None if sede == 'SIN INFORMACION' else sede
+            
+            sede_existe = connection.execute(text(
+                "SELECT ID FROM Sedes WHERE PERSONA_ID = :persona_id AND (GRUPO <=> :grupo) AND (JORNADA <=> :jornada)"
+            ), {'persona_id': persona_id[0], 'grupo': grupo, 'jornada': jornada}).fetchone()
+            
+            if sede_existe is None:
+                connection.execute(text("INSERT INTO Sedes (GRUPO, JORNADA, SEDE_NODAL, PERSONA_ID) VALUES (:grupo, :jornada, :sede, :persona_id)"), 
+                                 {'grupo': grupo, 'jornada': jornada, 'sede': sede, 'persona_id': persona_id[0]})
+                estadisticas['sedes'] += 1
+        connection.commit()
         
-        persona_existe = connection.execute(text(
-            "SELECT ID FROM Personas WHERE NUMERO_DOCUMENTO = :numero_doc"
-        ), {'numero_doc': numero_doc}).fetchone()
-        
-        datos_persona = {
-            'nombres': limpiar_valor(row['NOMBRES']),
-            'apellidos': limpiar_valor(row['APELLIDOS']),
-            'telefono1': limpiar_valor(row['TELÉFONO 1']),
-            'telefono2': limpiar_valor(row['TELÉFONO 2']),
-            'numero_doc': numero_doc,
-            'correo': limpiar_valor(row['CORREO ELECTRÓNICO']),
-            'direccion': limpiar_valor(row['DIRECCIÓN']),
-            'sexo': limpiar_valor(row['SEXO']),
-            'fecha_nac': convertir_fecha_mysql(row['FECHA DE NACIMIENTO']),
-            'tipo_persona': limpiar_valor(row['TIPO POBLACION']),
-            'tipo_doc_id': tipo_doc_id[0] if tipo_doc_id else None,
-            'nivel_id': nivel_id[0] if nivel_id else None,
-            'ciudad_id': ciudad_id[0] if ciudad_id else None,
-            'institucion_id': institucion_id[0] if institucion_id else None
-        }
-        
-        if persona_existe:
-            connection.execute(text(
-                """UPDATE Personas SET 
-                   NOMBRES = :nombres,
-                   APELLIDOS = :apellidos,
-                   TELEFONO1 = :telefono1,
-                   TELEFONO2 = :telefono2,
-                   CORREO_ELECTRONICO = :correo,
-                   DIRECCION = :direccion,
-                   SEXO = :sexo,
-                   FECHA_NACIMIENTO = :fecha_nac,
-                   TIPO_PERSONA = :tipo_persona,
-                   TIPO_DOCUMENTO_ID = :tipo_doc_id,
-                   NIVEL_MCER_ID = :nivel_id,
-                   CIUDAD_ID = :ciudad_id,
-                   INSTITUCION_ID = :institucion_id
-                   WHERE NUMERO_DOCUMENTO = :numero_doc"""
-            ), datos_persona)
-            personas_actualizadas += 1
-        else:
-            connection.execute(text(
-                """INSERT INTO Personas 
-                   (NOMBRES, APELLIDOS, TELEFONO1, TELEFONO2, NUMERO_DOCUMENTO, CORREO_ELECTRONICO,
-                    DIRECCION, SEXO, FECHA_NACIMIENTO, TIPO_PERSONA,
-                    TIPO_DOCUMENTO_ID, NIVEL_MCER_ID, CIUDAD_ID, INSTITUCION_ID)
-                   VALUES (:nombres, :apellidos, :telefono1, :telefono2, :numero_doc, :correo,
-                           :direccion, :sexo, :fecha_nac, :tipo_persona,
-                           :tipo_doc_id, :nivel_id, :ciudad_id, :institucion_id)"""
-            ), datos_persona)
-            personas_nuevas += 1
+        # 8. Cursos
+        for _, row in CURSOS.iterrows():
+            entidad = limpiar_valor(row['ENTIDAD'])
+            idioma = limpiar_valor(row['IDIOMA'])
+            institucion = limpiar_valor(row['INSTITUCIÓN EDUCATIVA'])
+            nombre_curso = limpiar_valor(row['NOMBRE_CURSO_PROCESADO'])
+            
+            if institucion is None or institucion == 'SIN INFORMACION':
+                continue
+            entidad = None if entidad == 'SIN INFORMACION' else entidad
+            idioma = None if idioma == 'SIN INFORMACION' else idioma
+            nombre_curso = None if nombre_curso == 'SIN INFORMACION' else nombre_curso
+            
+            institucion_id = connection.execute(text("SELECT ID FROM Instituciones WHERE NOMBRE_INSTITUCION = :nombre"), 
+                                               {'nombre': institucion}).fetchone()
+            if institucion_id is None:
+                continue
+            
+            curso_existe = connection.execute(text(
+                "SELECT ID FROM Cursos WHERE INSTITUCION_ID = :inst_id AND (NOMBRE_CURSO <=> :nombre) AND (ENTIDAD <=> :ent) AND (IDIOMA <=> :idioma)"
+            ), {'inst_id': institucion_id[0], 'nombre': nombre_curso, 'ent': entidad, 'idioma': idioma}).fetchone()
+            
+            if curso_existe is None:
+                connection.execute(text("INSERT INTO Cursos (ENTIDAD, IDIOMA, INSTITUCION_ID, NOMBRE_CURSO) VALUES (:entidad, :idioma, :inst_id, :nombre)"), 
+                                 {'entidad': entidad, 'idioma': idioma, 'inst_id': institucion_id[0], 'nombre': nombre_curso})
+                estadisticas['cursos'] += 1
+        connection.commit()
     
-    connection.commit()
-    print(f"✓ Personas procesadas: {personas_nuevas} nuevas, {personas_actualizadas} actualizadas")
-    if personas_sin_doc > 0:
-        print(f"  ℹ {personas_sin_doc} personas con 'Sin información' como número de documento")
-    if personas_saltadas > 0:
-        print(f"  ⚠ {personas_saltadas} personas saltadas por datos incompletos")
+    # Mostrar resumen
+    print(f"\n✅ AÑO {anio} COMPLETADO:")
+    print(f"   - Tipo documentos: {estadisticas['tipo_docs']}")
+    print(f"   - Ciudades: {estadisticas['ciudades']}")
+    print(f"   - Instituciones: {estadisticas['instituciones']}")
+    print(f"   - Niveles MCER: {estadisticas['niveles']}")
+    print(f"   - Personas nuevas: {estadisticas['personas_nuevas']}")
+    print(f"   - Personas actualizadas: {estadisticas['personas_actualizadas']}")
+    print(f"   - Relaciones Persona-Nivel: {estadisticas['relaciones']}")
+    print(f"   - Sedes: {estadisticas['sedes']}")
+    print(f"   - Cursos: {estadisticas['cursos']}")
     
-    print("\n6. Procesando Sedes...")
-    sedes_nuevas = 0
-    
-    for _, row in SEDES_2025.iterrows():
-        numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
-        
-        persona_id = connection.execute(text(
-            "SELECT ID FROM Personas WHERE NUMERO_DOCUMENTO = :numero_doc"
-        ), {'numero_doc': numero_doc}).fetchone()
-        
-        if persona_id is None:
-            continue
-        
-        grupo = limpiar_valor(row['GRUPO'])
-        jornada = limpiar_valor(row['JORNADA'])
-        sede = limpiar_valor(row['SEDE NODAL'])
-        
-        sede_existe = connection.execute(text(
-            """SELECT ID FROM Sedes 
-               WHERE PERSONA_ID = :persona_id AND GRUPO = :grupo AND JORNADA = :jornada"""
-        ), {'persona_id': persona_id[0], 'grupo': grupo, 'jornada': jornada}).fetchone()
-        
-        if sede_existe is None:
-            connection.execute(text(
-                """INSERT INTO Sedes (GRUPO, JORNADA, SEDE_NODAL, PERSONA_ID)
-                   VALUES (:grupo, :jornada, :sede, :persona_id)"""
-            ), {'grupo': grupo, 'jornada': jornada, 'sede': sede, 'persona_id': persona_id[0]})
-            sedes_nuevas += 1
-    
-    connection.commit()
-    print(f"✓ Sedes procesadas: {sedes_nuevas} nuevas")
+    return True
 
-    print("\n7. Procesando Cursos...")
-    cursos_nuevos = 0
-    
-    for _, row in CURSOS_2025.iterrows():
-        entidad = limpiar_valor(row['ENTIDAD'])
-        idioma = limpiar_valor(row['IDIOMA'])
-        institucion = limpiar_valor(row['INSTITUCIÓN EDUCATIVA'])
-        
-        institucion_id = None
-        if institucion:
-            institucion_id = connection.execute(text(
-                "SELECT ID FROM Instituciones WHERE NOMBRE_INSTITUCION = :nombre"
-            ), {'nombre': institucion}).fetchone()
-        
-        if institucion_id is None:
-            continue
-        
-        curso_existe = connection.execute(text(
-            """SELECT ID FROM Cursos 
-               WHERE ENTIDAD = :entidad AND IDIOMA = :idioma AND INSTITUCION_ID = :institucion_id"""
-        ), {
-            'entidad': entidad,
-            'idioma': idioma,
-            'institucion_id': institucion_id[0]
-        }).fetchone()
-        
-        if curso_existe is None:
-            connection.execute(text(
-                """INSERT INTO Cursos (ENTIDAD, IDIOMA, INSTITUCION_ID)
-                   VALUES (:entidad, :idioma, :institucion_id)"""
-            ), {
-                'entidad': entidad,
-                'idioma': idioma,
-                'institucion_id': institucion_id[0]
-            })
-            cursos_nuevos += 1
-    
-    connection.commit()
-    print(f"✓ Cursos procesados: {cursos_nuevos} nuevos")
 
-print("\n✅ Proceso completado exitosamente")
-print(f"   - Archivos procesados: {len(dfs_list)}")
-print(f"   - Personas nuevas: {personas_nuevas}")
-print(f"   - Personas actualizadas: {personas_actualizadas}")
-print(f"   - Sedes nuevas: {sedes_nuevas}")
-print(f"   - Cursos nuevos: {cursos_nuevos}")
+# ==========================================
+# EJECUCIÓN PRINCIPAL
+# ==========================================
+
+if __name__ == "__main__":
+    print("\n" + "="*70)
+    print("IMPORTACIÓN MASIVA DE CSVs 2016-2025")
+    print("="*70)
+    
+    años = range(2016, 2026)  # 2016 hasta 2025 inclusive
+    
+    resultados = {}
+    
+    for anio in años:
+        exito = procesar_csv_anio(anio)
+        resultados[anio] = exito
+    
+    # Resumen final
+    print("\n" + "="*70)
+    print("RESUMEN FINAL")
+    print("="*70)
+    
+    exitosos = sum(1 for v in resultados.values() if v)
+    fallidos = sum(1 for v in resultados.values() if not v)
+    
+    print(f"\n✅ Años procesados exitosamente: {exitosos}")
+    print(f"❌ Años no procesados: {fallidos}")
+    
+    if fallidos > 0:
+        print("\nAños no procesados:")
+        for anio, exito in resultados.items():
+            if not exito:
+                print(f"   - {anio}")
+    
+    print("\n" + "="*70)
+    print("PROCESO COMPLETADO")
+    print("="*70)

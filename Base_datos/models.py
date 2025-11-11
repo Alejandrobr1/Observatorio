@@ -25,7 +25,7 @@ class Tipo_documentos(Base):
 class Nivel_MCER(Base):
     __tablename__ = 'Nivel_MCER'
     ID = Column(BigInteger, primary_key=True, autoincrement=True)
-    NIVEL_MCER = Column(String(100), nullable=False)
+    NIVEL_MCER = Column(String(100), nullable=True)
     TIPO_POBLACION = Column(String(100))
     ESTADO_ESTUDIANTE = Column(String(100))
     ANIO = Column(Integer)

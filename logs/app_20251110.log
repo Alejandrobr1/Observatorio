@@ -1,0 +1,345 @@
+2025-11-10 09:08:26,799 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:08:26,891 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:13:32,494 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:13:32,508 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:13:32,686 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 09:13:32,709 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 09:13:32,709 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 09:13:33,010 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 09:13:33,011 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 09:13:43,505 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:13:43,522 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:15:23,008 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:15:23,022 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:15:23,098 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 09:15:23,121 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 09:15:23,121 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 09:15:23,437 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 09:15:23,438 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 09:15:27,682 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:15:27,697 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:36:16,904 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:36:16,920 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:36:17,000 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 09:36:17,023 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 09:36:17,023 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 09:36:17,354 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 09:36:17,354 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 09:36:22,679 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:36:22,698 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:44:39,120 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:44:39,136 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:50:54,241 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:50:54,257 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:50:54,350 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 09:50:54,564 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 09:50:54,564 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 09:50:54,829 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 09:50:54,829 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 09:52:06,097 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:52:06,112 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:52:19,293 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:52:19,308 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 09:52:19,391 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 09:52:19,599 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 09:52:19,600 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 09:52:19,862 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 09:52:19,862 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 09:52:24,161 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 09:52:24,176 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:08:12,204 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:08:12,222 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:16:08,723 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:16:08,738 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:16:08,827 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 10:16:09,012 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 10:16:09,012 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 10:16:09,306 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 10:16:09,306 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 10:16:16,231 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:16:16,245 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:19:22,835 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:19:22,848 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:19:30,736 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:19:30,752 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:19:49,606 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:19:49,621 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:20:03,521 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:20:03,539 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:20:33,378 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:20:33,390 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:20:46,642 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:20:46,655 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:21:02,343 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:21:02,369 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:21:17,146 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:21:17,162 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:21:34,845 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:21:34,858 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:22:45,969 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:22:45,984 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:29:29,186 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:29:29,205 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:29:29,298 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 10:29:29,522 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 10:29:29,522 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 10:29:29,866 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 10:29:29,867 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 10:29:40,591 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:29:40,605 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 10:30:10,131 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 10:30:10,146 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:08:19,171 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:08:19,196 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:21:39,232 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:21:39,251 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:28:52,074 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:28:52,097 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:29:18,127 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:29:18,158 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:29:18,335 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 11:29:18,618 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 11:29:18,618 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 11:29:18,975 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 11:29:18,975 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 11:29:22,764 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:29:22,781 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:31:00,919 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:31:00,938 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:31:01,030 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 11:31:01,241 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 11:31:01,241 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 11:31:01,559 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 11:31:01,559 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 11:31:20,267 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:31:20,282 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:34:45,521 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:34:45,537 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:34:45,626 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 11:34:45,849 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 11:34:45,849 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 11:34:46,253 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 11:34:46,253 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 11:34:50,071 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:34:50,089 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:36:06,056 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:36:06,072 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:41:47,953 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:41:47,967 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:41:48,050 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 11:41:48,276 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 11:41:48,276 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 11:41:48,586 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 11:41:48,587 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 11:41:56,907 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:41:56,926 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:42:22,140 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:42:22,157 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:42:46,141 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:42:46,157 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:43:33,271 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:43:33,287 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:43:43,019 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:43:43,039 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:44:02,189 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:44:02,205 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:44:15,153 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:44:15,170 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:44:39,449 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:44:39,463 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:45:11,058 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:45:11,071 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:45:50,165 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:45:50,181 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:46:13,336 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:46:13,351 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:46:29,677 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:46:29,691 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:46:50,863 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:46:50,885 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:49:23,281 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:49:23,299 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:49:23,411 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 11:49:23,658 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 11:49:23,659 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 11:49:24,007 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 11:49:24,008 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 11:49:34,358 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:49:34,375 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:52:52,817 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:52:52,833 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:52:52,914 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 11:52:53,144 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 11:52:53,144 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 11:52:53,444 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 11:52:53,445 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 11:53:16,210 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:53:16,224 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:53:42,629 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:53:42,644 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:53:51,949 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:53:51,967 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:54:43,719 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:54:43,736 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:54:43,823 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 11:54:43,842 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 11:54:43,842 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 11:54:44,154 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 11:54:44,155 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 11:55:00,205 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:55:00,218 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 11:58:25,512 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 11:58:25,527 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:00:36,267 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:00:36,282 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:00:57,947 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:00:57,963 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:00:58,059 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 12:00:58,267 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 12:00:58,268 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 12:00:58,629 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 12:00:58,629 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 12:01:04,397 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:01:04,415 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:12:12,022 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:12:12,047 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:12:12,129 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 12:12:12,340 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 12:12:12,340 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 12:12:12,660 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 12:12:12,661 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 12:12:19,464 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:12:19,479 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:12:41,202 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:12:41,217 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:21:33,742 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:21:33,756 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:21:33,837 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 12:21:34,078 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 12:21:34,078 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 12:21:34,386 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 12:21:34,386 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 12:21:59,451 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:21:59,464 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:22:34,853 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:22:34,868 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:22:34,969 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 12:22:35,184 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 12:22:35,184 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 12:22:35,502 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 12:22:35,503 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 12:22:59,053 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:22:59,081 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:24:16,117 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:24:16,134 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:36:46,109 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:36:46,126 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:36:55,579 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:36:55,596 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:40:06,261 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:40:06,276 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:40:14,567 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:40:14,584 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:40:14,681 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 12:40:14,920 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 12:40:14,920 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 12:40:15,227 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 12:40:15,228 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 12:40:20,817 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:40:20,833 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:40:44,325 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:40:44,340 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:41:18,003 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:41:18,016 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:41:26,251 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:41:26,269 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:41:46,254 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:41:46,268 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:42:02,385 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:42:02,400 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:42:45,047 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:42:45,060 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:43:06,493 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:43:06,508 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:43:17,908 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:43:17,921 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:43:43,463 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:43:43,478 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:44:30,505 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:44:30,518 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:44:54,743 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:44:54,755 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:57:30,837 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:57:30,862 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:57:30,965 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 12:57:31,228 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 12:57:31,229 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 12:57:31,558 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 12:57:31,559 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 12:57:46,081 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:57:46,117 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 12:58:08,179 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 12:58:08,210 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 13:03:50,528 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 13:03:50,542 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 13:04:02,321 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 13:04:02,334 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 13:04:24,006 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 13:04:24,020 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 13:04:41,812 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 13:04:41,828 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 13:04:55,564 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 13:04:55,579 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 13:05:03,174 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 13:05:03,189 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 13:05:25,949 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 13:05:25,977 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 13:05:44,071 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 13:05:44,085 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 13:06:02,593 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 13:06:02,609 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 19:39:48,579 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 19:39:48,628 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 19:40:28,062 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 19:40:28,089 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 19:49:57,889 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 19:49:57,919 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 19:50:00,048 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 19:50:00,433 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 19:50:00,434 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 19:50:00,823 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 19:50:00,823 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 19:50:08,135 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 19:50:08,153 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:02:51,810 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:02:51,832 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:02:51,963 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 20:02:52,210 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 20:02:52,210 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 20:02:52,559 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 20:02:52,560 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 20:03:14,943 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:03:14,971 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:05:37,534 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:05:37,553 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:12:35,253 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:12:35,273 - conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:12:35,371 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
+2025-11-10 20:12:35,598 - __main__ - INFO - Tablas eliminadas.
+2025-11-10 20:12:35,598 - __main__ - INFO - Iniciando creación de tablas en la base de datos
+2025-11-10 20:12:35,914 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
+2025-11-10 20:12:35,915 - __main__ - INFO - Proceso de creación de tablas finalizado
+2025-11-10 20:12:39,251 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:12:39,273 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:18:04,728 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:18:04,750 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:33:34,272 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:33:34,290 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:40:45,944 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:40:45,961 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:47:50,626 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:47:50,648 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:49:05,705 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:49:05,724 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 20:51:02,421 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 20:51:02,439 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
