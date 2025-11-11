@@ -5,8 +5,8 @@ import numpy as np
 from sqlalchemy import create_engine, text
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Instituciones y Sedes Nodales")
-st.title("🏫 Distribución de Estudiantes por Institución y Sede Nodal")
+st.set_page_config(layout="wide", page_title="Dashboard Instituciones y Sedes Nodales - Intensificación")
+st.title("🏫 Distribución de Estudiantes por Institución y Sede Nodal - Intensificación")
 
 # Configuración de la conexión a la base de datos
 @st.cache_resource
@@ -33,18 +33,19 @@ except Exception as e:
 st.sidebar.header("🔍 Filtros")
 
 with engine.connect() as connection:
-    # Obtener años disponibles
+    # Obtener años disponibles FILTRADO POR INTENSIFICACIÓN
     query_years = text("""
         SELECT DISTINCT pnm.ANIO_REGISTRO as año
         FROM Persona_Nivel_MCER pnm
         WHERE pnm.ANIO_REGISTRO IS NOT NULL
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
         ORDER BY año DESC
     """)
     result_years = connection.execute(query_years)
     available_years = [str(row[0]) for row in result_years.fetchall()]
 
     if not available_years:
-        st.error("No se encontraron años en la base de datos")
+        st.error("No se encontraron años en la base de datos con intensificación")
         st.stop()
 
     # Filtro de año
@@ -60,7 +61,7 @@ st.sidebar.divider()
 st.sidebar.header("📈 Estadísticas Generales")
 
 with engine.connect() as connection:
-    # Total estudiantes
+    # Total estudiantes FILTRADO POR INTENSIFICACIÓN
     query_total = text("""
         SELECT COUNT(DISTINCT p.ID) as total 
         FROM Persona_Nivel_MCER pnm
@@ -68,11 +69,12 @@ with engine.connect() as connection:
         INNER JOIN Sedes s ON s.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO = :año
         AND p.TIPO_PERSONA = 'Estudiante'
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
     """)
     total_estudiantes = connection.execute(query_total, {"año": int(selected_year)}).fetchone()[0]
     st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{total_estudiantes:,}")
     
-    # Total instituciones
+    # Total instituciones FILTRADO POR INTENSIFICACIÓN
     query_inst = text("""
         SELECT COUNT(DISTINCT i.ID) as total
         FROM Persona_Nivel_MCER pnm
@@ -83,11 +85,12 @@ with engine.connect() as connection:
         AND i.NOMBRE_INSTITUCION IS NOT NULL
         AND i.NOMBRE_INSTITUCION != ''
         AND i.NOMBRE_INSTITUCION != 'SIN INFORMACION'
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
     """)
     total_inst = connection.execute(query_inst, {"año": int(selected_year)}).fetchone()[0]
     st.sidebar.metric(f"Total Instituciones ({selected_year})", f"{total_inst:,}")
     
-    # Total sedes nodales
+    # Total sedes nodales FILTRADO POR INTENSIFICACIÓN
     query_sedes = text("""
         SELECT COUNT(DISTINCT s.SEDE_NODAL) as total
         FROM Persona_Nivel_MCER pnm
@@ -97,6 +100,7 @@ with engine.connect() as connection:
         AND s.SEDE_NODAL IS NOT NULL
         AND s.SEDE_NODAL != ''
         AND s.SEDE_NODAL != 'SIN INFORMACION'
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
     """)
     total_sedes = connection.execute(query_sedes, {"año": int(selected_year)}).fetchone()[0]
     st.sidebar.metric(f"Total Sedes Nodales ({selected_year})", f"{total_sedes:,}")
@@ -106,7 +110,7 @@ st.sidebar.divider()
 # Consulta principal
 try:
     with engine.connect() as connection:
-        # Consulta para obtener estudiantes por institución y sede nodal
+        # Consulta para obtener estudiantes por institución y sede nodal FILTRADO POR INTENSIFICACIÓN
         query = text("""
             SELECT 
                 i.NOMBRE_INSTITUCION,
@@ -124,6 +128,7 @@ try:
             AND s.SEDE_NODAL IS NOT NULL
             AND s.SEDE_NODAL != ''
             AND s.SEDE_NODAL != 'SIN INFORMACION'
+            AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
             GROUP BY i.NOMBRE_INSTITUCION, s.SEDE_NODAL
             ORDER BY i.NOMBRE_INSTITUCION, cantidad DESC
         """)
@@ -132,7 +137,7 @@ try:
         df = pd.DataFrame(result.fetchall(), columns=["INSTITUCION", "SEDE_NODAL", "cantidad"])
 
         if df.empty:
-            st.warning(f"⚠️ No hay datos de instituciones y sedes para el año {selected_year}")
+            st.warning(f"⚠️ No hay datos de instituciones y sedes para el año {selected_year} - Intensificación")
             st.stop()
 
         # Obtener lista de instituciones únicas ordenadas por total de estudiantes
@@ -155,7 +160,7 @@ try:
         data_matrix = np.array(data_matrix)
         
         # Top instituciones en sidebar
-        st.sidebar.header(f"📊 Top 5 Instituciones - {selected_year}")
+        st.sidebar.header(f"📊 Top 5 Instituciones - {selected_year} - Intensificación")
         top_5 = total_por_institucion.tail(5).sort_values(ascending=False)
         for idx, (inst, total) in enumerate(top_5.items(), 1):
             nombre_corto = inst[:30] + '...' if len(inst) > 30 else inst
@@ -163,7 +168,7 @@ try:
             st.sidebar.write(f"   {int(total):,} estudiantes")
 
         # Crear gráfico de barras horizontales apiladas
-        st.header(f"📊 Estudiantes por Institución y Sede Nodal - Año {selected_year}")
+        st.header(f"📊 Estudiantes por Institución y Sede Nodal - Año {selected_year} - Intensificación")
         
         # Limitar a top 15 instituciones para mejor visualización
         num_instituciones_mostrar = min(15, len(instituciones_ordenadas))
@@ -221,7 +226,7 @@ try:
         ax.set_yticklabels(labels_instituciones, fontsize=10)
         ax.set_xlabel('Cantidad de Estudiantes', fontsize=13, fontweight='bold')
         ax.set_ylabel('Institución Educativa', fontsize=13, fontweight='bold')
-        ax.set_title(f'Distribución de Estudiantes por Institución y Sede Nodal\nAño {selected_year}',
+        ax.set_title(f'Distribución de Estudiantes por Institución y Sede Nodal - Intensificación\nAño {selected_year}',
                     fontsize=16, fontweight='bold', pad=20)
         
         # Configurar límite del eje X
@@ -310,8 +315,8 @@ try:
                     autotext.set_color('white')
                     autotext.set_fontsize(10)
                 
-                ax_pie.set_title(f'Distribución por Sede Nodal\n{institucion_seleccionada[:40]}...' 
-                               if len(institucion_seleccionada) > 40 else f'Distribución por Sede Nodal\n{institucion_seleccionada}',
+                ax_pie.set_title(f'Distribución por Sede Nodal - Intensificación\n{institucion_seleccionada[:40]}...' 
+                               if len(institucion_seleccionada) > 40 else f'Distribución por Sede Nodal - Intensificación\n{institucion_seleccionada}',
                                fontsize=11, fontweight='bold', pad=15)
                 
                 st.pyplot(fig_pie)
@@ -338,10 +343,11 @@ try:
 
         # Información adicional
         st.success(f"""
-        ✅ **Datos cargados exitosamente**
+        ✅ **Datos cargados exitosamente - INTENSIFICACIÓN**
         
         📌 **Información del reporte:**
         - **Año**: {selected_year}
+        - **Tipo**: Intensificación
         - **Total estudiantes**: {int(total_por_institucion.sum()):,}
         - **Total instituciones**: {len(instituciones_ordenadas)}
         - **Total sedes nodales**: {len(sedes_unicas)}

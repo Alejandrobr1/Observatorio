@@ -2,12 +2,11 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import traceback
 from sqlalchemy import create_engine, text
 
-
-st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Sexo y Grado")
-st.title("📊 Distribución de Estudiantes por Sexo y Grado")
-
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Sexo y Grado - Formación Sábados")
+st.title("📊 Distribución de Estudiantes por Sexo y Grado - FORMACIÓN SÁBADOS")
 
 @st.cache_resource
 def get_database_connection():
@@ -20,7 +19,6 @@ def get_database_connection():
         st.error(f"Error al conectar a la base de datos: {str(e)}")
         raise e
 
-
 try:
     engine = get_database_connection()
     st.sidebar.success("✅ Conexión establecida")
@@ -29,30 +27,30 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
-
 st.sidebar.header("🔍 Filtros")
-
 
 with engine.connect() as connection:
     query_years = text("""
         SELECT DISTINCT pnm.ANIO_REGISTRO as año
         FROM Persona_Nivel_MCER pnm
+        INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO IS NOT NULL
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%formacion sabados%'
+        AND p.TIPO_PERSONA = 'Estudiante'
+        AND pnm.ANIO_REGISTRO BETWEEN 2016 AND 2025
         ORDER BY año DESC
     """)
     result_years = connection.execute(query_years)
     available_years = [str(row[0]) for row in result_years.fetchall()]
 
     if not available_years:
-        st.error("No se encontraron años en la base de datos")
+        st.error("❌ No se encontraron datos de Formación Sábados para estudiantes")
         st.stop()
 
     selected_year = st.sidebar.selectbox('📅 Año', available_years, index=0)
 
-
 st.sidebar.divider()
 st.sidebar.header("📈 Estadísticas Generales")
-
 
 with engine.connect() as connection:
     query_total = text("""
@@ -60,6 +58,7 @@ with engine.connect() as connection:
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO = :año
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%formacion sabados%'
         AND p.TIPO_PERSONA = 'Estudiante'
     """)
     total_estudiantes = connection.execute(query_total, {"año": int(selected_year)}).fetchone()[0]
@@ -72,6 +71,7 @@ with engine.connect() as connection:
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO = :año
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%formacion sabados%'
         AND p.TIPO_PERSONA = 'Estudiante'
         AND p.SEXO IS NOT NULL
         AND p.SEXO != ''
@@ -87,15 +87,13 @@ with engine.connect() as connection:
         porcentaje = (cantidad / total_estudiantes * 100) if total_estudiantes > 0 else 0
         st.sidebar.write(f"• {sexo}: {cantidad:,} ({porcentaje:.1f}%)")
 
-
 st.sidebar.divider()
-
 
 try:
     with engine.connect() as connection:
         # DIAGNÓSTICO - Usando subquery para evitar ONLY_FULL_GROUP_BY
         with st.expander("🔍 Diagnóstico de Datos"):
-            st.subheader("Grados disponibles en la base de datos")
+            st.subheader("Grados disponibles en la base de datos (Formación Sábados)")
             
             query_grados_disponibles = text("""
                 SELECT 
@@ -114,6 +112,7 @@ try:
                     INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
                     LEFT JOIN Nivel_MCER n ON pnm.NIVEL_MCER_ID = n.ID
                     WHERE pnm.ANIO_REGISTRO = :año
+                    AND LOWER(pnm.NOMBRE_CURSO) LIKE '%formacion sabados%'
                     AND p.TIPO_PERSONA = 'Estudiante'
                     GROUP BY 
                         CASE 
@@ -137,12 +136,10 @@ try:
             - **Registros Nivel_MCER**: Total de relaciones persona-nivel registradas
             - **Estudiantes Únicos**: Cantidad de estudiantes diferentes en ese grado
             
-            ℹ️ Un estudiante puede aparecer en múltiples años con diferentes grados.
+            ℹ️ Un estudiante puede aparecer en múltiples años con diferentes grados a medida que avanza en su educación.
             """)
         
-        
         # CONSULTA PRINCIPAL - Usando subquery para evitar ONLY_FULL_GROUP_BY
-        # Esta consulta muestra las inscripciones (no estudiantes únicos)
         query = text("""
             SELECT 
                 GRADO,
@@ -160,6 +157,7 @@ try:
                 INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
                 LEFT JOIN Nivel_MCER n ON pnm.NIVEL_MCER_ID = n.ID
                 WHERE pnm.ANIO_REGISTRO = :año
+                AND LOWER(pnm.NOMBRE_CURSO) LIKE '%formacion sabados%'
                 AND p.TIPO_PERSONA = 'Estudiante'
                 AND p.SEXO IS NOT NULL
                 AND p.SEXO != ''
@@ -214,11 +212,11 @@ try:
         # Ordenar grados numéricamente
         def ordenar_grado(grado):
             if grado == 'SIN INFORMACION':
-                return (2, 999, grado)
+                return (1, 0, '')
             elif str(grado).isdigit():
                 return (0, int(grado), grado)
             else:
-                return (1, 0, grado)
+                return (2, 0, grado)
         
         grados_unicos = sorted(df_agrupado['GRADO'].unique(), key=ordenar_grado)
         
@@ -243,7 +241,7 @@ try:
         st.sidebar.write(f"**Grados:** {', '.join(map(str, grados_unicos))}")
 
         # GRÁFICO PRINCIPAL
-        st.header(f"📊 Distribución por Sexo y Grado - Año {selected_year}")
+        st.header(f"📊 Distribución por Sexo y Grado - Formación Sábados - Año {selected_year}")
         
         st.info(f"""
         📌 **Nota importante**: Este gráfico muestra las **inscripciones/registros** de estudiantes por grado para el año {selected_year}.
@@ -267,17 +265,15 @@ try:
         # Agregar valores en las barras
         for i, (masc, fem, total) in enumerate(zip(masculino_por_grado, femenino_por_grado, total_por_grado)):
             if masc > 0:
-                ax.text(masc/2, i, f'{int(masc):,}', 
+                ax.text(masc / 2, i, f'{int(masc)}',
                        ha='center', va='center',
                        color='white', fontsize=9, fontweight='bold')
-            
             if fem > 0:
-                ax.text(masc + fem/2, i, f'{int(fem):,}',
+                ax.text(masc + fem / 2, i, f'{int(fem)}',
                        ha='center', va='center',
                        color='white', fontsize=9, fontweight='bold')
-            
             if total > 0:
-                ax.text(total, i, f'  {int(total):,}',
+                ax.text(masc + fem, i, f'  {int(total)}',
                        ha='left', va='center',
                        color='black', fontsize=9, fontweight='bold')
         
@@ -285,7 +281,7 @@ try:
         ax.set_yticklabels(grados_unicos, fontsize=10)
         ax.set_xlabel('Cantidad de Registros', fontsize=13, fontweight='bold')
         ax.set_ylabel('Grado', fontsize=13, fontweight='bold')
-        ax.set_title(f'Distribución de Estudiantes por Sexo y Grado\nAño {selected_year}',
+        ax.set_title(f'Distribución de Estudiantes por Sexo y Grado - Formación Sábados\nAño {selected_year}',
                     fontsize=16, fontweight='bold', pad=20)
         
         max_val = max(total_por_grado) if total_por_grado else 1
@@ -303,63 +299,56 @@ try:
         col1, col2 = st.columns([2, 1])
         
         with col1:
+            st.subheader("Datos por Grado")
             tabla_data = []
+            total_general = 0
+            total_masc = 0
+            total_fem = 0
+            
             for i, grado in enumerate(grados_unicos):
                 masc = masculino_por_grado[i]
                 fem = femenino_por_grado[i]
-                total = masc + fem
+                total = total_por_grado[i]
+                total_general += total
+                total_masc += masc
+                total_fem += fem
+                porcentaje = (total / sum(total_por_grado) * 100) if sum(total_por_grado) > 0 else 0
                 
                 tabla_data.append({
                     'Grado': grado,
-                    'Masculino': f"{int(masc):,}",
-                    'Femenino': f"{int(fem):,}",
-                    'Total': f"{int(total):,}",
-                    '% Masculino': f"{(masc/total*100):.1f}%" if total > 0 else "0%",
-                    '% Femenino': f"{(fem/total*100):.1f}%" if total > 0 else "0%"
+                    'Masculino': int(masc),
+                    'Femenino': int(fem),
+                    'Total': int(total),
+                    'Porcentaje': f"{porcentaje:.1f}%"
                 })
             
-            total_masc = sum(masculino_por_grado)
-            total_fem = sum(femenino_por_grado)
-            total_general = total_masc + total_fem
-            
             tabla_data.append({
-                'Grado': '**TOTAL**',
-                'Masculino': f"**{int(total_masc):,}**",
-                'Femenino': f"**{int(total_fem):,}**",
-                'Total': f"**{int(total_general):,}**",
-                '% Masculino': f"**{(total_masc/total_general*100):.1f}%**" if total_general > 0 else "**0%**",
-                '% Femenino': f"**{(total_fem/total_general*100):.1f}%**" if total_general > 0 else "**0%**"
+                'Grado': 'TOTAL',
+                'Masculino': int(total_masc),
+                'Femenino': int(total_fem),
+                'Total': int(total_general),
+                'Porcentaje': '100.0%'
             })
             
             df_tabla = pd.DataFrame(tabla_data)
             st.dataframe(df_tabla, use_container_width=True, hide_index=True)
         
         with col2:
-            st.subheader("📊 Totales Generales")
+            st.subheader("📊 Distribución por Sexo")
             
-            st.metric("Total Registros", f"{int(total_general):,}")
             st.metric("Total Masculino", f"{int(total_masc):,}", 
-                     f"{(total_masc/total_general*100):.1f}%" if total_general > 0 else "0%")
-            st.metric("Total Femenino", f"{int(total_fem):,}",
-                     f"{(total_fem/total_general*100):.1f}%" if total_general > 0 else "0%")
+                     f"{(total_masc/total_general*100):.1f}%")
+            st.metric("Total Femenino", f"{int(total_fem):,}", 
+                     f"{(total_fem/total_general*100):.1f}%")
             
-            st.subheader("Distribución Total")
-            
-            fig_pie, ax_pie = plt.subplots(figsize=(6, 6))
-            
-            colors_pie = ['#3498db', '#e74c3c']
-            explode_pie = (0.05, 0.05)
-            
+            fig_pie, ax_pie = plt.subplots(figsize=(7, 7))
             ax_pie.pie([total_masc, total_fem],
                       labels=['Masculino', 'Femenino'],
                       autopct='%1.1f%%',
-                      colors=colors_pie,
-                      explode=explode_pie,
+                      colors=['#3498db', '#e74c3c'],
                       startangle=90,
-                      textprops={'fontsize': 11, 'fontweight':'bold'},
-                      shadow=True)
-            
-            ax_pie.set_title('Distribución por Sexo', fontsize=12, fontweight='bold', pad=15)
+                      textprops={'fontsize': 12, 'fontweight': 'bold'})
+            ax_pie.set_title('Distribución por Sexo', fontsize=14, fontweight='bold', pad=20)
             st.pyplot(fig_pie)
 
         # Gráfico vertical
@@ -380,14 +369,13 @@ try:
                             edgecolor='black', linewidth=1.2)
         
         for i, total in enumerate(total_por_grado):
-            if total > 0:
-                ax_stack.text(i, total, f'{int(total):,}',
-                             ha='center', va='bottom',
-                             fontsize=9, fontweight='bold')
+            ax_stack.text(i, total, f'{int(total)}',
+                         ha='center', va='bottom',
+                         fontsize=11, fontweight='bold', color='#2c3e50')
         
         ax_stack.set_xlabel('Grado', fontsize=13, fontweight='bold')
         ax_stack.set_ylabel('Cantidad de Registros', fontsize=13, fontweight='bold')
-        ax_stack.set_title(f'Distribución por Grado (Apilado Vertical) - Año {selected_year}',
+        ax_stack.set_title(f'Distribución por Grado (Apilado Vertical) - Formación Sábados - Año {selected_year}',
                           fontsize=16, fontweight='bold', pad=20)
         ax_stack.set_xticks(x_pos)
         ax_stack.set_xticklabels(grados_unicos, rotation=45, ha='right', fontsize=10)
@@ -398,13 +386,14 @@ try:
         st.pyplot(fig_stack)
 
         with st.expander("🔍 Ver datos agrupados completos"):
-            st.dataframe(df_agrupado.sort_values(['GRADO', 'SEXO_CATEGORIA']), 
-                        use_container_width=True, hide_index=True)
+            st.dataframe(df_agrupado.sort_values(['GRADO', 'SEXO_CATEGORIA']), use_container_width=True, hide_index=True)
         
         st.success(f"""
         ✅ **Datos cargados exitosamente**
         
         📌 **Información del reporte:**
+        - **Curso**: Formación Sábados
+        - **Tipo de población**: Estudiante
         - **Año**: {selected_year}
         - **Total registros**: {int(total_general):,}
         - **Total grados distintos**: {len(grados_unicos)}
@@ -418,5 +407,4 @@ except Exception as e:
     st.exception(e)
     
     with st.expander("Ver detalles técnicos del error"):
-        import traceback
         st.code(traceback.format_exc())

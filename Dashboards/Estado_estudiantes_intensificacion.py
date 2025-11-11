@@ -4,8 +4,8 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Aprobación de Estudiantes")
-st.title("📊 Aprobación de Estudiantes por Año")
+st.set_page_config(layout="wide", page_title="Dashboard Aprobación de Estudiantes - Intensificación")
+st.title("📊 Aprobación de Estudiantes por Año - Intensificación")
 
 # Configuración de la conexión a la base de datos
 @st.cache_resource
@@ -32,18 +32,19 @@ except Exception as e:
 st.sidebar.header("🔍 Filtros")
 
 with engine.connect() as connection:
-    # Obtener años disponibles
+    # Obtener años disponibles FILTRADO POR INTENSIFICACIÓN
     query_years = text("""
         SELECT DISTINCT pnm.ANIO_REGISTRO as año
         FROM Persona_Nivel_MCER pnm
         WHERE pnm.ANIO_REGISTRO IS NOT NULL
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
         ORDER BY año DESC
     """)
     result_years = connection.execute(query_years)
     available_years = [str(row[0]) for row in result_years.fetchall()]
 
     if not available_years:
-        st.error("No se encontraron años en la base de datos")
+        st.error("No se encontraron años en la base de datos con intensificación")
         st.stop()
 
     # Filtro de año
@@ -59,23 +60,24 @@ st.sidebar.divider()
 st.sidebar.header("📈 Estadísticas Generales")
 
 with engine.connect() as connection:
-    # Total estudiantes en el año seleccionado
+    # Total estudiantes en el año seleccionado FILTRADO POR INTENSIFICACIÓN
     query_total_year = text("""
         SELECT COUNT(DISTINCT pnm.PERSONA_ID) as total 
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO = :año
         AND p.TIPO_PERSONA = 'Estudiante'
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
     """)
     total_year = connection.execute(query_total_year, {"año": int(selected_year)}).fetchone()[0]
     st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{total_year:,}")
 
 st.sidebar.divider()
 
-# Consulta principal para obtener aprobación
+# Consulta principal para obtener aprobación FILTRADO POR INTENSIFICACIÓN
 try:
     with engine.connect() as connection:
-        # Consulta para obtener estado de aprobación
+        # Consulta para obtener estado de aprobación CON INTENSIFICACIÓN
         query = text("""
             SELECT 
                 n.ESTADO_ESTUDIANTE,
@@ -88,6 +90,7 @@ try:
             AND n.ESTADO_ESTUDIANTE IS NOT NULL
             AND n.ESTADO_ESTUDIANTE != ''
             AND n.ESTADO_ESTUDIANTE != 'SIN INFORMACION'
+            AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
             GROUP BY n.ESTADO_ESTUDIANTE
             ORDER BY n.ESTADO_ESTUDIANTE
         """)
@@ -96,7 +99,7 @@ try:
         df = pd.DataFrame(result.fetchall(), columns=["ESTADO_ESTUDIANTE", "cantidad"])
 
         if df.empty:
-            st.warning(f"⚠️ No hay datos de aprobación para el año {selected_year}")
+            st.warning(f"⚠️ No hay datos de aprobación para el año {selected_year} - Intensificación")
             
             # Mostrar diagnóstico
             with st.expander("🔍 Diagnóstico"):
@@ -104,11 +107,13 @@ try:
                     SELECT DISTINCT n.ESTADO_ESTUDIANTE, COUNT(*) as cantidad
                     FROM Persona_Nivel_MCER pnm
                     INNER JOIN Nivel_MCER n ON pnm.NIVEL_MCER_ID = n.ID
+                    INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
                     WHERE pnm.ANIO_REGISTRO = :año
+                    AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
                     GROUP BY n.ESTADO_ESTUDIANTE
                 """)
                 result_estados = connection.execute(query_estados, {"año": int(selected_year)})
-                st.write("**Estados disponibles en la BD:**")
+                st.write("**Estados disponibles en la BD (Intensificación):**")
                 for row in result_estados:
                     st.write(f"- '{row[0]}': {row[1]} registros")
             
@@ -139,7 +144,7 @@ try:
         df_final = df_agrupado[df_agrupado['CATEGORIA'].isin(['Aprobó', 'No Aprobó'])]
         
         if df_final.empty:
-            st.warning(f"⚠️ No se encontraron registros de Aprobó/No Aprobó para el año {selected_year}")
+            st.warning(f"⚠️ No se encontraron registros de Aprobó/No Aprobó para el año {selected_year} - Intensificación")
             st.info("Los estados disponibles son:")
             st.dataframe(df[['ESTADO_ESTUDIANTE', 'cantidad']])
             st.stop()
@@ -147,7 +152,7 @@ try:
         total_estudiantes = df_final['cantidad'].sum()
         
         # Mostrar estadísticas en sidebar
-        st.sidebar.header(f"📊 Aprobación - {selected_year}")
+        st.sidebar.header(f"📊 Aprobación - {selected_year} - Intensificación")
         for _, row in df_final.iterrows():
             categoria = row['CATEGORIA']
             cantidad = int(row['cantidad'])
@@ -155,7 +160,7 @@ try:
             st.sidebar.metric(categoria, f"{cantidad:,}", f"{porcentaje:.1f}%")
 
         # Crear gráfico de pastel principal
-        st.header(f"📊 Distribución de Aprobación - Año {selected_year}")
+        st.header(f"📊 Distribución de Aprobación - Año {selected_year} - Intensificación")
         
         col1, col2 = st.columns([2, 1])
         
@@ -169,9 +174,9 @@ try:
             }
             colors = [colors_map.get(cat, '#95a5a6') for cat in df_final['CATEGORIA']]
             
-            # CORRECCIÓN: Crear explode dinámicamente según el número de categorías
+            # Crear explode dinámicamente según el número de categorías
             num_categorias = len(df_final)
-            explode = tuple([0.05] * num_categorias)  # Un valor 0.05 por cada categoría
+            explode = tuple([0.05] * num_categorias)
             
             # Crear el gráfico de pastel
             wedges, texts, autotexts = ax.pie(
@@ -195,7 +200,7 @@ try:
                 text.set_fontsize(16)
                 text.set_fontweight('bold')
             
-            ax.set_title(f'Aprobación de Estudiantes\nAño {selected_year}', 
+            ax.set_title(f'Aprobación de Estudiantes - Intensificación\nAño {selected_year}', 
                         fontsize=18, fontweight='bold', pad=20)
             
             plt.tight_layout()
@@ -264,7 +269,7 @@ try:
         
         ax_bar.set_xlabel('Estado', fontsize=14, fontweight='bold')
         ax_bar.set_ylabel('Cantidad de Estudiantes', fontsize=14, fontweight='bold')
-        ax_bar.set_title(f'Cantidad de Estudiantes por Estado - Año {selected_year}', 
+        ax_bar.set_title(f'Cantidad de Estudiantes por Estado - Año {selected_year} - Intensificación', 
                         fontsize=16, fontweight='bold', pad=20)
         ax_bar.grid(axis='y', alpha=0.3, linestyle='--')
         
@@ -273,16 +278,17 @@ try:
 
         # Datos detallados (expandible)
         with st.expander("🔍 Ver datos completos por estado"):
-            st.write("**Estados originales en la base de datos:**")
+            st.write("**Estados originales en la base de datos (Intensificación):**")
             st.dataframe(df[['ESTADO_ESTUDIANTE', 'cantidad']].sort_values('cantidad', ascending=False), 
                         use_container_width=True, hide_index=True)
         
         # Información adicional
         st.success(f"""
-        ✅ **Datos cargados exitosamente**
+        ✅ **Datos cargados exitosamente - INTENSIFICACIÓN**
         
         📌 **Información del reporte:**
         - **Año**: {selected_year}
+        - **Tipo**: Intensificación
         - **Total estudiantes evaluados**: {int(total_estudiantes):,}
         - **Aprobados**: {int(aprobo):,}
         - **No aprobados**: {int(total_estudiantes - aprobo):,}

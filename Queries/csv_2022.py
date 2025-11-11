@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Base_datos.conexion import engine
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-ruta_archivo = os.path.join(project_root, "CSVs", "data_2022.csv")
+ruta_archivo = os.path.join(project_root, "CSVs", "data_2022_intensificacion.csv")
 
 df = pd.read_csv(ruta_archivo, sep=';', encoding='utf-8-sig')
 
@@ -323,16 +323,21 @@ with engine.connect() as connection:
     relaciones_nuevas = 0
     niveles_no_encontrados = 0
     
+    # Crear un mapeo de NUMERO_DOCUMENTO a NOMBRE_CURSO desde el DataFrame original
+    nombre_curso_map = dict(zip(df["NÚMERO DE IDENTIFICACIÓN"], df["NOMBRE_CURSO_PROCESADO"]))
+    
     for _, row in PERSONA_NIVEL_2022.iterrows():
         numero_doc = row['NÚMERO DE IDENTIFICACIÓN']
         nivel_mcer_valor = limpiar_valor(row['NIVEL_MCER'])
         poblacion_valor = limpiar_valor(row['TIPO POBLACION'])
         anio_registro = int(row['ANIO']) if pd.notna(row['ANIO']) else None
         grado_valor = limpiar_valor(row['GRADO'])  # INCLUIR GRADO
+        nombre_curso_valor = limpiar_valor(nombre_curso_map.get(numero_doc, 'SIN INFORMACION'))
         
         nivel_mcer_valor = None if nivel_mcer_valor == 'SIN INFORMACION' else nivel_mcer_valor
         poblacion_valor = None if poblacion_valor == 'SIN INFORMACION' else poblacion_valor
         grado_valor = None if grado_valor == 'SIN INFORMACION' else grado_valor
+        nombre_curso_valor = None if nombre_curso_valor == 'SIN INFORMACION' else nombre_curso_valor
         
         persona_id = connection.execute(text("SELECT ID FROM Personas WHERE NUMERO_DOCUMENTO = :numero_doc"), 
                                        {'numero_doc': numero_doc}).fetchone()
@@ -362,9 +367,9 @@ with engine.connect() as connection:
         
         if relacion_existe is None:
             connection.execute(text(
-                """INSERT INTO Persona_Nivel_MCER (PERSONA_ID, NIVEL_MCER_ID, ANIO_REGISTRO)
-                   VALUES (:persona_id, :nivel_id, :anio)"""
-            ), {'persona_id': persona_id[0], 'nivel_id': nivel_id[0], 'anio': anio_registro})
+                """INSERT INTO Persona_Nivel_MCER (PERSONA_ID, NIVEL_MCER_ID, ANIO_REGISTRO, NOMBRE_CURSO)
+                   VALUES (:persona_id, :nivel_id, :anio, :nombre_curso)"""
+            ), {'persona_id': persona_id[0], 'nivel_id': nivel_id[0], 'anio': anio_registro, 'nombre_curso': nombre_curso_valor})
             relaciones_nuevas += 1
     
     connection.commit()

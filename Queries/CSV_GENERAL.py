@@ -153,7 +153,7 @@ def procesar_csv_anio(anio):
                         "DIRECCIÓN","SEXO","FECHA DE NACIMIENTO","TIPO POBLACION","TIPO DE IDENTIFICACIÓN",
                         "MUNICIPIO","INSTITUCIÓN EDUCATIVA"]].copy()
     
-    PERSONA_NIVEL = df[["NÚMERO DE IDENTIFICACIÓN","NIVEL_MCER","TIPO POBLACION","ANIO","GRADO"]].copy()
+    PERSONA_NIVEL = df[["NÚMERO DE IDENTIFICACIÓN","NIVEL_MCER","TIPO POBLACION","ANIO","GRADO","NOMBRE_CURSO_PROCESADO"]].copy()
     
     SEDES = df[["GRUPO","JORNADA","SEDE NODAL","NÚMERO DE IDENTIFICACIÓN"]].copy()
     
@@ -319,10 +319,12 @@ def procesar_csv_anio(anio):
             poblacion_valor = limpiar_valor(row['TIPO POBLACION'])
             anio_registro = int(row['ANIO']) if pd.notna(row['ANIO']) else None
             grado_valor = limpiar_valor(row['GRADO'])
+            nombre_curso_valor = limpiar_valor(row['NOMBRE_CURSO_PROCESADO'])
             
             nivel_mcer_valor = None if nivel_mcer_valor == 'SIN INFORMACION' else nivel_mcer_valor
             poblacion_valor = None if poblacion_valor == 'SIN INFORMACION' else poblacion_valor
             grado_valor = None if grado_valor == 'SIN INFORMACION' else grado_valor
+            nombre_curso_valor = None if nombre_curso_valor == 'SIN INFORMACION' else nombre_curso_valor
             
             persona_id = connection.execute(text("SELECT ID FROM Personas WHERE NUMERO_DOCUMENTO = :numero_doc"), 
                                            {'numero_doc': numero_doc}).fetchone()
@@ -341,14 +343,14 @@ def procesar_csv_anio(anio):
             
             relacion_existe = connection.execute(text(
                 """SELECT ID FROM Persona_Nivel_MCER 
-                   WHERE PERSONA_ID = :persona_id AND NIVEL_MCER_ID = :nivel_id AND (ANIO_REGISTRO <=> :anio)"""
-            ), {'persona_id': persona_id[0], 'nivel_id': nivel_id[0], 'anio': anio_registro}).fetchone()
+                   WHERE PERSONA_ID = :persona_id AND NIVEL_MCER_ID = :nivel_id AND (ANIO_REGISTRO <=> :anio) AND (NOMBRE_CURSO <=> :nombre_curso)"""
+            ), {'persona_id': persona_id[0], 'nivel_id': nivel_id[0], 'anio': anio_registro, 'nombre_curso': nombre_curso_valor}).fetchone()
             
             if relacion_existe is None:
                 connection.execute(text(
-                    """INSERT INTO Persona_Nivel_MCER (PERSONA_ID, NIVEL_MCER_ID, ANIO_REGISTRO)
-                       VALUES (:persona_id, :nivel_id, :anio)"""
-                ), {'persona_id': persona_id[0], 'nivel_id': nivel_id[0], 'anio': anio_registro})
+                    """INSERT INTO Persona_Nivel_MCER (PERSONA_ID, NIVEL_MCER_ID, ANIO_REGISTRO, NOMBRE_CURSO)
+                       VALUES (:persona_id, :nivel_id, :anio, :nombre_curso)"""
+                ), {'persona_id': persona_id[0], 'nivel_id': nivel_id[0], 'anio': anio_registro, 'nombre_curso': nombre_curso_valor})
                 estadisticas['relaciones'] += 1
         connection.commit()
         
