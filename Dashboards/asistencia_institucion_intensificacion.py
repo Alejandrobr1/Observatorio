@@ -5,8 +5,8 @@ from sqlalchemy import create_engine, text
 import numpy as np
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Institución")
-st.title("🏫 Distribución de Estudiantes por Institución Educativa")
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Institución - Intensificación")
+st.title("🏫 Distribución de Estudiantes por Institución Educativa - Intensificación")
 
 # Configuración de la conexión a la base de datos
 @st.cache_resource
@@ -33,18 +33,19 @@ except Exception as e:
 st.sidebar.header("🔍 Filtros")
 
 with engine.connect() as connection:
-    # Obtener años disponibles
+    # Obtener años disponibles FILTRADO POR INTENSIFICACIÓN
     query_years = text("""
         SELECT DISTINCT pnm.ANIO_REGISTRO as año
         FROM Persona_Nivel_MCER pnm
         WHERE pnm.ANIO_REGISTRO IS NOT NULL
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
         ORDER BY año DESC
     """)
     result_years = connection.execute(query_years)
     available_years = [str(row[0]) for row in result_years.fetchall()]
 
     if not available_years:
-        st.error("No se encontraron años en la base de datos")
+        st.error("No se encontraron años con datos de intensificación")
         st.stop()
 
     # Filtro de año
@@ -60,18 +61,19 @@ st.sidebar.divider()
 st.sidebar.header("📈 Estadísticas Generales")
 
 with engine.connect() as connection:
-    # Total estudiantes en el año seleccionado
+    # Total estudiantes en el año seleccionado FILTRADO POR INTENSIFICACIÓN
     query_total_year = text("""
         SELECT COUNT(DISTINCT p.ID) as total 
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO = :año
         AND p.TIPO_PERSONA = 'Estudiante'
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
     """)
     total_year = connection.execute(query_total_year, {"año": int(selected_year)}).fetchone()[0]
     st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{total_year:,}")
     
-    # Total instituciones
+    # Total instituciones FILTRADO POR INTENSIFICACIÓN
     query_total_inst = text("""
         SELECT COUNT(DISTINCT i.ID) as total
         FROM Persona_Nivel_MCER pnm
@@ -81,13 +83,14 @@ with engine.connect() as connection:
         AND p.TIPO_PERSONA = 'Estudiante'
         AND i.NOMBRE_INSTITUCION IS NOT NULL
         AND i.NOMBRE_INSTITUCION != ''
+        AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
     """)
     total_inst = connection.execute(query_total_inst, {"año": int(selected_year)}).fetchone()[0]
     st.sidebar.metric(f"Total Instituciones ({selected_year})", f"{total_inst:,}")
 
 st.sidebar.divider()
 
-# Consulta principal para obtener estudiantes por institución
+# Consulta principal para obtener estudiantes por institución FILTRADO POR INTENSIFICACIÓN
 try:
     with engine.connect() as connection:
         # Consulta para obtener cantidad de estudiantes por institución
@@ -103,6 +106,7 @@ try:
             AND i.NOMBRE_INSTITUCION IS NOT NULL
             AND i.NOMBRE_INSTITUCION != ''
             AND i.NOMBRE_INSTITUCION != 'SIN INFORMACION'
+            AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
             GROUP BY i.NOMBRE_INSTITUCION
             ORDER BY cantidad DESC
         """)
@@ -111,7 +115,7 @@ try:
         df = pd.DataFrame(result.fetchall(), columns=["INSTITUCION", "cantidad"])
 
         if df.empty:
-            st.warning(f"⚠️ No hay datos de instituciones para el año {selected_year}")
+            st.warning(f"⚠️ No hay datos de instituciones para intensificación en el año {selected_year}")
             st.stop()
 
         total_estudiantes = df['cantidad'].sum()
@@ -120,7 +124,7 @@ try:
         df['porcentaje'] = (df['cantidad'] / total_estudiantes * 100).round(1)
         
         # Mostrar top 5 en sidebar
-        st.sidebar.header(f"📊 Top 5 Instituciones - {selected_year}")
+        st.sidebar.header(f"📊 Top 5 Instituciones - {selected_year} - Intensificación")
         for idx, row in df.head(5).iterrows():
             institucion = row['INSTITUCION']
             cantidad = int(row['cantidad'])
@@ -131,7 +135,7 @@ try:
             st.sidebar.write(f"   {cantidad:,} ({porcentaje}%)")
 
         # Crear gráfico de pastel principal
-        st.header(f"📊 Distribución de Estudiantes por Institución - Año {selected_year}")
+        st.header(f"📊 Distribución de Estudiantes por Institución - Año {selected_year} - Intensificación")
         
         # Limitar a top 10 para mejor visualización
         num_instituciones_mostrar = min(10, len(df))
@@ -187,7 +191,7 @@ try:
                 text.set_fontsize(10)
                 text.set_fontweight('bold')
             
-            ax.set_title(f'Distribución de Estudiantes por Institución\nAño {selected_year}', 
+            ax.set_title(f'Distribución de Estudiantes por Institución - Intensificación\nAño {selected_year}', 
                         fontsize=16, fontweight='bold', pad=20)
             
             plt.tight_layout()
@@ -264,7 +268,7 @@ try:
         ax_bar.set_yticks(y_pos)
         ax_bar.set_yticklabels(labels_bar, fontsize=10)
         ax_bar.set_xlabel('Cantidad de Estudiantes', fontsize=12, fontweight='bold')
-        ax_bar.set_title(f'Top 10 Instituciones con Más Estudiantes - Año {selected_year}', 
+        ax_bar.set_title(f'Top 10 Instituciones con Más Estudiantes - Año {selected_year} - Intensificación', 
                         fontsize=14, fontweight='bold', pad=15)
         ax_bar.grid(axis='x', alpha=0.3, linestyle='--')
         ax_bar.invert_yaxis()  # La institución con más estudiantes arriba
@@ -308,10 +312,11 @@ try:
         institucion_mayor = df.iloc[0]['INSTITUCION']
         
         st.success(f"""
-        ✅ **Datos cargados exitosamente**
+        ✅ **Datos cargados exitosamente - INTENSIFICACIÓN**
         
         📌 **Información del reporte:**
         - **Año**: {selected_year}
+        - **Tipo**: Intensificación
         - **Total estudiantes**: {int(total_estudiantes):,}
         - **Total instituciones**: {len(df):,}
         - **Institución con más estudiantes**: {institucion_mayor} ({int(df.iloc[0]['cantidad']):,} estudiantes)

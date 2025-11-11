@@ -15,6 +15,7 @@ Persona_Nivel_MCER = Table(
     Column('PERSONA_ID', BigInteger, ForeignKey('Personas.ID'), nullable=False),
     Column('NIVEL_MCER_ID', BigInteger, ForeignKey('Nivel_MCER.ID'), nullable=False),
     Column('ANIO_REGISTRO', Integer),  # Año en que la persona obtuvo este nivel
+    Column('NOMBRE_CURSO', String(200)),  # Nombre del curso (para filtros de intensificación)
 )
 
 class Tipo_documentos(Base):

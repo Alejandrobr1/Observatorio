@@ -343,3 +343,13 @@
 2025-11-10 20:49:05,724 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
 2025-11-10 20:51:02,421 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
 2025-11-10 20:51:02,439 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 21:50:58,255 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 21:50:58,646 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 21:51:15,530 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 21:51:15,547 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 21:51:38,006 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 21:51:38,027 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 21:52:11,154 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 21:52:11,182 - Base_datos.conexion - INFO - Conexión a base de datos cerrada
+2025-11-10 22:14:14,766 - Base_datos.conexion - INFO - Conexión exitosa a MySQL en puerto 3308
+2025-11-10 22:14:14,786 - Base_datos.conexion - INFO - Conexión a base de datos cerrada

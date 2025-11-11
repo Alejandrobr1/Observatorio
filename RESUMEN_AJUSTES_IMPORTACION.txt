@@ -1,0 +1,236 @@
+📋 RESUMEN EJECUTIVO - AJUSTES DE IMPORTACIÓN
+==============================================
+
+ESTADO: ✅ COMPLETADO
+
+---
+
+## 🎯 OBJETIVO
+Ajustar los archivos de importación de datos (CSV_GENERAL.py) para que funcionen correctamente 
+con el nuevo modelo de base de datos y puedan ser ejecutados en cualquier PC.
+
+---
+
+## ✅ CAMBIOS REALIZADOS
+
+### 1. ARCHIVOS MODIFICADOS (2 archivos)
+   ✅ Queries/CSV_GENERAL.py
+   ✅ Queries/CSV_GENERAL_INTENSIFICACION.py
+
+### 2. CAMBIOS ESPECÍFICOS EN EL CÓDIGO
+
+   **A) Incluir NOMBRE_CURSO en PERSONA_NIVEL**
+   
+      Línea: ~155 (antes línea 154)
+      
+      ANTES:
+      PERSONA_NIVEL = df[["NÚMERO DE IDENTIFICACIÓN","NIVEL_MCER","TIPO POBLACION","ANIO","GRADO"]].copy()
+      
+      DESPUÉS:
+      PERSONA_NIVEL = df[["NÚMERO DE IDENTIFICACIÓN","NIVEL_MCER","TIPO POBLACION","ANIO","GRADO","NOMBRE_CURSO_PROCESADO"]].copy()
+
+   **B) Extraer NOMBRE_CURSO en sección 6 (Persona_Nivel_MCER)**
+   
+      Línea: ~320-328
+      
+      Agregadas líneas:
+      nombre_curso_valor = limpiar_valor(row['NOMBRE_CURSO_PROCESADO'])
+      nombre_curso_valor = None if nombre_curso_valor == 'SIN INFORMACION' else nombre_curso_valor
+
+   **C) Actualizar validación de duplicados**
+   
+      Línea: ~344
+      
+      ANTES:
+      WHERE PERSONA_ID = :persona_id AND NIVEL_MCER_ID = :nivel_id AND (ANIO_REGISTRO <=> :anio)
+      
+      DESPUÉS:
+      WHERE PERSONA_ID = :persona_id AND NIVEL_MCER_ID = :nivel_id AND (ANIO_REGISTRO <=> :anio) AND (NOMBRE_CURSO <=> :nombre_curso)
+
+   **D) Actualizar INSERT en Persona_Nivel_MCER**
+   
+      Línea: ~349
+      
+      ANTES:
+      INSERT INTO Persona_Nivel_MCER (PERSONA_ID, NIVEL_MCER_ID, ANIO_REGISTRO)
+      VALUES (:persona_id, :nivel_id, :anio)
+      
+      DESPUÉS:
+      INSERT INTO Persona_Nivel_MCER (PERSONA_ID, NIVEL_MCER_ID, ANIO_REGISTRO, NOMBRE_CURSO)
+      VALUES (:persona_id, :nivel_id, :anio, :nombre_curso)
+
+---
+
+## 📂 ARCHIVOS NUEVOS CREADOS (4 archivos)
+
+1. ✅ README_IMPORTACION.md
+   - Guía rápida de 3 pasos
+   - Checklist de requisitos
+   - FAQs
+
+2. ✅ EJECUTAR_IMPORTACION.py
+   - Script maestro automatizado
+   - Verifica dependencias
+   - Valida conexión a BD
+   - Crea tablas si no existen
+   - Ejecuta ambos scripts de importación
+   - Genera reportes
+
+3. ✅ VALIDAR_IMPORTACION.py
+   - Verifica integridad de datos
+   - Genera estadísticas por tabla
+   - Detecta datos faltantes
+   - Valida relaciones
+
+4. ✅ CAMBIOS_REALIZADOS_IMPORTACION.md
+   - Documentación técnica detallada
+   - Antes/Después del código
+   - Explicación de cada cambio
+
+---
+
+## 🚀 CÓMO USAR EN OTRO PC
+
+### OPCIÓN 1: Forma rápida y automatizada (RECOMENDADA)
+
+```powershell
+# 1. Preparar ambiente
+python -m venv env
+.\env\Scripts\Activate.ps1
+pip install pandas sqlalchemy mysql-connector-python
+
+# 2. Editar configuración de conexión
+# Abrir y editar: Base_datos/conexion.py
+# Cambiar: DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+
+# 3. Crear esquema de BD
+python Base_datos/crear_tablas.py
+
+# 4. Importar TODOS los datos automáticamente
+python EJECUTAR_IMPORTACION.py
+
+# 5. Validar que todo funcionó correctamente (opcional)
+python VALIDAR_IMPORTACION.py
+```
+
+### OPCIÓN 2: Forma manual
+
+```powershell
+# 1. Preparar ambiente (igual que arriba)
+
+# 2. Crear esquema
+python Base_datos/crear_tablas.py
+
+# 3. Importar datos Sábados
+python Queries/CSV_GENERAL.py
+
+# 4. Importar datos Intensificación
+python Queries/CSV_GENERAL_INTENSIFICACION.py
+```
+
+---
+
+## 📊 DATOS QUE SE IMPORTAN
+
+✅ Programas Sábados (2016-2025)
+   - Estudiantes regulares
+   - Niveles MCER
+   - Instituciones y sedes
+
+✅ Programas Intensificación (2016-2025)
+   - Estudiantes de programas intensivos
+   - Datos específicos de intensificación
+
+✅ Docentes (Formación Docente)
+   - Se detectan automáticamente
+   - Asociados a NOMBRE_CURSO='Formación Docente'
+
+---
+
+## 🔑 CARACTERÍSTICAS PRINCIPALES
+
+✅ **Idempotencia**: Se puede ejecutar múltiples veces sin crear duplicados
+✅ **Validación**: Detecta y evita duplicados considerando NOMBRE_CURSO
+✅ **Flexibilidad**: Permite importar años específicos
+✅ **Robustez**: Manejo completo de errores y valores nulos
+✅ **Automatización**: Script maestro hace todo automáticamente
+✅ **Documentación**: Guías completas para usuarios finales
+✅ **Verificación**: Script de validación para confirmar integridad
+
+---
+
+## 📈 MODELO DE DATOS ACTUALIZADO
+
+Tabla Persona_Nivel_MCER (NUEVA ESTRUCTURA):
+```
+CREATE TABLE Persona_Nivel_MCER (
+  ID BIGINT PRIMARY KEY AUTO_INCREMENT,
+  PERSONA_ID BIGINT NOT NULL,
+  NIVEL_MCER_ID BIGINT NOT NULL,
+  ANIO_REGISTRO INT,
+  NOMBRE_CURSO VARCHAR(200)  ← NUEVO CAMPO
+);
+```
+
+Otros cambios:
+✅ GRADO: Movido de Instituciones → Nivel_MCER
+✅ Nivel_MCER: Ahora contiene IDIOMA, CERTIFICADO
+
+---
+
+## ⏱️ TIEMPO DE EJECUCIÓN
+
+Importación típica:
+- Datos 2016-2025: ~5-15 minutos (depende de velocidad de MySQL)
+- Validación: ~1-2 minutos
+
+---
+
+## ✨ VALIDACIÓN FINAL
+
+Después de ejecutar, verifica:
+
+✅ python VALIDAR_IMPORTACION.py
+
+Deberías ver:
+- ✅ Todas las tablas creadas
+- ✅ Registros en cada tabla
+- ✅ Personas importadas correctamente
+- ✅ Relaciones persona-nivel con NOMBRE_CURSO
+- ✅ Instituciones y sedes asociadas
+
+---
+
+## 📞 SOPORTE
+
+Si hay errores:
+
+1. "Can't connect to MySQL"
+   → Verifica Base_datos/conexion.py
+   → Verifica que MySQL esté corriendo en puerto 3308
+
+2. "Table already exists"
+   → Es normal, se sobrescribe automáticamente
+
+3. "File not found data_2025.csv"
+   → Verifica que los CSVs estén en carpeta CSVs/
+   → Nombres deben ser: data_AAAA.csv o data_AAAA_intensificacion.csv
+
+---
+
+## 📋 CHECKLIST FINAL
+
+- [ ] Ambiente virtual creado y activado
+- [ ] Dependencias instaladas (pandas, sqlalchemy, mysql-connector-python)
+- [ ] Base_datos/conexion.py configurado con credentials correctos
+- [ ] CSVs copiados en carpeta CSVs/ (años 2016-2025)
+- [ ] Ejecutado: python Base_datos/crear_tablas.py
+- [ ] Ejecutado: python EJECUTAR_IMPORTACION.py
+- [ ] Ejecutado: python VALIDAR_IMPORTACION.py (opcional)
+- [ ] ✅ Datos importados y listos para dashboards
+
+---
+
+VERSIÓN: 2.1
+FECHA: Noviembre 2025
+ESTADO: ✅ LISTO PARA PRODUCCIÓN
