@@ -31,15 +31,16 @@ def get_data_sexo_grado():
     engine = get_engine()
     query = """
     SELECT 
-        pnm.GRADO,
+        c.NOMBRE_CURSO as grado,
         p.SEXO,
         COUNT(*) as cantidad,
         pnm.ANIO_REGISTRO
     FROM Persona_Nivel_MCER pnm
     JOIN Personas p ON pnm.PERSONA_ID = p.ID
+    LEFT JOIN Cursos c ON pnm.ID_CURSO = c.ID_CURSO
     WHERE pnm.NOMBRE_CURSO LIKE '%Sabados%' OR pnm.NOMBRE_CURSO LIKE '%sabados%'
-    GROUP BY pnm.GRADO, p.SEXO, pnm.ANIO_REGISTRO
-    ORDER BY pnm.GRADO, p.SEXO
+    GROUP BY c.NOMBRE_CURSO, p.SEXO, pnm.ANIO_REGISTRO
+    ORDER BY c.NOMBRE_CURSO, p.SEXO
     """
     return pd.read_sql(text(query), engine)
 
@@ -54,16 +55,16 @@ try:
     st.divider()
     
     # Gráfico de sexo y grado
-    sexo_grado = df.groupby(['GRADO', 'SEXO'])['cantidad'].sum().reset_index()
+    sexo_grado = df.groupby(['grado', 'SEXO'])['cantidad'].sum().reset_index()
     
     fig1 = px.bar(
         sexo_grado,
-        x='GRADO',
+        x='grado',
         y='cantidad',
         color='SEXO',
         barmode='group',
         title='Distribución por Grado y Sexo',
-        labels={'cantidad': 'Cantidad', 'GRADO': 'Grado', 'SEXO': 'Sexo'}
+        labels={'cantidad': 'Cantidad', 'grado': 'Grado', 'SEXO': 'Sexo'}
     )
     
     st.plotly_chart(fig1, use_container_width=True)

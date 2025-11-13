@@ -86,13 +86,14 @@ with engine.connect() as connection:
     query = text("""
         SELECT 
             COALESCE(p.SEXO, 'SIN ESPECIFICAR') as sexo,
-            COALESCE(p.GRADO, 'SIN ESPECIFICAR') as grado,
+            COALESCE(c.NOMBRE_CURSO, 'SIN ESPECIFICAR') as grado,
             COUNT(DISTINCT p.ID) as cantidad
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
+        LEFT JOIN Cursos c ON pnm.ID_CURSO = c.ID_CURSO
         WHERE pnm.ANIO_REGISTRO = :year
         AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%docentes%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%docente%')
-        GROUP BY COALESCE(p.SEXO, 'SIN ESPECIFICAR'), COALESCE(p.GRADO, 'SIN ESPECIFICAR')
+        GROUP BY COALESCE(p.SEXO, 'SIN ESPECIFICAR'), COALESCE(c.NOMBRE_CURSO, 'SIN ESPECIFICAR')
         ORDER BY cantidad DESC
     """)
     
