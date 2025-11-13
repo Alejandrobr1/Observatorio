@@ -39,7 +39,7 @@ try:
     engine = get_engine()
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
-    st.sidebar.success("✅ Conexión establecida")
+    st.sidebar.divider()
 except Exception as e:
     st.error(f"❌ Error: {e}")
     st.stop()

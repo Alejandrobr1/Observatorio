@@ -170,14 +170,10 @@ with tab1:
                 personas_result = conn.execute(text("SELECT COUNT(*) as total FROM Personas"))
                 personas_count = personas_result.fetchone()[0]
                 
-                pnm_result = conn.execute(text("SELECT COUNT(*) as total FROM Persona_Nivel_MCER"))
-                pnm_count = pnm_result.fetchone()[0]
-                
                 inst_result = conn.execute(text("SELECT COUNT(*) as total FROM Instituciones"))
                 inst_count = inst_result.fetchone()[0]
                 
             col2.metric("👥 Total de Personas", personas_count)
-            col2.metric("📊 Registros Nivel MCER", pnm_count)
             col2.metric("🏫 Instituciones", inst_count)
         except Exception as e:
             st.warning(f"No se pudo conectar a la base de datos: {e}")
@@ -194,37 +190,37 @@ with tab2:
     st.markdown("#### 📚 Formación Sábados (6 Dashboards)")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.page_link("pages/1_📊_Estudiantes_Sabados.py", label="📊 Estudiantes", icon="📊")
-        st.page_link("pages/6_📊_Estado_Estudiantes_Sabados.py", label="📊 Estado", icon="📊")
+        st.page_link("pages/1_📊_Estudiantes_Sabados.py", label="📊 Estudiantes")
+        st.page_link("pages/6_📊_Estado_Estudiantes_Sabados.py", label="📊 Estado")
     with col2:
-        st.page_link("pages/2_👥_Sexo_Grado_Sabados.py", label="👥 Sexo y Grado", icon="👥")
-        st.page_link("pages/8_📚_Niveles_MCER_Sabados.py", label="📚 Niveles MCER", icon="📚")
+        st.page_link("pages/2_👥_Sexo_Grado_Sabados.py", label="👥 Sexo y Grado")
+        st.page_link("pages/8_📚_Niveles_MCER_Sabados.py", label="📚 Niveles MCER")
     with col3:
-        st.page_link("pages/10_🏫_Instituciones_Sabados.py", label="🏫 Instituciones", icon="🏫")
-        st.page_link("pages/14_📚_Asistencia_Institucion_Sabados.py", label="📍 Asistencia x Institución", icon="📍")
+        st.page_link("pages/10_🏫_Instituciones_Sabados.py", label="🏫 Instituciones")
+        st.page_link("pages/14_📚_Asistencia_Institucion_Sabados.py", label="📍 Asistencia x Institución")
     st.divider()
     
     # Formación Docentes
     st.markdown("#### 🎓 Formación Docentes (2 Dashboards)")
     col1, col2 = st.columns(2)
     with col1:
-        st.page_link("pages/3_👥_Sexo_Grado_Docentes.py", label="👥 Sexo y Grado", icon="👥")
+        st.page_link("pages/3_👥_Sexo_Grado_Docentes.py", label="👥 Sexo y Grado")
     with col2:
-        st.page_link("pages/12_🏫_Asistencia_Institucion_Docentes.py", label="📍 Asistencia x Institución", icon="📍")
+        st.page_link("pages/12_🏫_Asistencia_Institucion_Docentes.py", label="📍 Asistencia x Institución")
     st.divider()
     
     # Formación Intensificación
     st.markdown("#### ⚡ Formación Intensificación (6 Dashboards)")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.page_link("pages/4_⚡_Estudiantes_Intensificacion.py", label="⚡ Estudiantes", icon="⚡")
-        st.page_link("pages/7_⚡_Estado_Estudiantes_Intensificacion.py", label="⚡ Estado", icon="⚡")
+        st.page_link("pages/4_⚡_Estudiantes_Intensificacion.py", label="⚡ Estudiantes")
+        st.page_link("pages/7_⚡_Estado_Estudiantes_Intensificacion.py", label="⚡ Estado")
     with col2:
-        st.page_link("pages/5_📈_Sexo_Grado_Intensificacion.py", label="📊 Sexo y Grado", icon="📊")
-        st.page_link("pages/9_📚_Niveles_MCER_Intensificacion.py", label="📚 Niveles MCER", icon="📚")
+        st.page_link("pages/5_📈_Sexo_Grado_Intensificacion.py", label="📊 Sexo y Grado")
+        st.page_link("pages/9_📚_Niveles_MCER_Intensificacion.py", label="📚 Niveles MCER")
     with col3:
-        st.page_link("pages/11_🏫_Instituciones_Intensificacion.py", label="🏫 Instituciones", icon="🏫")
-        st.page_link("pages/13_⚡_Asistencia_Institucion_Intensificacion.py", label="📍 Asistencia x Institución", icon="📍")
+        st.page_link("pages/11_🏫_Instituciones_Intensificacion.py", label="🏫 Instituciones")
+        st.page_link("pages/13_⚡_Asistencia_Institucion_Intensificacion.py", label="📍 Asistencia x Institución")
     st.divider()
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")

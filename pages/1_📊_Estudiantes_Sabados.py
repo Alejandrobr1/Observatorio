@@ -56,6 +56,9 @@ def get_estudiantes_sabados():
 
 try:
     df = get_estudiantes_sabados()
+
+    st.sidebar.page_link("app.py", label="🏠 Volver al Inicio", icon="🏠")
+    st.sidebar.divider()
     
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("👥 Total Estudiantes", len(df))

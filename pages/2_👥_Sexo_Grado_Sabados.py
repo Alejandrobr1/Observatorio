@@ -45,6 +45,9 @@ def get_data_sexo_grado():
 
 try:
     df = get_data_sexo_grado()
+
+    st.sidebar.page_link("app.py", label="🏠 Volver al Inicio", icon="🏠")
+    st.sidebar.divider()
     
     col1, col2, col3 = st.columns(3)
     col1.metric("📊 Registros Total", len(df))
