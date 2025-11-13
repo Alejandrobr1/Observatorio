@@ -30,17 +30,16 @@ def get_engine():
 def get_data_sexo_grado():
     engine = get_engine()
     query = """
-    SELECT 
-        c.NOMBRE_CURSO as grado,
+    SELECT
+        pnm.NOMBRE_CURSO as grado,
         p.SEXO,
         COUNT(*) as cantidad,
         pnm.ANIO_REGISTRO
     FROM Persona_Nivel_MCER pnm
     JOIN Personas p ON pnm.PERSONA_ID = p.ID
-    LEFT JOIN Cursos c ON pnm.ID_CURSO = c.ID_CURSO
     WHERE pnm.NOMBRE_CURSO LIKE '%Sabados%' OR pnm.NOMBRE_CURSO LIKE '%sabados%'
-    GROUP BY c.NOMBRE_CURSO, p.SEXO, pnm.ANIO_REGISTRO
-    ORDER BY c.NOMBRE_CURSO, p.SEXO
+    GROUP BY pnm.NOMBRE_CURSO, p.SEXO, pnm.ANIO_REGISTRO
+    ORDER BY pnm.NOMBRE_CURSO, p.SEXO
     """
     return pd.read_sql(text(query), engine)
 

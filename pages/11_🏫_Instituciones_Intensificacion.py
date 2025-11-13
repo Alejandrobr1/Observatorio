@@ -70,8 +70,7 @@ with engine.connect() as connection:
             COUNT(DISTINCT p.ID) as cantidad
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
-        LEFT JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
-        LEFT JOIN Instituciones i ON nm.INSTITUCION_ID = i.ID
+        LEFT JOIN Instituciones i ON p.INSTITUCION_ID = i.ID
         WHERE pnm.ANIO_REGISTRO = :year
         AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%intensif%')
         GROUP BY COALESCE(i.NOMBRE_INSTITUCION, 'SIN ESPECIFICAR')
