@@ -79,7 +79,7 @@ with engine.connect() as connection:
             p.APELLIDOS,
             p.SEXO,
             nm.NIVEL_MCER,
-            p.GRADO,
+            nm.GRADO,
             pnm.ANIO_REGISTRO,
             pnm.NOMBRE_CURSO,
             i.NOMBRE_INSTITUCION,
