@@ -46,9 +46,9 @@ def get_estudiantes_sabados():
         p.TIPO_POBLACION
     FROM Persona_Nivel_MCER pnm
     JOIN Personas p ON pnm.PERSONA_ID = p.ID
-    JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
-    JOIN Instituciones i ON nm.INSTITUCION_ID = i.ID
-    JOIN Ciudades ci ON i.CIUDAD_ID = ci.ID
+    LEFT JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
+    LEFT JOIN Instituciones i ON p.INSTITUCION_ID = i.ID
+    LEFT JOIN Ciudades ci ON p.CIUDAD_ID = ci.ID
     WHERE LOWER(pnm.NOMBRE_CURSO) LIKE '%sabados%'
     ORDER BY pnm.ANIO_REGISTRO DESC, p.NOMBRES
     """

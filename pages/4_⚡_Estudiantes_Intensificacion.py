@@ -87,8 +87,8 @@ with engine.connect() as connection:
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         LEFT JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
-        LEFT JOIN Instituciones i ON nm.INSTITUCION_ID = i.ID
-        LEFT JOIN Ciudades ci ON i.CIUDAD_ID = ci.ID
+        LEFT JOIN Instituciones i ON p.INSTITUCION_ID = i.ID
+        LEFT JOIN Ciudades ci ON p.CIUDAD_ID = ci.ID
         WHERE pnm.ANIO_REGISTRO = :year
         AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%intensif%')
         ORDER BY p.NOMBRES
