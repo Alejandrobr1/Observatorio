@@ -68,7 +68,7 @@ try:
     
     st.divider()
     
-    tab1, tab2, tab3, tab4 = st.tabs(["Distribución", "Por Año", "Por Institución", "Datos"])
+    tab1, tab2, tab3 = st.tabs(["Distribución", "Por Año", "Por Institución"])
     
     with tab1:
         col1, col2 = st.columns(2)
@@ -111,9 +111,6 @@ try:
             orientation='h'
         )
         st.plotly_chart(fig, use_container_width=True)
-    
-    with tab4:
-        st.dataframe(df, use_container_width=True)
 
 except Exception as e:
     st.error(f"Error al cargar datos: {e}")
