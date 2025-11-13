@@ -2,8 +2,8 @@ import streamlit as st
 import os
 from sqlalchemy import create_engine, text
 
-st.set_page_config(page_title="Estudiantes por Institución - Formación Intensificación", layout="wide", page_icon="⚡")
-st.title("⚡ Estudiantes por Institución - Formación Intensificación")
+st.set_page_config(page_title="Estudiantes por Institución - Sábados", layout="wide", page_icon="📚")
+st.title("📚 Estudiantes por Institución - Sábados")
 
 @st.cache_resource
 def get_engine():
@@ -34,7 +34,7 @@ except Exception as e:
 import pandas as pd
 import plotly.express as px
 
-# Query para Estudiantes por Institución - Intensificación
+# Query para Estudiantes por Institución - Sábados
 query = """
 SELECT 
     p.ID_PERSONA,
@@ -47,7 +47,7 @@ FROM Personas p
 INNER JOIN Instituciones i ON p.ID_INSTITUCION = i.ID_INSTITUCION
 INNER JOIN Persona_Nivel_MCER pnm ON p.ID_PERSONA = pnm.ID_PERSONA
 INNER JOIN Nivel_MCER nm ON pnm.ID_NIVEL_MCER = nm.ID_NIVEL_MCER
-WHERE pnm.ID_CURSO = 3
+WHERE pnm.ID_CURSO = 1
 ORDER BY i.NOMBRE_INSTITUCION, p.APELLIDO, p.NOMBRE
 """
 
