@@ -126,7 +126,7 @@ def export_combined_data(engine):
             pnm.NOMBRE_CURSO,
             pnm.TIPO_POBLACION,
             i.NOMBRE_INSTITUCION,
-            ci.NOMBRE_CIUDAD
+            ci.MUNICIPIO AS NOMBRE_CIUDAD
         FROM Persona_Nivel_MCER pnm
         JOIN Personas p ON pnm.PERSONA_ID = p.ID
         JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
