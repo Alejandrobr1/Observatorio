@@ -201,7 +201,7 @@ with tab2:
         st.page_link("pages/8_📚_Niveles_MCER_Sabados.py", label="📚 Niveles MCER", icon="📚")
     with col3:
         st.page_link("pages/10_🏫_Instituciones_Sabados.py", label="🏫 Instituciones", icon="🏫")
-        st.page_link("pages/14_📚_Asistencia_Institucion_Sabados.py", label="📍 Asistencia x Institución", icon="📍")
+        st.page_link("pages/14_📚_Asistencia_Institucion_Sabados.py", label="� Estudiantes x Institución", icon="�")
     st.divider()
     
     # Formación Docentes
@@ -210,7 +210,7 @@ with tab2:
     with col1:
         st.page_link("pages/3_👥_Sexo_Grado_Docentes.py", label="👥 Sexo y Grado", icon="👥")
     with col2:
-        st.page_link("pages/12_🏫_Asistencia_Institucion_Docentes.py", label="📍 Asistencia x Institución", icon="📍")
+        st.page_link("pages/12_🏫_Asistencia_Institucion_Docentes.py", label="� Estudiantes x Institución", icon="�")
     st.divider()
     
     # Formación Intensificación
@@ -224,7 +224,7 @@ with tab2:
         st.page_link("pages/9_📚_Niveles_MCER_Intensificacion.py", label="📚 Niveles MCER", icon="📚")
     with col3:
         st.page_link("pages/11_🏫_Instituciones_Intensificacion.py", label="🏫 Instituciones", icon="🏫")
-        st.page_link("pages/13_⚡_Asistencia_Institucion_Intensificacion.py", label="📍 Asistencia x Institución", icon="📍")
+        st.page_link("pages/13_⚡_Asistencia_Institucion_Intensificacion.py", label="⚡ Estudiantes x Institución", icon="⚡")
     st.divider()
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")
