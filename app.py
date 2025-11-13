@@ -217,7 +217,7 @@ with tab2:
     st.markdown("#### ⚡ Formación Intensificación (6 Dashboards)")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.page_link("pages/4_📊_Estudiantes_Intensificacion.py", label="⚡ Estudiantes", icon="⚡")
+        st.page_link("pages/4_⚡_Estudiantes_Intensificacion.py", label="⚡ Estudiantes", icon="⚡")
         st.page_link("pages/7_⚡_Estado_Estudiantes_Intensificacion.py", label="⚡ Estado", icon="⚡")
     with col2:
         st.page_link("pages/5_📈_Sexo_Grado_Intensificacion.py", label="📊 Sexo y Grado", icon="📊")
