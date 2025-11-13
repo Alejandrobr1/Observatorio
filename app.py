@@ -116,7 +116,7 @@ def export_combined_data(engine):
     try:
         query = """
         SELECT 
-            p.NÚMERO_DE_IDENTIFICACIÓN,
+            p.NUMERO_DOCUMENTO,
             p.NOMBRES,
             p.APELLIDOS,
             p.SEXO,
@@ -132,7 +132,7 @@ def export_combined_data(engine):
         JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
         JOIN Instituciones i ON nm.INSTITUCION_ID = i.ID
         JOIN Ciudades ci ON i.CIUDAD_ID = ci.ID
-        ORDER BY p.NÚMERO_DE_IDENTIFICACIÓN, pnm.ANIO_REGISTRO
+        ORDER BY p.NUMERO_DOCUMENTO, pnm.ANIO_REGISTRO
         """
         df = pd.read_sql(text(query), engine)
         return df.to_csv(index=False).encode('utf-8')

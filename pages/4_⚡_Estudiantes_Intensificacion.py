@@ -74,7 +74,7 @@ with engine.connect() as connection:
     # Query principal
     query = text("""
         SELECT 
-            p.NÚMERO_DE_IDENTIFICACIÓN,
+            p.NUMERO_DOCUMENTO,
             p.NOMBRES,
             p.APELLIDOS,
             p.SEXO,
