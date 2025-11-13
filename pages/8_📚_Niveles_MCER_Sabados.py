@@ -1,37 +1,71 @@
-"""
-Dashboard: Niveles MCER - Formación Sábados
-"""
+import streamlit as st"""
+
+import osDashboard: Niveles MCER - Formación Sábados
+
+from sqlalchemy import create_engine, text"""
+
 import streamlit as st
-import os
-import pandas as pd
+
+st.set_page_config(page_title="Niveles MCER - Sábados", layout="wide", page_icon="📚")import os
+
+st.title("📚 Niveles MCER - Formación Sábados")import pandas as pd
+
 from sqlalchemy import create_engine, text
-import plotly.express as px
-import numpy as np
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
+@st.cache_resourceimport plotly.express as px
 
-st.set_page_config(page_title="Niveles MCER - Sábados", layout="wide", page_icon="📚")
+def get_engine():import numpy as np
 
-st.title("📚 Distribución por Nivel MCER - Formación Sábados")
-
-@st.cache_resource
-def get_engine():
     try:
-        db_user = st.secrets.get("DB_USER", os.getenv('DB_USER', 'root'))
-        db_pass = st.secrets.get("DB_PASS", os.getenv('DB_PASS', '123456'))
-        db_host = st.secrets.get("DB_HOST", os.getenv('DB_HOST', 'localhost'))
-        db_port = st.secrets.get("DB_PORT", os.getenv('DB_PORT', '3308'))
-        db_name = st.secrets.get("DB_NAME", os.getenv('DB_NAME', 'observatorio_bilinguismo'))
+
+        db_user = st.secrets.get("DB_USER", os.getenv('DB_USER', 'root'))try:
+
+        db_pass = st.secrets.get("DB_PASS", os.getenv('DB_PASS', '123456'))    from dotenv import load_dotenv
+
+        db_host = st.secrets.get("DB_HOST", os.getenv('DB_HOST', 'localhost'))    load_dotenv()
+
+        db_port = st.secrets.get("DB_PORT", os.getenv('DB_PORT', '3308'))except ImportError:
+
+        db_name = st.secrets.get("DB_NAME", os.getenv('DB_NAME', 'observatorio_bilinguismo'))    pass
+
     except FileNotFoundError:
-        db_user = os.getenv('DB_USER', 'root')
+
+        db_user = os.getenv('DB_USER', 'root')st.set_page_config(page_title="Niveles MCER - Sábados", layout="wide", page_icon="📚")
+
         db_pass = os.getenv('DB_PASS', '123456')
-        db_host = os.getenv('DB_HOST', 'localhost')
+
+        db_host = os.getenv('DB_HOST', 'localhost')st.title("📚 Distribución por Nivel MCER - Formación Sábados")
+
         db_port = os.getenv('DB_PORT', '3308')
-        db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')
+
+        db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')@st.cache_resource
+
+    connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"def get_engine():
+
+    return create_engine(connection_string)    try:
+
+        db_user = st.secrets.get("DB_USER", os.getenv('DB_USER', 'root'))
+
+try:        db_pass = st.secrets.get("DB_PASS", os.getenv('DB_PASS', '123456'))
+
+    engine = get_engine()        db_host = st.secrets.get("DB_HOST", os.getenv('DB_HOST', 'localhost'))
+
+    with engine.connect() as conn:        db_port = st.secrets.get("DB_PORT", os.getenv('DB_PORT', '3308'))
+
+        conn.execute(text("SELECT 1"))        db_name = st.secrets.get("DB_NAME", os.getenv('DB_NAME', 'observatorio_bilinguismo'))
+
+    st.sidebar.success("✅ Conexión")    except FileNotFoundError:
+
+except Exception as e:        db_user = os.getenv('DB_USER', 'root')
+
+    st.error(f"Error: {e}")        db_pass = os.getenv('DB_PASS', '123456')
+
+    st.stop()        db_host = os.getenv('DB_HOST', 'localhost')
+
+        db_port = os.getenv('DB_PORT', '3308')
+
+st.info("📚 Distribución de Niveles MCER en Formación Sábados")        db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')
+
     
     connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
     return create_engine(connection_string)

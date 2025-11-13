@@ -1,35 +1,71 @@
+import streamlit as st"""
+
+import osDashboard: Estado de Estudiantes - Formación Sábados
+
+from sqlalchemy import create_engine, textMuestra la aprobación/no aprobación de estudiantes
+
 """
-Dashboard: Estado de Estudiantes - Formación Intensificación
-"""
-import streamlit as st
-import os
+
+st.set_page_config(page_title="Estado - Sábados", layout="wide", page_icon="📊")import streamlit as st
+
+st.title("📊 Estado - Formación Sábados")import os
+
 import pandas as pd
-from sqlalchemy import create_engine, text
-import plotly.express as px
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
+@st.cache_resourcefrom sqlalchemy import create_engine, text
 
-st.set_page_config(page_title="Estado Estudiantes - Intensificación", layout="wide", page_icon="⚡")
+def get_engine():import plotly.express as px
 
-st.title("⚡ Estado de Estudiantes - Formación Intensificación")
-
-@st.cache_resource
-def get_engine():
     try:
-        db_user = st.secrets.get("DB_USER", os.getenv('DB_USER', 'root'))
-        db_pass = st.secrets.get("DB_PASS", os.getenv('DB_PASS', '123456'))
-        db_host = st.secrets.get("DB_HOST", os.getenv('DB_HOST', 'localhost'))
-        db_port = st.secrets.get("DB_PORT", os.getenv('DB_PORT', '3308'))
-        db_name = st.secrets.get("DB_NAME", os.getenv('DB_NAME', 'observatorio_bilinguismo'))
-    except FileNotFoundError:
+
+        db_user = st.secrets.get("DB_USER", os.getenv('DB_USER', 'root'))# Intenta cargar variables de entorno
+
+        db_pass = st.secrets.get("DB_PASS", os.getenv('DB_PASS', '123456'))try:
+
+        db_host = st.secrets.get("DB_HOST", os.getenv('DB_HOST', 'localhost'))    from dotenv import load_dotenv
+
+        db_port = st.secrets.get("DB_PORT", os.getenv('DB_PORT', '3308'))    load_dotenv()
+
+        db_name = st.secrets.get("DB_NAME", os.getenv('DB_NAME', 'observatorio_bilinguismo'))except ImportError:
+
+    except FileNotFoundError:    pass
+
         db_user = os.getenv('DB_USER', 'root')
-        db_pass = os.getenv('DB_PASS', '123456')
+
+        db_pass = os.getenv('DB_PASS', '123456')st.set_page_config(page_title="Estado Estudiantes - Sábados", layout="wide", page_icon="📊")
+
         db_host = os.getenv('DB_HOST', 'localhost')
-        db_port = os.getenv('DB_PORT', '3308')
+
+        db_port = os.getenv('DB_PORT', '3308')st.title("📊 Estado de Estudiantes - Formación Sábados")
+
+        db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')
+
+    connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"@st.cache_resource
+
+    return create_engine(connection_string)def get_engine():
+
+    try:
+
+try:        db_user = st.secrets.get("DB_USER", os.getenv('DB_USER', 'root'))
+
+    engine = get_engine()        db_pass = st.secrets.get("DB_PASS", os.getenv('DB_PASS', '123456'))
+
+    with engine.connect() as conn:        db_host = st.secrets.get("DB_HOST", os.getenv('DB_HOST', 'localhost'))
+
+        conn.execute(text("SELECT 1"))        db_port = st.secrets.get("DB_PORT", os.getenv('DB_PORT', '3308'))
+
+    st.sidebar.success("✅ Conexión")        db_name = st.secrets.get("DB_NAME", os.getenv('DB_NAME', 'observatorio_bilinguismo'))
+
+except Exception as e:    except FileNotFoundError:
+
+    st.error(f"Error: {e}")        db_user = os.getenv('DB_USER', 'root')
+
+    st.stop()        db_pass = os.getenv('DB_PASS', '123456')
+
+        db_host = os.getenv('DB_HOST', 'localhost')
+
+st.info("🎓 Estado de estudiantes en Formación Sábados")        db_port = os.getenv('DB_PORT', '3308')
+
         db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')
     
     connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
@@ -51,7 +87,7 @@ with engine.connect() as connection:
         SELECT DISTINCT pnm.ANIO_REGISTRO as año
         FROM Persona_Nivel_MCER pnm
         WHERE pnm.ANIO_REGISTRO IS NOT NULL
-        AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%intensif%')
+        AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%sabado%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%sabados%')
         ORDER BY año DESC
     """)
     result_years = connection.execute(query_years)
@@ -72,7 +108,7 @@ with engine.connect() as connection:
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         LEFT JOIN Nivel_MCER n ON pnm.NIVEL_MCER_ID = n.ID
         WHERE pnm.ANIO_REGISTRO = :year
-        AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%intensif%')
+        AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%sabado%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%sabados%')
         GROUP BY COALESCE(n.ESTADO_ESTUDIANTE, 'SIN INFORMACION')
         ORDER BY estado
     """)
