@@ -49,7 +49,7 @@ try:
     col1, col2, col3 = st.columns(3)
     col1.metric("📊 Registros Total", len(df))
     col2.metric("👥 Sexos", df['SEXO'].nunique())
-    col3.metric("🎓 Grados", df['GRADO'].nunique())
+    col3.metric("🎓 Grados", df['grado'].nunique())
     
     st.divider()
     
@@ -66,11 +66,11 @@ try:
         labels={'cantidad': 'Cantidad', 'grado': 'Grado', 'SEXO': 'Sexo'}
     )
     
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig1, width='stretch')
     
     # Tabla de datos
     st.subheader("📋 Datos detallados")
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, width='stretch')
 
 except Exception as e:
     st.error(f"Error al cargar datos: {e}")
