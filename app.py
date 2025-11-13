@@ -111,36 +111,6 @@ def export_all_tables_to_zip(engine):
     return mem_zip.read()
 
 
-def export_combined_data(engine):
-    """Exporta los datos principales combinados en un único CSV."""
-    try:
-        query = """
-        SELECT 
-            p.NUMERO_DOCUMENTO,
-            p.NOMBRES,
-            p.APELLIDOS,
-            p.SEXO,
-            pnm.NIVEL_MCER,
-            pnm.GRADO,
-            pnm.ANIO_REGISTRO,
-            pnm.NOMBRE_CURSO,
-            pnm.TIPO_POBLACION,
-            i.NOMBRE_INSTITUCION,
-            ci.MUNICIPIO AS NOMBRE_CIUDAD
-        FROM Persona_Nivel_MCER pnm
-        JOIN Personas p ON pnm.PERSONA_ID = p.ID
-        JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
-        JOIN Instituciones i ON nm.INSTITUCION_ID = i.ID
-        JOIN Ciudades ci ON i.CIUDAD_ID = ci.ID
-        ORDER BY p.NUMERO_DOCUMENTO, pnm.ANIO_REGISTRO
-        """
-        df = pd.read_sql(text(query), engine)
-        return df.to_csv(index=False).encode('utf-8')
-    except Exception as e:
-        st.error(f"Error al exportar datos combinados: {e}")
-        return None
-
-
 # Contenido principal
 tab1, tab2, tab3 = st.tabs(["🏠 Inicio", "📈 Dashboards", "📥 Descargas"])
 
@@ -229,46 +199,23 @@ with tab2:
 with tab3:
     st.markdown("### 📥 Centro de Descargas")
     
-    col1, col2 = st.columns(2)
+    st.markdown("#### Exportar Base de Datos Completa")
+    st.markdown("Descarga un ZIP con todos los datos de cada tabla en formato CSV.")
     
-    with col1:
-        st.markdown("#### Exportar Base de Datos Completa")
-        st.markdown("Descarga un ZIP con todos los datos de cada tabla en formato CSV.")
-        
-        if st.button("📦 Generar ZIP con todas las tablas", key="export_zip"):
-            with st.spinner("Generando exportación..."):
-                try:
-                    engine = get_engine()
-                    data_bytes = export_all_tables_to_zip(engine)
-                    st.download_button(
-                        label="⬇️ Descargar ZIP",
-                        data=data_bytes,
-                        file_name="observatorio_bilinguismo_completo.zip",
-                        mime="application/zip"
-                    )
-                    st.success("✅ Exportación lista para descargar")
-                except Exception as e:
-                    st.error(f"Error al exportar: {e}")
-    
-    with col2:
-        st.markdown("#### Exportar Datos Combinados")
-        st.markdown("Descarga un CSV con los datos principales de estudiantes y niveles.")
-        
-        if st.button("📄 Generar CSV combinado", key="export_csv"):
-            with st.spinner("Generando exportación..."):
-                try:
-                    engine = get_engine()
-                    data_bytes = export_combined_data(engine)
-                    if data_bytes:
-                        st.download_button(
-                            label="⬇️ Descargar CSV",
-                            data=data_bytes,
-                            file_name="observatorio_bilinguismo_datos.csv",
-                            mime="text/csv"
-                        )
-                        st.success("✅ Exportación lista para descargar")
-                except Exception as e:
-                    st.error(f"Error al exportar: {e}")
+    if st.button("📦 Generar ZIP con todas las tablas", key="export_zip"):
+        with st.spinner("Generando exportación..."):
+            try:
+                engine = get_engine()
+                data_bytes = export_all_tables_to_zip(engine)
+                st.download_button(
+                    label="⬇️ Descargar ZIP",
+                    data=data_bytes,
+                    file_name="observatorio_bilinguismo_completo.zip",
+                    mime="application/zip"
+                )
+                st.success("✅ Exportación lista para descargar")
+            except Exception as e:
+                st.error(f"Error al exportar: {e}")
 
 
 st.sidebar.markdown("---")
