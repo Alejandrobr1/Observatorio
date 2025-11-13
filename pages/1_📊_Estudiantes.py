@@ -31,44 +31,4 @@ except Exception as e:
     st.error(f"❌ Error de conexión: {e}")
     st.stop()
 
-import pandas as pd
-
-# Query para estudiantes Sábados
-query = """
-SELECT 
-    p.ID_PERSONA,
-    p.NOMBRE,
-    p.APELLIDO,
-    td.TIPO_DOCUMENTO,
-    p.NUMERO_DOCUMENTO,
-    p.EMAIL,
-    p.CELULAR,
-    c.NOMBRE_CIUDAD,
-    i.NOMBRE_INSTITUCION,
-    pnm.ESTADO
-FROM Personas p
-LEFT JOIN Tipo_documentos td ON p.ID_TIPO_DOCUMENTO = td.ID_TIPO_DOCUMENTO
-LEFT JOIN Ciudades c ON p.ID_CIUDAD = c.ID_CIUDAD
-LEFT JOIN Instituciones i ON p.ID_INSTITUCION = i.ID_INSTITUCION
-LEFT JOIN Persona_Nivel_MCER pnm ON p.ID_PERSONA = pnm.ID_PERSONA
-WHERE pnm.ID_CURSO = 1
-ORDER BY p.APELLIDO, p.NOMBRE
-"""
-
-try:
-    df = pd.read_sql(query, engine)
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Total de Estudiantes", len(df))
-    with col2:
-        st.metric("Ciudades", df['NOMBRE_CIUDAD'].nunique())
-    with col3:
-        st.metric("Instituciones", df['NOMBRE_INSTITUCION'].nunique())
-    
-    st.divider()
-    st.subheader("Listado de Estudiantes")
-    st.dataframe(df, use_container_width=True, hide_index=True)
-    
-except Exception as e:
-    st.error(f"Error al cargar datos: {e}")
+st.info("Dashboard: Estudiantes - Formación Sábados")

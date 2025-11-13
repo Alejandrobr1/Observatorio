@@ -2,8 +2,8 @@ import streamlit as st
 import os
 from sqlalchemy import create_engine, text
 
-st.set_page_config(page_title="Estudiantes por Institución - Docentes", layout="wide", page_icon="🏫")
-st.title("🏫 Estudiantes por Institución - Docentes")
+st.set_page_config(page_title="Estudiantes por Institución - Formación Docentes", layout="wide", page_icon="🏫")
+st.title("🏫 Estudiantes por Institución - Formación Docentes")
 
 @st.cache_resource
 def get_engine():

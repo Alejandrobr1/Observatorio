@@ -2,8 +2,8 @@ import streamlit as st
 import os
 from sqlalchemy import create_engine, text
 
-st.set_page_config(page_title="Estudiantes - Formación Intensificación", layout="wide", page_icon="⚡")
-st.title("⚡ Estudiantes - Formación Intensificación")
+st.set_page_config(page_title="Sexo y Grado - Formación Docentes", layout="wide", page_icon="👥")
+st.title("👥 Sexo y Grado - Formación Docentes")
 
 @st.cache_resource
 def get_engine():
@@ -31,4 +31,4 @@ except Exception as e:
     st.error(f"❌ Error de conexión: {e}")
     st.stop()
 
-st.info("Dashboard: Estudiantes - Formación Intensificación")
+st.info("Dashboard: Sexo y Grado - Formación Docentes")

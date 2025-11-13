@@ -194,14 +194,14 @@ with tab2:
     st.markdown("#### 📚 Formación Sábados (6 Dashboards)")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.page_link("pages/1_📊_Estudiantes.py", label="📊 Estudiantes", icon="📊")
-        st.page_link("pages/6_📊_Estado.py", label="📊 Estado", icon="📊")
+        st.page_link("pages/1_📊_Estudiantes_Sabados.py", label="📊 Estudiantes", icon="📊")
+        st.page_link("pages/6_📊_Estado_Estudiantes_Sabados.py", label="📊 Estado", icon="📊")
     with col2:
         st.page_link("pages/2_👥_Sexo_Grado_Sabados.py", label="👥 Sexo y Grado", icon="👥")
-        st.page_link("pages/8_📚_Niveles_MCER.py", label="📚 Niveles MCER", icon="📚")
+        st.page_link("pages/8_📚_Niveles_MCER_Sabados.py", label="📚 Niveles MCER", icon="📚")
     with col3:
         st.page_link("pages/10_🏫_Instituciones_Sabados.py", label="🏫 Instituciones", icon="🏫")
-        st.page_link("pages/14_📚_Est_Inst_Sabados.py", label="📚 Estudiantes x Institución", icon="📚")
+        st.page_link("pages/14_📚_Asistencia_Institucion_Sabados.py", label="📍 Asistencia x Institución", icon="📍")
     st.divider()
     
     # Formación Docentes
@@ -210,21 +210,21 @@ with tab2:
     with col1:
         st.page_link("pages/3_👥_Sexo_Grado_Docentes.py", label="👥 Sexo y Grado", icon="👥")
     with col2:
-        st.page_link("pages/12_🏫_Est_Inst_Docentes.py", label="🏫 Estudiantes x Institución", icon="🏫")
+        st.page_link("pages/12_🏫_Asistencia_Institucion_Docentes.py", label="📍 Asistencia x Institución", icon="📍")
     st.divider()
     
     # Formación Intensificación
     st.markdown("#### ⚡ Formación Intensificación (6 Dashboards)")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.page_link("pages/4_⚡_Estudiantes.py", label="⚡ Estudiantes", icon="⚡")
-        st.page_link("pages/7_⚡_Estado.py", label="⚡ Estado", icon="⚡")
+        st.page_link("pages/4_📊_Estudiantes_Intensificacion.py", label="⚡ Estudiantes", icon="⚡")
+        st.page_link("pages/7_⚡_Estado_Estudiantes_Intensificacion.py", label="⚡ Estado", icon="⚡")
     with col2:
-        st.page_link("pages/5_📈_Sexo_Grado_Intensificacion.py", label="📈 Sexo y Grado", icon="📈")
-        st.page_link("pages/9_📚_Niveles_MCER.py", label="📚 Niveles MCER", icon="📚")
+        st.page_link("pages/5_📈_Sexo_Grado_Intensificacion.py", label="📊 Sexo y Grado", icon="📊")
+        st.page_link("pages/9_📚_Niveles_MCER_Intensificacion.py", label="📚 Niveles MCER", icon="📚")
     with col3:
         st.page_link("pages/11_🏫_Instituciones_Intensificacion.py", label="🏫 Instituciones", icon="🏫")
-        st.page_link("pages/13_⚡_Est_Inst_Intensif.py", label="⚡ Estudiantes x Institución", icon="⚡")
+        st.page_link("pages/13_⚡_Asistencia_Institucion_Intensificacion.py", label="📍 Asistencia x Institución", icon="📍")
     st.divider()
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")

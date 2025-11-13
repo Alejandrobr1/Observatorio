@@ -31,38 +31,4 @@ except Exception as e:
     st.error(f"❌ Error de conexión: {e}")
     st.stop()
 
-import pandas as pd
-import plotly.express as px
-
-# Query para Estado - Sábados
-query = """
-SELECT 
-    pnm.ESTADO,
-    COUNT(DISTINCT pnm.ID_PERSONA) as TOTAL
-FROM Persona_Nivel_MCER pnm
-WHERE pnm.ID_CURSO = 1
-GROUP BY pnm.ESTADO
-ORDER BY TOTAL DESC
-"""
-
-try:
-    df = pd.read_sql(query, engine)
-    
-    st.subheader("Distribución de Estudiantes por Estado")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        fig = px.pie(df, names='ESTADO', values='TOTAL', title="Proporción de Estados")
-        st.plotly_chart(fig, use_container_width=True)
-    
-    with col2:
-        fig_bar = px.bar(df, x='ESTADO', y='TOTAL', title="Cantidad por Estado")
-        st.plotly_chart(fig_bar, use_container_width=True)
-    
-    st.divider()
-    st.subheader("Tabla de Datos")
-    st.dataframe(df, use_container_width=True, hide_index=True)
-    
-except Exception as e:
-    st.error(f"Error al cargar datos: {e}")
+st.info("Dashboard: Estado - Formación Sábados")
