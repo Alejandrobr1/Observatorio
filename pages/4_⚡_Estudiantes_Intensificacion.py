@@ -155,8 +155,8 @@ with col2:
     )
     st.plotly_chart(fig_nivel, use_container_width=True)
 
-st.subheader("📋 Datos Detallados")
-st.dataframe(df, use_container_width=True)
+# st.subheader("📋 Datos Detallados")
+# st.dataframe(df, use_container_width=True)
 
 # Descargar datos
 col1, col2 = st.columns(2)
