@@ -43,7 +43,7 @@ def get_estudiantes_sabados():
         pnm.NOMBRE_CURSO,
         i.NOMBRE_INSTITUCION,
         ci.MUNICIPIO AS NOMBRE_CIUDAD,
-        p.TIPO_POBLACION
+        p.TIPO_PERSONA AS TIPO_POBLACION
     FROM Persona_Nivel_MCER pnm
     JOIN Personas p ON pnm.PERSONA_ID = p.ID
     LEFT JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
