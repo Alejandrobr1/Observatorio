@@ -72,7 +72,7 @@ with engine.connect() as connection:
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         LEFT JOIN Instituciones i ON p.INSTITUCION_ID = i.ID
         WHERE pnm.ANIO_REGISTRO = :year
-        AND (LOWER(a.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(a.NOMBRE_CURSO) LIKE '%intensif%')
+        AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%intensif%')
         GROUP BY COALESCE(i.NOMBRE_INSTITUCION, 'SIN ESPECIFICAR')
         ORDER BY total_registros DESC
     """)
