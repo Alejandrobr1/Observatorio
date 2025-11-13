@@ -104,14 +104,15 @@ if data:
     
     with col2:
         df_sorted = df.sort_values('Cantidad', ascending=True)
-        fig_bar = px.barh(
+        fig_bar = px.bar(
             df_sorted,
             y='Institución',
             x='Cantidad',
             title=f"Estudiantes por Institución - {selected_year}",
             color='Cantidad',
             color_continuous_scale='viridis',
-            labels={'Cantidad': 'Cantidad', 'Institución': 'Institución'}
+            labels={'Cantidad': 'Cantidad', 'Institución': 'Institución'},
+            orientation='h'
         )
         st.plotly_chart(fig_bar, use_container_width=True)
     

@@ -110,7 +110,6 @@ if data:
             y='Estado',
             x='Cantidad',
             title=f"Cantidad por Estado - {selected_year}",
-            orientation='h',
             color='Cantidad',
             color_continuous_scale='viridis'
         )

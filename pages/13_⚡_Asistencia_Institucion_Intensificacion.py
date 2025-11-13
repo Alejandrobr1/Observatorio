@@ -117,14 +117,15 @@ if data:
     
     with col2:
         df_sorted = df.sort_values('Total Registros', ascending=True)
-        fig_barh = px.barh(
+        fig_barh = px.bar(
             df_sorted,
             y='Institución',
             x='Total Registros',
             title=f"Total de Registros por Institución - {selected_year}",
             color='Total Registros',
             color_continuous_scale='viridis',
-            labels={'Total Registros': 'Registros', 'Institución': 'Institución'}
+            labels={'Total Registros': 'Registros', 'Institución': 'Institución'},
+            orientation='h'
         )
         st.plotly_chart(fig_barh, use_container_width=True)
     
