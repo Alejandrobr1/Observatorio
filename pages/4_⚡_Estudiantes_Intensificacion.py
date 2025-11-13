@@ -83,7 +83,7 @@ with engine.connect() as connection:
             pnm.ANIO_REGISTRO,
             pnm.NOMBRE_CURSO,
             i.NOMBRE_INSTITUCION,
-            ci.NOMBRE_CIUDAD
+            ci.MUNICIPIO AS NOMBRE_CIUDAD
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         LEFT JOIN Nivel_MCER nm ON pnm.NIVEL_MCER_ID = nm.ID
