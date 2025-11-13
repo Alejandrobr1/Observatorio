@@ -48,12 +48,10 @@ st.sidebar.header("🔍 Filtros")
 
 with engine.connect() as connection:
     query_years = text("""
-        SELECT DISTINCT a.ANIO_REGISTRO as año
-        FROM Asistencias a
-        INNER JOIN Personas p ON a.PERSONA_ID = p.ID
-        INNER JOIN Instituciones i ON a.INSTITUCION_ID = i.ID
-        WHERE a.ANIO_REGISTRO IS NOT NULL
-        AND (LOWER(a.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(a.NOMBRE_CURSO) LIKE '%intensif%')
+        SELECT DISTINCT pnm.ANIO_REGISTRO as año
+        FROM Persona_Nivel_MCER pnm
+        WHERE pnm.ANIO_REGISTRO IS NOT NULL
+        AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%intensif%')
         ORDER BY año DESC
     """)
     result_years = connection.execute(query_years)
@@ -69,35 +67,27 @@ with engine.connect() as connection:
     query = text("""
         SELECT 
             COALESCE(i.NOMBRE_INSTITUCION, 'SIN ESPECIFICAR') as institucion,
-            COUNT(DISTINCT a.ID) as total_registros,
-            SUM(CASE WHEN a.ASISTENCIA = 'Asistió' OR a.ASISTENCIA = 'S' THEN 1 ELSE 0 END) as asistencias,
-            SUM(CASE WHEN a.ASISTENCIA = 'No asistió' OR a.ASISTENCIA = 'N' THEN 1 ELSE 0 END) as inasistencias,
-            ROUND(SUM(CASE WHEN a.ASISTENCIA = 'Asistió' OR a.ASISTENCIA = 'S' THEN 1 ELSE 0 END) * 100.0 / COUNT(DISTINCT a.ID), 2) as porcentaje_asistencia
-        FROM Asistencias a
-        INNER JOIN Personas p ON a.PERSONA_ID = p.ID
-        INNER JOIN Instituciones i ON a.INSTITUCION_ID = i.ID
-        WHERE a.ANIO_REGISTRO = :year
+            COUNT(DISTINCT pnm.ID) as total_registros
+        FROM Persona_Nivel_MCER pnm
+        INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
+        LEFT JOIN Instituciones i ON p.INSTITUCION_ID = i.ID
+        WHERE pnm.ANIO_REGISTRO = :year
         AND (LOWER(a.NOMBRE_CURSO) LIKE '%intensificacion%' OR LOWER(a.NOMBRE_CURSO) LIKE '%intensif%')
         GROUP BY COALESCE(i.NOMBRE_INSTITUCION, 'SIN ESPECIFICAR')
-        ORDER BY porcentaje_asistencia DESC
+        ORDER BY total_registros DESC
     """)
     
     result = connection.execute(query, {"year": int(selected_year)})
     data = result.fetchall()
 
 if data:
-    df = pd.DataFrame(data, columns=['Institución', 'Total Registros', 'Asistencias', 'Inasistencias', 'Porcentaje Asistencia'])
+    df = pd.DataFrame(data, columns=['Institución', 'Total Registros'])
     
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
     with col1:
         st.metric("📊 Total Registros", int(df['Total Registros'].sum()))
     with col2:
-        st.metric("✅ Total Asistencias", int(df['Asistencias'].sum()))
-    with col3:
-        st.metric("❌ Total Inasistencias", int(df['Inasistencias'].sum()))
-    with col4:
-        promedio = (df['Asistencias'].sum() / df['Total Registros'].sum() * 100) if df['Total Registros'].sum() > 0 else 0
-        st.metric("📈 Promedio Asistencia", f"{promedio:.1f}%")
+        st.metric("🏫 Instituciones", len(df))
     
     st.divider()
     
@@ -105,20 +95,7 @@ if data:
     
     with col1:
         fig_bar = px.bar(
-            df.sort_values('Porcentaje Asistencia', ascending=False),
-            x='Institución',
-            y='Porcentaje Asistencia',
-            title=f"Porcentaje de Asistencia por Institución - {selected_year}",
-            color='Porcentaje Asistencia',
-            color_continuous_scale='RdYlGn',
-            labels={'Porcentaje Asistencia': 'Porcentaje (%)', 'Institución': 'Institución'}
-        )
-        st.plotly_chart(fig_bar, use_container_width=True)
-    
-    with col2:
-        df_sorted = df.sort_values('Total Registros', ascending=True)
-        fig_barh = px.bar(
-            df_sorted,
+            df.sort_values('Total Registros', ascending=True),
             y='Institución',
             x='Total Registros',
             title=f"Total de Registros por Institución - {selected_year}",
@@ -127,7 +104,16 @@ if data:
             labels={'Total Registros': 'Registros', 'Institución': 'Institución'},
             orientation='h'
         )
-        st.plotly_chart(fig_barh, use_container_width=True)
+        st.plotly_chart(fig_bar, use_container_width=True)
+
+    with col2:
+        fig_pie = px.pie(
+            df,
+            values='Total Registros',
+            names='Institución',
+            title=f"Distribución de Registros - {selected_year}"
+        )
+        st.plotly_chart(fig_pie, use_container_width=True)
     
     st.subheader("📋 Datos Detallados")
     st.dataframe(df, use_container_width=True)
