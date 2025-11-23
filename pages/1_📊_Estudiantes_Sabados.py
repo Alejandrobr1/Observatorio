@@ -36,7 +36,7 @@ def get_estudiantes_sabados():
     SELECT 
         p.NOMBRES,
         p.APELLIDOS,
-        p.SEXO,
+        p.GENERO,
         nm.NIVEL_MCER,
         nm.GRADO,
         pnm.ANIO_REGISTRO,
@@ -83,10 +83,10 @@ try:
         
         with col2:
             fig = px.pie(
-                df.groupby('SEXO').size().reset_index(name='count'),
-                names='SEXO',
+                df.groupby('GENERO').size().reset_index(name='count'),
+                names='GENERO',
                 values='count',
-                title='Distribución por Sexo'
+                title='Distribución por Genero'
             )
             st.plotly_chart(fig, use_container_width=True)
     

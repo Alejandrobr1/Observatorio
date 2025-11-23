@@ -2,27 +2,20 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
+import sys, os
+
+# Añadir el directorio raíz del proyecto a sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Base_datos.conexion import get_engine
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Sexo y Grado - Intensificación")
-st.title("📊 Distribución de Estudiantes por Sexo y Grado - Intensificación")
-
-# Configuración de la conexión a la base de datos
-@st.cache_resource
-def get_database_connection():
-    try:
-        engine = create_engine("mysql+mysqlconnector://root:123456@localhost:3308/observatorio_bilinguismo")
-        with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
-        return engine
-    except Exception as e:
-        st.error(f"Error al conectar a la base de datos: {str(e)}")
-        raise e
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Genero y Grado - Intensificación")
+st.title("📊 Distribución de Estudiantes por Genero y Grado - Intensificación")
 
 # Inicializar conexión
 try:
-    engine = get_database_connection()
+    engine = get_engine()
     st.sidebar.success("✅ Conexión establecida")
 except Exception as e:
     st.error("❌ No se pudo conectar a la base de datos")
@@ -74,10 +67,10 @@ with engine.connect() as connection:
     total_estudiantes = connection.execute(query_total, {"año": int(selected_year)}).fetchone()[0]
     st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{total_estudiantes:,}")
     
-    # Total por sexo FILTRADO POR INTENSIFICACIÓN
-    query_sexo = text("""
+    # Total por genero FILTRADO POR INTENSIFICACIÓN
+    query_genero = text("""
         SELECT 
-            p.SEXO,
+            p.GENERO,
             COUNT(DISTINCT p.ID) as cantidad
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
@@ -85,31 +78,31 @@ with engine.connect() as connection:
         INNER JOIN Cursos c ON c.INSTITUCION_ID = p.INSTITUCION_ID
         WHERE pnm.ANIO_REGISTRO = :año
         AND p.TIPO_PERSONA = 'Estudiante'
-        AND p.SEXO IS NOT NULL
-        AND p.SEXO != ''
-        AND p.SEXO != 'SIN INFORMACION'
+        AND p.GENERO IS NOT NULL
+        AND p.GENERO != ''
+        AND p.GENERO != 'SIN INFORMACION'
         AND LOWER(c.NOMBRE_CURSO) LIKE '%intensificacion%'
-        GROUP BY p.SEXO
+        GROUP BY p.GENERO
     """)
-    result_sexo = connection.execute(query_sexo, {"año": int(selected_year)})
+    result_genero = connection.execute(query_genero, {"año": int(selected_year)})
     
-    st.sidebar.write("**Por Sexo:**")
-    for row in result_sexo:
-        sexo = row[0]
+    st.sidebar.write("**Por Genero:**")
+    for row in result_genero:
+        genero = row[0]
         cantidad = row[1]
         porcentaje = (cantidad / total_estudiantes * 100) if total_estudiantes > 0 else 0
-        st.sidebar.write(f"• {sexo}: {cantidad:,} ({porcentaje:.1f}%)")
+        st.sidebar.write(f"• {genero}: {cantidad:,} ({porcentaje:.1f}%)")
 
 st.sidebar.divider()
 
-# Consulta principal para obtener estudiantes por sexo y grado FILTRADO POR INTENSIFICACIÓN
+# Consulta principal para obtener estudiantes por genero y grado FILTRADO POR INTENSIFICACIÓN
 try:
     with engine.connect() as connection:
-        # Consulta para obtener datos por grado y sexo
+        # Consulta para obtener datos por grado y genero
         query = text("""
             SELECT 
                 n.GRADO,
-                p.SEXO,
+                p.GENERO,
                 COUNT(DISTINCT p.NUMERO_DOCUMENTO) as cantidad
             FROM Persona_Nivel_MCER pnm
             INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
@@ -120,16 +113,16 @@ try:
             AND n.GRADO IS NOT NULL
             AND n.GRADO != ''
             AND n.GRADO != 'SIN INFORMACION'
-            AND p.SEXO IS NOT NULL
-            AND p.SEXO != ''
-            AND p.SEXO != 'SIN INFORMACION'
+            AND p.GENERO IS NOT NULL
+            AND p.GENERO != ''
+            AND p.GENERO != 'SIN INFORMACION'
             AND LOWER(pnm.NOMBRE_CURSO) LIKE '%intensificacion%'
-            GROUP BY n.GRADO, p.SEXO
-            ORDER BY n.GRADO, p.SEXO
+            GROUP BY n.GRADO, p.GENERO
+            ORDER BY n.GRADO, p.GENERO
         """)
         
         result = connection.execute(query, {"año": int(selected_year)})
-        df = pd.DataFrame(result.fetchall(), columns=["GRADO", "SEXO", "cantidad"])
+        df = pd.DataFrame(result.fetchall(), columns=["GRADO", "GENERO", "cantidad"])
 
         if df.empty:
             st.warning(f"⚠️ No hay datos de grados para intensificación en el año {selected_year}")
@@ -152,25 +145,25 @@ try:
             
             st.stop()
 
-        # Normalizar sexo
-        df['SEXO_NORMALIZADO'] = df['SEXO'].str.upper().str.strip()
+        # Normalizar genero
+        df['GENERO_NORMALIZADO'] = df['GENERO'].str.upper().str.strip()
         
-        # Categorizar sexo
-        def categorizar_sexo(sexo):
-            if pd.isna(sexo):
+        # Categorizar genero
+        def categorizar_genero(genero):
+            if pd.isna(genero):
                 return 'Otro'
-            sexo_upper = str(sexo).upper()
-            if any(keyword in sexo_upper for keyword in ['M', 'MASCULINO', 'HOMBRE', 'MALE']):
+            genero_upper = str(genero).upper()
+            if any(keyword in genero_upper for keyword in ['M', 'MASCULINO', 'HOMBRE', 'MALE']):
                 return 'Masculino'
-            elif any(keyword in sexo_upper for keyword in ['F', 'FEMENINO', 'MUJER', 'FEMALE']):
+            elif any(keyword in genero_upper for keyword in ['F', 'FEMENINO', 'MUJER', 'FEMALE']):
                 return 'Femenino'
             else:
                 return 'Otro'
         
-        df['SEXO_CATEGORIA'] = df['SEXO_NORMALIZADO'].apply(categorizar_sexo)
+        df['GENERO_CATEGORIA'] = df['GENERO_NORMALIZADO'].apply(categorizar_genero)
         
-        # Agrupar por grado y sexo categorizado
-        df_agrupado = df.groupby(['GRADO', 'SEXO_CATEGORIA'])['cantidad'].sum().reset_index()
+        # Agrupar por grado y genero categorizado
+        df_agrupado = df.groupby(['GRADO', 'GENERO_CATEGORIA'])['cantidad'].sum().reset_index()
         
         # Obtener lista única de grados
         grados_unicos = sorted(df_agrupado['GRADO'].unique())
@@ -181,11 +174,11 @@ try:
         
         for grado in grados_unicos:
             # Masculino
-            masc = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['SEXO_CATEGORIA'] == 'Masculino')]
+            masc = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['GENERO_CATEGORIA'] == 'Masculino')]
             masculino_por_grado.append(masc['cantidad'].sum() if not masc.empty else 0)
             
             # Femenino
-            fem = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['SEXO_CATEGORIA'] == 'Femenino')]
+            fem = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['GENERO_CATEGORIA'] == 'Femenino')]
             femenino_por_grado.append(fem['cantidad'].sum() if not fem.empty else 0)
         
         total_por_grado = [m + f for m, f in zip(masculino_por_grado, femenino_por_grado)]
@@ -195,7 +188,7 @@ try:
         st.sidebar.write(f"**Total de grados:** {len(grados_unicos)}")
 
         # MODIFICADO: Crear gráfico de barras horizontales apiladas (izquierda a derecha)
-        st.header(f"📊 Distribución por Sexo y Grado - Año {selected_year} - Intensificación")
+        st.header(f"📊 Distribución por Genero y Grado - Año {selected_year} - Intensificación")
         
         fig, ax = plt.subplots(figsize=(14, max(8, len(grados_unicos) * 0.6)))
         
@@ -238,7 +231,7 @@ try:
         ax.set_yticklabels(grados_unicos, fontsize=11)
         ax.set_xlabel('Cantidad de Estudiantes', fontsize=13, fontweight='bold')
         ax.set_ylabel('Grado', fontsize=13, fontweight='bold')
-        ax.set_title(f'Distribución de Estudiantes por Sexo y Grado - Intensificación\nAño {selected_year}',
+        ax.set_title(f'Distribución de Estudiantes por Genero y Grado - Intensificación\nAño {selected_year}',
                     fontsize=16, fontweight='bold', pad=20)
         
         # Configurar el límite del eje X
@@ -303,7 +296,7 @@ try:
                      f"{(total_fem/total_general*100):.1f}%" if total_general > 0 else "0%")
             
             # Gráfico de pastel de distribución total
-            st.subheader("Distribución Total por Sexo")
+            st.subheader("Distribución Total por Genero")
             
             fig_pie, ax_pie = plt.subplots(figsize=(6, 6))
             
@@ -319,7 +312,7 @@ try:
                       textprops={'fontsize': 11, 'fontweight': 'bold'},
                       shadow=True)
             
-            ax_pie.set_title('Distribución por Sexo', fontsize=12, fontweight='bold', pad=15)
+            ax_pie.set_title('Distribución por Genero', fontsize=12, fontweight='bold', pad=15)
             st.pyplot(fig_pie)
 
         # Gráfico de barras verticales apiladas
@@ -358,8 +351,8 @@ try:
         st.pyplot(fig_stack)
 
         # Datos detallados
-        with st.expander("🔍 Ver datos completos por grado y sexo"):
-            st.dataframe(df_agrupado.sort_values(['GRADO', 'SEXO_CATEGORIA']), 
+        with st.expander("🔍 Ver datos completos por grado y genero"):
+            st.dataframe(df_agrupado.sort_values(['GRADO', 'GENERO_CATEGORIA']), 
                         use_container_width=True, hide_index=True)
         
         # Información adicional

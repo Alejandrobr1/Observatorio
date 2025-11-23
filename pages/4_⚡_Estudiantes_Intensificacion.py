@@ -78,7 +78,7 @@ with engine.connect() as connection:
             p.NUMERO_DOCUMENTO,
             p.NOMBRES,
             p.APELLIDOS,
-            p.SEXO,
+            p.GENERO,
             nm.NIVEL_MCER,
             nm.GRADO,
             pnm.ANIO_REGISTRO,
@@ -103,7 +103,7 @@ if not rows:
     st.stop()
 
 df = pd.DataFrame(rows, columns=[
-    'Identificación', 'Nombres', 'Apellidos', 'Sexo',
+    'Identificación', 'Nombres', 'Apellidos', 'Genero',
     'Nivel MCER', 'Grado', 'Año', 'Curso', 'Institución', 'Ciudad'
 ])
 
@@ -114,11 +114,11 @@ with col1:
     st.metric("👥 Total Estudiantes", len(df))
 
 with col2:
-    femenino = len(df[df['Sexo'].str.lower() == 'f'])
+    femenino = len(df[df['Genero'].str.lower() == 'f'])
     st.metric("👩 Mujeres", femenino)
 
 with col3:
-    masculino = len(df[df['Sexo'].str.lower() == 'm'])
+    masculino = len(df[df['Genero'].str.lower() == 'm'])
     st.metric("👨 Hombres", masculino)
 
 with col4:
@@ -131,13 +131,13 @@ st.divider()
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("Distribución por Sexo")
-    sex_dist = df['Sexo'].value_counts()
+    st.subheader("Distribución por Genero")
+    sex_dist = df['Genero'].value_counts()
     sex_labels = ['Femenino' if x.lower() == 'f' else 'Masculino' if x.lower() == 'm' else x for x in sex_dist.index]
     fig_sex = px.pie(
         values=sex_dist.values,
         names=sex_labels,
-        title=f"Estudiantes por Sexo - {selected_year}",
+        title=f"Estudiantes por Genero - {selected_year}",
         color_discrete_sequence=['#FF69B4', '#4169E1']
     )
     st.plotly_chart(fig_sex, use_container_width=True)

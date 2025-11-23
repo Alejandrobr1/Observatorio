@@ -6,17 +6,13 @@ import streamlit as st
 import io
 import zipfile
 import pandas as pd
-from sqlalchemy import create_engine, text, inspect
+from sqlalchemy import text, inspect
 import os
+import sys
 
-
-# Intenta cargar variables de entorno (funciona en desarrollo local)
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    # Si no está instalado, continúa (Streamlit Cloud usa secrets)
-    pass
+# Añadir el directorio raíz del proyecto a sys.path para encontrar 'Base_datos'
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
+from Base_datos.conexion import get_engine
 
 
 # Configuración de la página
@@ -64,29 +60,6 @@ st.markdown(
     </div>""",
     unsafe_allow_html=True
 )
-
-
-# Obtener conexión a la base de datos
-@st.cache_resource
-def get_engine():
-    # Primero intenta obtener de st.secrets (Streamlit Cloud)
-    # Si no está disponible, usa variables de entorno
-    try:
-        db_user = st.secrets.get("DB_USER", os.getenv('DB_USER', 'root'))
-        db_pass = st.secrets.get("DB_PASS", os.getenv('DB_PASS', '123456'))
-        db_host = st.secrets.get("DB_HOST", os.getenv('DB_HOST', 'localhost'))
-        db_port = st.secrets.get("DB_PORT", os.getenv('DB_PORT', '3308'))
-        db_name = st.secrets.get("DB_NAME", os.getenv('DB_NAME', 'observatorio_bilinguismo'))
-    except FileNotFoundError:
-        # Si secrets.toml no existe, usa solo variables de entorno
-        db_user = os.getenv('DB_USER', 'root')
-        db_pass = os.getenv('DB_PASS', '123456')
-        db_host = os.getenv('DB_HOST', 'localhost')
-        db_port = os.getenv('DB_PORT', '3308')
-        db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')
-    
-    connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
-    return create_engine(connection_string)
 
 
 def export_all_tables_to_zip(engine):
@@ -163,7 +136,7 @@ with tab2:
         st.page_link("pages/1_📊_Estudiantes_Sabados.py", label="📊 Estudiantes")
         st.page_link("pages/6_📊_Estado_Estudiantes_Sabados.py", label="📊 Estado")
     with col2:
-        st.page_link("pages/2_👥_Sexo_Grado_Sabados.py", label="👥 Sexo y Grado")
+        st.page_link("pages/2_👥_Genero_Grado_Sabados.py", label="👥 Genero y Grado")
         st.page_link("pages/8_📚_Niveles_MCER_Sabados.py", label="📚 Niveles MCER")
     with col3:
         st.page_link("pages/10_🏫_Instituciones_Sabados.py", label="🏫 Instituciones")
@@ -174,7 +147,7 @@ with tab2:
     st.markdown("#### 🎓 Formación Docentes (2 Dashboards)")
     col1, col2 = st.columns(2)
     with col1:
-        st.page_link("pages/3_👥_Sexo_Grado_Docentes.py", label="👥 Sexo y Grado")
+        st.page_link("pages/3_👥_Genero_Grado_Docentes.py", label="👥 Genero y Grado")
     with col2:
         st.page_link("pages/12_🏫_Asistencia_Institucion_Docentes.py", label="📍 Asistencia x Institución")
     st.divider()
@@ -186,7 +159,7 @@ with tab2:
         st.page_link("pages/4_⚡_Estudiantes_Intensificacion.py", label="⚡ Estudiantes")
         st.page_link("pages/7_⚡_Estado_Estudiantes_Intensificacion.py", label="⚡ Estado")
     with col2:
-        st.page_link("pages/5_📈_Sexo_Grado_Intensificacion.py", label="📊 Sexo y Grado")
+        st.page_link("pages/5_📈_Genero_Grado_Intensificacion.py", label="📊 Genero y Grado")
         st.page_link("pages/9_📚_Niveles_MCER_Intensificacion.py", label="📚 Niveles MCER")
     with col3:
         st.page_link("pages/11_🏫_Instituciones_Intensificacion.py", label="🏫 Instituciones")

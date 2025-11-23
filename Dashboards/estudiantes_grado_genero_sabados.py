@@ -5,8 +5,8 @@ import numpy as np
 import traceback
 from sqlalchemy import create_engine, text
 
-st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Sexo y Grado - Formación Sábados")
-st.title("📊 Distribución de Estudiantes por Sexo y Grado - FORMACIÓN SÁBADOS")
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Genero y Grado - Formación Sábados")
+st.title("📊 Distribución de Estudiantes por Genero y Grado - FORMACIÓN SÁBADOS")
 
 @st.cache_resource
 def get_database_connection():
@@ -64,28 +64,28 @@ with engine.connect() as connection:
     total_estudiantes = connection.execute(query_total, {"año": int(selected_year)}).fetchone()[0]
     st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{total_estudiantes:,}")
     
-    query_sexo = text("""
+    query_genero = text("""
         SELECT 
-            p.SEXO,
+            p.GENERO,
             COUNT(DISTINCT p.ID) as cantidad
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO = :año
         AND LOWER(pnm.NOMBRE_CURSO) LIKE '%formacion sabados%'
         AND p.TIPO_PERSONA = 'Estudiante'
-        AND p.SEXO IS NOT NULL
-        AND p.SEXO != ''
-        AND p.SEXO != 'SIN INFORMACION'
-        GROUP BY p.SEXO
+        AND p.GENERO IS NOT NULL
+        AND p.GENERO != ''
+        AND p.GENERO != 'SIN INFORMACION'
+        GROUP BY p.GENERO
     """)
-    result_sexo = connection.execute(query_sexo, {"año": int(selected_year)})
+    result_genero = connection.execute(query_genero, {"año": int(selected_year)})
     
-    st.sidebar.write("**Por Sexo:**")
-    for row in result_sexo:
-        sexo = row[0]
+    st.sidebar.write("**Por Genero:**")
+    for row in result_genero:
+        genero = row[0]
         cantidad = row[1]
         porcentaje = (cantidad / total_estudiantes * 100) if total_estudiantes > 0 else 0
-        st.sidebar.write(f"• {sexo}: {cantidad:,} ({porcentaje:.1f}%)")
+        st.sidebar.write(f"• {genero}: {cantidad:,} ({porcentaje:.1f}%)")
 
 st.sidebar.divider()
 
@@ -143,7 +143,7 @@ try:
         query = text("""
             SELECT 
                 GRADO,
-                SEXO,
+                GENERO,
                 cantidad
             FROM (
                 SELECT 
@@ -151,7 +151,7 @@ try:
                         WHEN n.GRADO IS NULL OR n.GRADO = '' OR n.GRADO = 'SIN INFORMACION' THEN 'SIN INFORMACION'
                         ELSE n.GRADO
                     END as GRADO,
-                    p.SEXO,
+                    p.GENERO,
                     COUNT(DISTINCT pnm.ID) as cantidad
                 FROM Persona_Nivel_MCER pnm
                 INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
@@ -159,25 +159,25 @@ try:
                 WHERE pnm.ANIO_REGISTRO = :año
                 AND LOWER(pnm.NOMBRE_CURSO) LIKE '%formacion sabados%'
                 AND p.TIPO_PERSONA = 'Estudiante'
-                AND p.SEXO IS NOT NULL
-                AND p.SEXO != ''
-                AND p.SEXO != 'SIN INFORMACION'
+                AND p.GENERO IS NOT NULL
+                AND p.GENERO != ''
+                AND p.GENERO != 'SIN INFORMACION'
                 GROUP BY 
                     CASE 
                         WHEN n.GRADO IS NULL OR n.GRADO = '' OR n.GRADO = 'SIN INFORMACION' THEN 'SIN INFORMACION'
                         ELSE n.GRADO
                     END,
-                    p.SEXO
+                    p.GENERO
             ) AS datos_base
             ORDER BY 
                 CASE WHEN GRADO = 'SIN INFORMACION' THEN 1 ELSE 0 END,
                 CASE WHEN GRADO REGEXP '^[0-9]+$' THEN CAST(GRADO AS UNSIGNED) ELSE 999 END,
                 GRADO, 
-                SEXO
+                GENERO
         """)
         
         result = connection.execute(query, {"año": int(selected_year)})
-        df = pd.DataFrame(result.fetchall(), columns=["GRADO", "SEXO", "cantidad"])
+        df = pd.DataFrame(result.fetchall(), columns=["GRADO", "GENERO", "cantidad"])
 
         if df.empty:
             st.warning(f"⚠️ No hay datos para el año {selected_year}")
@@ -189,25 +189,25 @@ try:
             st.dataframe(df, use_container_width=True, hide_index=True)
             st.write(f"**Total de registros:** {len(df)}")
             st.write(f"**Grados únicos encontrados:** {sorted(df['GRADO'].unique())}")
-            st.write(f"**Sexos únicos:** {sorted(df['SEXO'].unique())}")
+            st.write(f"**Generos únicos:** {sorted(df['GENERO'].unique())}")
             st.write(f"**Total de inscripciones:** {df['cantidad'].sum()}")
 
         # Procesamiento de datos
-        df['SEXO_NORMALIZADO'] = df['SEXO'].str.upper().str.strip()
+        df['GENERO_NORMALIZADO'] = df['GENERO'].str.upper().str.strip()
         
-        def categorizar_sexo(sexo):
-            if pd.isna(sexo):
+        def categorizar_genero(genero):
+            if pd.isna(genero):
                 return 'Otro'
-            sexo_upper = str(sexo).upper()
-            if any(keyword in sexo_upper for keyword in ['M', 'MASCULINO', 'HOMBRE', 'MALE']):
+            genero_upper = str(genero).upper()
+            if any(keyword in genero_upper for keyword in ['M', 'MASCULINO', 'HOMBRE', 'MALE']):
                 return 'Masculino'
-            elif any(keyword in sexo_upper for keyword in ['F', 'FEMENINO', 'MUJER', 'FEMALE']):
+            elif any(keyword in genero_upper for keyword in ['F', 'FEMENINO', 'MUJER', 'FEMALE']):
                 return 'Femenino'
             else:
                 return 'Otro'
         
-        df['SEXO_CATEGORIA'] = df['SEXO_NORMALIZADO'].apply(categorizar_sexo)
-        df_agrupado = df.groupby(['GRADO', 'SEXO_CATEGORIA'])['cantidad'].sum().reset_index()
+        df['GENERO_CATEGORIA'] = df['GENERO_NORMALIZADO'].apply(categorizar_genero)
+        df_agrupado = df.groupby(['GRADO', 'GENERO_CATEGORIA'])['cantidad'].sum().reset_index()
         
         # Ordenar grados numéricamente
         def ordenar_grado(grado):
@@ -225,13 +225,13 @@ try:
         otro_por_grado = []
         
         for grado in grados_unicos:
-            masc = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['SEXO_CATEGORIA'] == 'Masculino')]
+            masc = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['GENERO_CATEGORIA'] == 'Masculino')]
             masculino_por_grado.append(masc['cantidad'].sum() if not masc.empty else 0)
             
-            fem = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['SEXO_CATEGORIA'] == 'Femenino')]
+            fem = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['GENERO_CATEGORIA'] == 'Femenino')]
             femenino_por_grado.append(fem['cantidad'].sum() if not fem.empty else 0)
             
-            otro = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['SEXO_CATEGORIA'] == 'Otro')]
+            otro = df_agrupado[(df_agrupado['GRADO'] == grado) & (df_agrupado['GENERO_CATEGORIA'] == 'Otro')]
             otro_por_grado.append(otro['cantidad'].sum() if not otro.empty else 0)
         
         total_por_grado = [m + f + o for m, f, o in zip(masculino_por_grado, femenino_por_grado, otro_por_grado)]
@@ -241,7 +241,7 @@ try:
         st.sidebar.write(f"**Grados:** {', '.join(map(str, grados_unicos))}")
 
         # GRÁFICO PRINCIPAL
-        st.header(f"📊 Distribución por Sexo y Grado - Formación Sábados - Año {selected_year}")
+        st.header(f"📊 Distribución por Genero y Grado - Formación Sábados - Año {selected_year}")
         
         st.info(f"""
         📌 **Nota importante**: Este gráfico muestra las **inscripciones/registros** de estudiantes por grado para el año {selected_year}.
@@ -281,7 +281,7 @@ try:
         ax.set_yticklabels(grados_unicos, fontsize=10)
         ax.set_xlabel('Cantidad de Registros', fontsize=13, fontweight='bold')
         ax.set_ylabel('Grado', fontsize=13, fontweight='bold')
-        ax.set_title(f'Distribución de Estudiantes por Sexo y Grado - Formación Sábados\nAño {selected_year}',
+        ax.set_title(f'Distribución de Estudiantes por Genero y Grado - Formación Sábados\nAño {selected_year}',
                     fontsize=16, fontweight='bold', pad=20)
         
         max_val = max(total_por_grado) if total_por_grado else 1
@@ -334,7 +334,7 @@ try:
             st.dataframe(df_tabla, use_container_width=True, hide_index=True)
         
         with col2:
-            st.subheader("📊 Distribución por Sexo")
+            st.subheader("📊 Distribución por Genero")
             
             st.metric("Total Masculino", f"{int(total_masc):,}", 
                      f"{(total_masc/total_general*100):.1f}%")
@@ -348,7 +348,7 @@ try:
                       colors=['#3498db', '#e74c3c'],
                       startangle=90,
                       textprops={'fontsize': 12, 'fontweight': 'bold'})
-            ax_pie.set_title('Distribución por Sexo', fontsize=14, fontweight='bold', pad=20)
+            ax_pie.set_title('Distribución por Genero', fontsize=14, fontweight='bold', pad=20)
             st.pyplot(fig_pie)
 
         # Gráfico vertical
@@ -386,7 +386,7 @@ try:
         st.pyplot(fig_stack)
 
         with st.expander("🔍 Ver datos agrupados completos"):
-            st.dataframe(df_agrupado.sort_values(['GRADO', 'SEXO_CATEGORIA']), use_container_width=True, hide_index=True)
+            st.dataframe(df_agrupado.sort_values(['GRADO', 'GENERO_CATEGORIA']), use_container_width=True, hide_index=True)
         
         st.success(f"""
         ✅ **Datos cargados exitosamente**

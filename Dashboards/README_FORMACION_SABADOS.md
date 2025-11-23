@@ -13,11 +13,11 @@ Todos los dashboards aplicarán automáticamente los siguientes filtros:
 ## 📈 Dashboards Disponibles
 
 ### 1. **estudiantes_niveles_sabados.py**
-**Título**: 📊 Estudiantes por Nivel MCER y Sexo - FORMACIÓN SÁBADOS
+**Título**: 📊 Estudiantes por Nivel MCER y Genero - FORMACIÓN SÁBADOS
 
 **Descripción**:
 - Muestra la distribución de estudiantes de Formación Sábados por nivel MCER (A1, A2, B1, B2, C1, C2)
-- Desglosado por sexo (Masculino/Femenino)
+- Desglosado por genero (Masculino/Femenino)
 - Gráfico de barras apiladas y tabla resumen
 
 **Filtros Disponibles**:
@@ -26,17 +26,17 @@ Todos los dashboards aplicarán automáticamente los siguientes filtros:
 
 **Gráficos**:
 - Barras apiladas horizontales por nivel MCER
-- Gráfico de pastel con distribución por sexo
+- Gráfico de pastel con distribución por genero
 - Tabla resumen
 
 ---
 
-### 2. **estudiantes_grado_sexo_sabados.py**
-**Título**: 📊 Distribución de Estudiantes por Sexo y Grado - FORMACIÓN SÁBADOS
+### 2. **estudiantes_grado_genero_sabados.py**
+**Título**: 📊 Distribución de Estudiantes por Genero y Grado - FORMACIÓN SÁBADOS
 
 **Descripción**:
 - Muestra la distribución de estudiantes de Formación Sábados por grado escolar
-- Desglosado por sexo (Masculino/Femenino)
+- Desglosado por genero (Masculino/Femenino)
 - Barras horizontales y verticales apiladas
 
 **Filtros Disponibles**:
@@ -46,7 +46,7 @@ Todos los dashboards aplicarán automáticamente los siguientes filtros:
 - Barras horizontales apiladas por grado
 - Barras verticales apiladas por grado
 - Tabla resumen por grado
-- Gráfico de pastel con distribución por sexo
+- Gráfico de pastel con distribución por genero
 
 ---
 

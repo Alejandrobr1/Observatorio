@@ -9,8 +9,8 @@ st.cache_data.clear()
 st.cache_resource.clear()
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard MCER por Sexo")
-st.title("📊 Estudiantes por Nivel MCER y Sexo")
+st.set_page_config(layout="wide", page_title="Dashboard MCER por Genero")
+st.title("📊 Estudiantes por Nivel MCER y Genero")
 
 # Configuración de la conexión a la base de datos
 @st.cache_resource
@@ -144,7 +144,7 @@ try:
         query = text(f"""
             SELECT 
                 n.NIVEL_MCER,
-                p.SEXO,
+                p.GENERO,
                 COUNT(DISTINCT p.NUMERO_DOCUMENTO) as cantidad
             FROM Persona_Nivel_MCER pnm
             INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
@@ -153,16 +153,16 @@ try:
             WHERE pnm.ANIO_REGISTRO = :año
             AND n.NIVEL_MCER IS NOT NULL
             AND n.NIVEL_MCER != 'SIN INFORMACION'
-            AND p.SEXO IS NOT NULL
-            AND p.SEXO != ''
-            AND p.SEXO != 'SIN INFORMACION'
+            AND p.GENERO IS NOT NULL
+            AND p.GENERO != ''
+            AND p.GENERO != 'SIN INFORMACION'
             {filtros_sql}
-            GROUP BY n.NIVEL_MCER, p.SEXO
-            ORDER BY n.NIVEL_MCER, p.SEXO
+            GROUP BY n.NIVEL_MCER, p.GENERO
+            ORDER BY n.NIVEL_MCER, p.GENERO
         """)
         
         result = connection.execute(query, query_params)
-        df = pd.DataFrame(result.fetchall(), columns=["NIVEL_MCER", "SEXO", "cantidad"])
+        df = pd.DataFrame(result.fetchall(), columns=["NIVEL_MCER", "GENERO", "cantidad"])
 
         if df.empty:
             st.warning(f"⚠️ No hay datos disponibles con los filtros seleccionados")
@@ -202,13 +202,13 @@ try:
             
             # Filtrar masculinos
             masc_data = nivel_data[
-                nivel_data['SEXO'].str.upper().str.contains('M|MASCULINO|HOMBRE', na=False, regex=True)
+                nivel_data['GENERO'].str.upper().str.contains('M|MASCULINO|HOMBRE', na=False, regex=True)
             ]
             masculino_por_nivel[nivel] = masc_data['cantidad'].sum() if not masc_data.empty else 0
             
             # Filtrar femeninos
             fem_data = nivel_data[
-                nivel_data['SEXO'].str.upper().str.contains('F|FEMENINO|MUJER', na=False, regex=True)
+                nivel_data['GENERO'].str.upper().str.contains('F|FEMENINO|MUJER', na=False, regex=True)
             ]
             femenino_por_nivel[nivel] = fem_data['cantidad'].sum() if not fem_data.empty else 0
 
@@ -255,7 +255,7 @@ try:
         ax.set_xlabel('Nivel MCER', fontsize=14, fontweight='bold')
         ax.set_ylabel('Cantidad de Personas', fontsize=14, fontweight='bold')
         
-        titulo_grafico = f'Distribución por Nivel MCER y Sexo'
+        titulo_grafico = f'Distribución por Nivel MCER y Genero'
         if selected_institucion != 'TODAS':
             # Acortar nombre si es muy largo
             nombre_corto = selected_institucion[:40] + '...' if len(selected_institucion) > 40 else selected_institucion
@@ -305,7 +305,7 @@ try:
             st.dataframe(df_resumen, use_container_width=True, hide_index=True)
 
         with col2:
-            st.subheader("Distribución por Sexo")
+            st.subheader("Distribución por Genero")
             
             total_masc = sum(masculino_vals)
             total_fem = sum(femenino_vals)
@@ -326,11 +326,11 @@ try:
                           colors=['#3498db', '#e74c3c'],
                           startangle=90,
                           textprops={'fontsize': 12, 'fontweight': 'bold'})
-                ax_pie.set_title('Distribución por Sexo', fontsize=14, fontweight='bold', pad=20)
+                ax_pie.set_title('Distribución por Genero', fontsize=14, fontweight='bold', pad=20)
                 st.pyplot(fig_pie)
 
         with st.expander("🔍 Ver datos detallados"):
-            st.dataframe(df.sort_values(['NIVEL_MCER', 'SEXO']), use_container_width=True, hide_index=True)
+            st.dataframe(df.sort_values(['NIVEL_MCER', 'GENERO']), use_container_width=True, hide_index=True)
         
         st.success(f"""
         ✅ **Datos cargados exitosamente**

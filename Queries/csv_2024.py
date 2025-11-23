@@ -66,8 +66,8 @@ def limpiar_valor(valor):
 # Rellenar valores faltantes
 columnas_texto = [
     'TIPO DE IDENTIFICACIÓN', 'NOMBRES', 'APELLIDOS', 'TELÉFONO 1', 'TELÉFONO 2',
-    'CORREO ELECTRÓNICO', 'DIRECCIÓN', 'SEXO', 'TIPO POBLACION', 'NIVEL_MCER',
-    'POBLACIÓN', 'ESTADO ETAPA 2', 'IDIOMA', 'CERTIFICADO', 'MUNICIPIO',
+    'CORREO ELECTRÓNICO', 'DIRECCIÓN', 'GENERO', 'TIPO POBLACION', 'NIVEL_MCER',
+    'POBLACIÓN', 'ESTADO ETAPA 2', 'IDIOMA', 'MUNICIPIO',
     'INSTITUCIÓN EDUCATIVA', 'COLEGIO ABREVIADO PARA LISTADOS', 'GRADO',
     'GRUPO', 'JORNADA', 'SEDE NODAL', 'ENTIDAD', 'NOMBRE CURSO'
 ]
@@ -114,7 +114,6 @@ NIVEL_MCER_2024 = df[[
     "ESTADO ETAPA 2",
     "ANIO",
     "IDIOMA",
-    "CERTIFICADO",
     grado_col
 ]].copy()
 
@@ -138,7 +137,7 @@ CURSOS_2024 = df[["ENTIDAD","IDIOMA","INSTITUCIÓN EDUCATIVA","NOMBRE_CURSO_PROC
 CURSOS_2024 = CURSOS_2024[CURSOS_2024["INSTITUCIÓN EDUCATIVA"] != 'SIN INFORMACION'].drop_duplicates().reset_index(drop=True)
 
 PERSONAS_2024 = df[["NOMBRES","APELLIDOS","TELÉFONO 1","TELÉFONO 2","NÚMERO DE IDENTIFICACIÓN","CORREO ELECTRÓNICO",
-                    "DIRECCIÓN","SEXO","FECHA DE NACIMIENTO","TIPO POBLACION","TIPO DE IDENTIFICACIÓN",
+                    "DIRECCIÓN","GENERO","FECHA DE NACIMIENTO","TIPO POBLACION","TIPO DE IDENTIFICACIÓN",
                     "MUNICIPIO","INSTITUCIÓN EDUCATIVA"]].copy()
 
 # PREPARAR PERSONA_NIVEL CON GRADO INCLUIDO
@@ -209,14 +208,12 @@ with engine.connect() as connection:
         estado = limpiar_valor(row['ESTADO ETAPA 2'])
         anio = int(row['ANIO']) if pd.notna(row['ANIO']) else None
         idioma = limpiar_valor(row.get('IDIOMA'))
-        certificado = limpiar_valor(row.get('CERTIFICADO'))
         grado = limpiar_valor(row.get('GRADO'))
         
         nivel = None if nivel == 'SIN INFORMACION' else nivel
         tipo_pob = None if tipo_pob == 'SIN INFORMACION' else tipo_pob
         estado = None if estado == 'SIN INFORMACION' else estado
         idioma = None if idioma == 'SIN INFORMACION' else idioma
-        certificado = None if certificado == 'SIN INFORMACION' else certificado
         grado = None if grado == 'SIN INFORMACION' else grado
         
         if nivel is None and tipo_pob is None and grado is None:
@@ -233,9 +230,9 @@ with engine.connect() as connection:
         
         if result.fetchone() is None:
             connection.execute(text(
-                """INSERT INTO Nivel_MCER (NIVEL_MCER, TIPO_POBLACION, ESTADO_ESTUDIANTE, ANIO, IDIOMA, CERTIFICADO, GRADO) 
-                   VALUES (:nivel, :tipo_pob, :estado, :anio, :idioma, :certificado, :grado)"""
-            ), {'nivel': nivel, 'tipo_pob': tipo_pob, 'estado': estado, 'anio': anio, 'idioma': idioma, 'certificado': certificado, 'grado': grado})
+                """INSERT INTO Nivel_MCER (NIVEL_MCER, TIPO_POBLACION, ESTADO_ESTUDIANTE, ANIO, IDIOMA, GRADO) 
+                   VALUES (:nivel, :tipo_pob, :estado, :anio, :idioma, :grado)"""
+            ), {'nivel': nivel, 'tipo_pob': tipo_pob, 'estado': estado, 'anio': anio, 'idioma': idioma, 'grado': grado})
             niveles_insertados += 1
     
     connection.commit()
@@ -291,7 +288,7 @@ with engine.connect() as connection:
             'numero_doc': numero_doc,
             'correo': None if limpiar_valor(row['CORREO ELECTRÓNICO']) == 'SIN INFORMACION' else limpiar_valor(row['CORREO ELECTRÓNICO']),
             'direccion': None if limpiar_valor(row['DIRECCIÓN']) == 'SIN INFORMACION' else limpiar_valor(row['DIRECCIÓN']),
-            'sexo': None if limpiar_valor(row['SEXO']) == 'SIN INFORMACION' else limpiar_valor(row['SEXO']),
+            'genero': None if limpiar_valor(row['GENERO']) == 'SIN INFORMACION' else limpiar_valor(row['GENERO']),
             'fecha_nac': convertir_fecha_mysql(row['FECHA DE NACIMIENTO']),
             'tipo_persona': None if limpiar_valor(row['TIPO POBLACION']) == 'SIN INFORMACION' else limpiar_valor(row['TIPO POBLACION']),
             'tipo_doc_id': tipo_doc_id[0] if tipo_doc_id else None,
@@ -302,7 +299,7 @@ with engine.connect() as connection:
         if persona_existe:
             connection.execute(text(
                 """UPDATE Personas SET NOMBRES = :nombres, APELLIDOS = :apellidos, TELEFONO1 = :telefono1, 
-                   TELEFONO2 = :telefono2, CORREO_ELECTRONICO = :correo, DIRECCION = :direccion, SEXO = :sexo,
+                   TELEFONO2 = :telefono2, CORREO_ELECTRONICO = :correo, DIRECCION = :direccion, GENERO = :genero,
                    FECHA_NACIMIENTO = :fecha_nac, TIPO_PERSONA = :tipo_persona, TIPO_DOCUMENTO_ID = :tipo_doc_id,
                    CIUDAD_ID = :ciudad_id, INSTITUCION_ID = :institucion_id WHERE NUMERO_DOCUMENTO = :numero_doc"""
             ), datos_persona)
@@ -310,8 +307,8 @@ with engine.connect() as connection:
         else:
             connection.execute(text(
                 """INSERT INTO Personas (NOMBRES, APELLIDOS, TELEFONO1, TELEFONO2, NUMERO_DOCUMENTO, CORREO_ELECTRONICO,
-                   DIRECCION, SEXO, FECHA_NACIMIENTO, TIPO_PERSONA, TIPO_DOCUMENTO_ID, CIUDAD_ID, INSTITUCION_ID)
-                   VALUES (:nombres, :apellidos, :telefono1, :telefono2, :numero_doc, :correo, :direccion, :sexo,
+                   DIRECCION, GENERO, FECHA_NACIMIENTO, TIPO_PERSONA, TIPO_DOCUMENTO_ID, CIUDAD_ID, INSTITUCION_ID)
+                   VALUES (:nombres, :apellidos, :telefono1, :telefono2, :numero_doc, :correo, :direccion, :genero,
                    :fecha_nac, :tipo_persona, :tipo_doc_id, :ciudad_id, :institucion_id)"""
             ), datos_persona)
             personas_nuevas += 1

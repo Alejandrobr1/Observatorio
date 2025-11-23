@@ -69,25 +69,25 @@ with engine.connect() as connection:
     query = text("""
         SELECT 
             COALESCE(n.NIVEL_MCER, 'SIN ESPECIFICAR') as nivel,
-            COALESCE(p.SEXO, 'SIN ESPECIFICAR') as sexo,
+            COALESCE(p.GENERO, 'SIN ESPECIFICAR') as genero,
             COUNT(DISTINCT p.ID) as cantidad
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         LEFT JOIN Nivel_MCER n ON pnm.NIVEL_MCER_ID = n.ID
         WHERE pnm.ANIO_REGISTRO = :year
         AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%sabado%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%sabados%')
-        GROUP BY COALESCE(n.NIVEL_MCER, 'SIN ESPECIFICAR'), COALESCE(p.SEXO, 'SIN ESPECIFICAR')
-        ORDER BY nivel, sexo
+        GROUP BY COALESCE(n.NIVEL_MCER, 'SIN ESPECIFICAR'), COALESCE(p.GENERO, 'SIN ESPECIFICAR')
+        ORDER BY nivel, genero
     """)
     
     result = connection.execute(query, {"year": int(selected_year)})
     data = result.fetchall()
 
 if data:
-    df = pd.DataFrame(data, columns=['Nivel', 'Sexo', 'Cantidad'])
+    df = pd.DataFrame(data, columns=['Nivel', 'Genero', 'Cantidad'])
     
-    # Normalizar sexo
-    df['Sexo_Label'] = df['Sexo'].apply(
+    # Normalizar genero
+    df['Genero_Label'] = df['Genero'].apply(
         lambda x: 'Femenino' if x.lower() == 'f' else ('Masculino' if x.lower() == 'm' else 'Otro')
     )
     
@@ -97,7 +97,7 @@ if data:
     with col2:
         st.metric("📚 Niveles", df['Nivel'].nunique())
     with col3:
-        st.metric("👥 Sexos", df['Sexo_Label'].nunique())
+        st.metric("👥 Generos", df['Genero_Label'].nunique())
     
     st.divider()
     
@@ -106,15 +106,15 @@ if data:
         df,
         x='Nivel',
         y='Cantidad',
-        color='Sexo_Label',
+        color='Genero_Label',
         title=f"Estudiantes por Nivel MCER - {selected_year}",
         barmode='group',
         color_discrete_map={'Masculino': '#3498db', 'Femenino': '#e74c3c', 'Otro': '#95a5a6'},
-        labels={'Cantidad': 'Cantidad', 'Nivel': 'Nivel MCER', 'Sexo_Label': 'Sexo'}
+        labels={'Cantidad': 'Cantidad', 'Nivel': 'Nivel MCER', 'Genero_Label': 'Genero'}
     )
     st.plotly_chart(fig_bar, use_container_width=True)
     
     st.subheader("📋 Datos Detallados")
-    st.dataframe(df[['Nivel', 'Sexo_Label', 'Cantidad']], use_container_width=True)
+    st.dataframe(df[['Nivel', 'Genero_Label', 'Cantidad']], use_container_width=True)
 else:
     st.warning(f"⚠️ No hay datos para el año {selected_year}")

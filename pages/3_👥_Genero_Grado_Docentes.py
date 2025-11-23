@@ -1,5 +1,5 @@
 """
-Dashboard: Estudiantes por Sexo y Grado - Formación Docentes
+Dashboard: Estudiantes por Genero y Grado - Formación Docentes
 """
 import streamlit as st
 import os
@@ -17,10 +17,10 @@ except ImportError:
     pass
 
 
-st.set_page_config(page_title="Sexo y Grado - Docentes", layout="wide", page_icon="👥")
+st.set_page_config(page_title="Genero y Grado - Docentes", layout="wide", page_icon="👥")
 
 
-st.title("👥 Distribución por Sexo y Grado - Formación Docentes")
+st.title("👥 Distribución por Genero y Grado - Formación Docentes")
 
 
 @st.cache_resource
@@ -86,14 +86,14 @@ with engine.connect() as connection:
     # Query principal
     query = text("""
         SELECT 
-            COALESCE(p.SEXO, 'SIN ESPECIFICAR') as sexo,
+            COALESCE(p.GENERO, 'SIN ESPECIFICAR') as genero,
             COALESCE(pnm.NOMBRE_CURSO, 'SIN ESPECIFICAR') as grado,
             COUNT(DISTINCT p.ID) as cantidad
         FROM Persona_Nivel_MCER pnm
         INNER JOIN Personas p ON pnm.PERSONA_ID = p.ID
         WHERE pnm.ANIO_REGISTRO = :year
         AND (LOWER(pnm.NOMBRE_CURSO) LIKE '%docentes%' OR LOWER(pnm.NOMBRE_CURSO) LIKE '%docente%')
-        GROUP BY COALESCE(p.SEXO, 'SIN ESPECIFICAR'), COALESCE(pnm.NOMBRE_CURSO, 'SIN ESPECIFICAR')
+        GROUP BY COALESCE(p.GENERO, 'SIN ESPECIFICAR'), COALESCE(pnm.NOMBRE_CURSO, 'SIN ESPECIFICAR')
         ORDER BY cantidad DESC
     """)
     
@@ -107,11 +107,11 @@ if not data:
     st.stop()
 
 
-df = pd.DataFrame(data, columns=['Sexo', 'Grado', 'Cantidad'])
+df = pd.DataFrame(data, columns=['Genero', 'Grado', 'Cantidad'])
 
 
 # Limpiar datos
-df['Sexo_Label'] = df['Sexo'].apply(lambda x: 'Femenino' if x.lower() == 'f' else ('Masculino' if x.lower() == 'm' else 'No especificado'))
+df['Genero_Label'] = df['Genero'].apply(lambda x: 'Femenino' if x.lower() == 'f' else ('Masculino' if x.lower() == 'm' else 'No especificado'))
 df['Grado'] = df['Grado'].fillna('Sin especificar')
 
 
@@ -120,9 +120,9 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.metric("👥 Total Estudiantes", df['Cantidad'].sum())
 with col2:
-    st.metric("👩 Mujeres", df[df['Sexo'].str.lower() == 'f']['Cantidad'].sum())
+    st.metric("👩 Mujeres", df[df['Genero'].str.lower() == 'f']['Cantidad'].sum())
 with col3:
-    st.metric("👨 Hombres", df[df['Sexo'].str.lower() == 'm']['Cantidad'].sum())
+    st.metric("👨 Hombres", df[df['Genero'].str.lower() == 'm']['Cantidad'].sum())
 
 
 st.divider()
@@ -133,12 +133,12 @@ col1, col2 = st.columns(2)
 
 
 with col1:
-    st.subheader("📊 Distribución por Sexo")
-    sex_data = df.groupby('Sexo_Label')['Cantidad'].sum()
+    st.subheader("📊 Distribución por Genero")
+    sex_data = df.groupby('Genero_Label')['Cantidad'].sum()
     fig_sex = px.pie(
         values=sex_data.values,
         names=sex_data.index,
-        title=f"Estudiantes por Sexo - {selected_year}",
+        title=f"Estudiantes por Genero - {selected_year}",
         color_discrete_sequence=['#FF69B4', '#4169E1']
     )
     st.plotly_chart(fig_sex, use_container_width=True)
@@ -159,7 +159,7 @@ with col2:
 
 
 st.subheader("📋 Datos Detallados")
-st.dataframe(df[['Sexo_Label', 'Grado', 'Cantidad']], use_container_width=True)
+st.dataframe(df[['Genero_Label', 'Grado', 'Cantidad']], use_container_width=True)
 
 
-st.info("💡 Este dashboard muestra la distribución de estudiantes por sexo y grado en Formación Docentes")
+st.info("💡 Este dashboard muestra la distribución de estudiantes por genero y grado en Formación Docentes")

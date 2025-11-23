@@ -3,27 +3,20 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import traceback
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
+import sys, os
+
+# Añadir el directorio raíz del proyecto a sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Base_datos.conexion import get_engine
 
 # Configurar streamlit
 st.set_page_config(layout="wide", page_title="Dashboard Docentes por Institución - Formación Docente")
 st.title("📊 Docentes por Institución - FORMACIÓN DOCENTE")
 
-# Configuración de la conexión a la base de datos
-@st.cache_resource
-def get_database_connection():
-    try:
-        engine = create_engine("mysql+mysqlconnector://root:123456@localhost:3308/observatorio_bilinguismo")
-        with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
-        return engine
-    except Exception as e:
-        st.error(f"Error al conectar a la base de datos: {str(e)}")
-        raise e
-
 # Inicializar conexión
 try:
-    engine = get_database_connection()
+    engine = get_engine()
     st.sidebar.success("✅ Conexión establecida")
 except Exception as e:
     st.error("❌ No se pudo conectar a la base de datos")

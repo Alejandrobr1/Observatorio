@@ -1,6 +1,0 @@
-streamlit>=1.40.0
-pandas>=2.0.0
-sqlalchemy>=2.0.0
-mysql-connector-python>=9.0.0
-plotly>=5.0.0
-python-dotenv>=1.0.0

@@ -4,9 +4,9 @@ import plotly.express as px
 from sqlalchemy import create_engine, text
 import os
 
-st.set_page_config(page_title="Sexo y Grado - Sábados", layout="wide", page_icon="👥")
+st.set_page_config(page_title="Genero y Grado - Sábados", layout="wide", page_icon="👥")
 
-st.title("👥 Sexo y Grado - Formación Sábados")
+st.title("👥 Genero y Grado - Formación Sábados")
 
 @st.cache_resource
 def get_engine():
@@ -27,46 +27,46 @@ def get_engine():
     return create_engine(connection_string)
 
 @st.cache_data
-def get_data_sexo_grado():
+def get_data_genero_grado():
     engine = get_engine()
     query = """
     SELECT
         pnm.NOMBRE_CURSO as grado,
-        p.SEXO,
+        p.GENERO,
         COUNT(*) as cantidad,
         pnm.ANIO_REGISTRO
     FROM Persona_Nivel_MCER pnm
     JOIN Personas p ON pnm.PERSONA_ID = p.ID
     WHERE pnm.NOMBRE_CURSO LIKE '%Sabados%' OR pnm.NOMBRE_CURSO LIKE '%sabados%'
-    GROUP BY pnm.NOMBRE_CURSO, p.SEXO, pnm.ANIO_REGISTRO
-    ORDER BY pnm.NOMBRE_CURSO, p.SEXO
+    GROUP BY pnm.NOMBRE_CURSO, p.GENERO, pnm.ANIO_REGISTRO
+    ORDER BY pnm.NOMBRE_CURSO, p.GENERO
     """
     return pd.read_sql(text(query), engine)
 
 try:
-    df = get_data_sexo_grado()
+    df = get_data_genero_grado()
 
     st.sidebar.page_link("app.py", label="🏠 Volver al Inicio", icon="🏠")
     st.sidebar.divider()
     
     col1, col2, col3 = st.columns(3)
     col1.metric("📊 Registros Total", len(df))
-    col2.metric("👥 Sexos", df['SEXO'].nunique())
+    col2.metric("👥 Generos", df['GENERO'].nunique())
     col3.metric("🎓 Grados", df['grado'].nunique())
     
     st.divider()
     
-    # Gráfico de sexo y grado
-    sexo_grado = df.groupby(['grado', 'SEXO'])['cantidad'].sum().reset_index()
+    # Gráfico de genero y grado
+    genero_grado = df.groupby(['grado', 'GENERO'])['cantidad'].sum().reset_index()
     
     fig1 = px.bar(
-        sexo_grado,
+        genero_grado,
         x='grado',
         y='cantidad',
-        color='SEXO',
+        color='GENERO',
         barmode='group',
-        title='Distribución por Grado y Sexo',
-        labels={'cantidad': 'Cantidad', 'grado': 'Grado', 'SEXO': 'Sexo'}
+        title='Distribución por Grado y Genero',
+        labels={'cantidad': 'Cantidad', 'grado': 'Grado', 'GENERO': 'Genero'}
     )
     
     st.plotly_chart(fig1, width='stretch')

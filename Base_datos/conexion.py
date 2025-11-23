@@ -2,10 +2,6 @@ import sys
 import os
 from sqlalchemy import create_engine
 import pandas as pd
-from dotenv import load_dotenv
-
-# Cargar variables de entorno desde .env
-load_dotenv()
 
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -14,18 +10,7 @@ from logger_config import get_logger
 
 
 logger = get_logger(__name__)
-
-# Credenciales desde variables de entorno
-# Clever Cloud en producción, Docker en desarrollo
-db_user = os.getenv('DB_USER', 'root')
-db_pass = os.getenv('DB_PASS', '123456')
-db_host = os.getenv('DB_HOST', 'localhost')
-db_port = os.getenv('DB_PORT', '3308')
-db_name = os.getenv('DB_NAME', 'observatorio_bilinguismo')
-
-# Construir connection string
-connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
-engine = create_engine(connection_string)
+engine = create_engine("mysql+mysqlconnector://root:123456@localhost:3308/observatorio_bilinguismo")
 
 try:
     with engine.connect() as connection:
@@ -41,3 +26,15 @@ except Exception as e:
 finally:
     engine.dispose()
     logger.info("Conexión a base de datos cerrada")
+# Esta es la única fuente de verdad para la conexión a la base de datos.
+# Para un entorno local, está bien tenerla aquí.
+# Si usaras variables de entorno, las leerías aquí.
+CONNECTION_STRING = "mysql+mysqlconnector://root:123456@localhost:3308/observatorio_bilinguismo"
+
+def get_engine():
+    """
+    Crea y devuelve una instancia del motor de SQLAlchemy.
+    Esta función será llamada por todos los demás scripts.
+    """
+    engine = create_engine(CONNECTION_STRING)
+    return engine
