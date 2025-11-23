@@ -133,37 +133,11 @@ try:
     
     with engine.connect() as connection:
         inseridos = 0
-        duplicados = 0
         
         for reg in registros:
             try:
-                # Verificar si el registro ya existe
-                resultado = connection.execute(text(
-                    """SELECT COUNT(*) FROM Estudiantes_2016 
-                       WHERE FECHA = :fecha 
-                       AND SEDE_NODAL = :sede_nodal 
-                       AND POBLACION = :poblacion 
-                       AND NIVEL = :nivel 
-                       AND DIA = :dia 
-                       AND JORNADA = :jornada 
-                       AND ETAPA = :etapa"""
-                ), {
-                    'fecha': reg['FECHA'],
-                    'sede_nodal': reg['SEDE_NODAL'],
-                    'poblacion': reg['POBLACION'],
-                    'nivel': reg['NIVEL'],
-                    'dia': reg['DIA'],
-                    'jornada': reg['JORNADA'],
-                    'etapa': reg['ETAPA']
-                })
-                
-                count = resultado.scalar()
-                
-                if count > 0:
-                    duplicados += 1
-                    continue
-                
-                # Insertar nuevo registro
+                # Insertar registro sin verificar duplicados
+                # Se permiten valores duplicados tal como vienen en el Excel
                 connection.execute(text(
                     """INSERT INTO Estudiantes_2016 
                        (FECHA, SEDE_NODAL, POBLACION, NIVEL, DIA, JORNADA, MATRICULADOS, ETAPA)
@@ -198,7 +172,6 @@ try:
     # Verificar resultados
     print(f"\n📊 Estadísticas de inserción:")
     print(f"   • Registros insertados: {inseridos}")
-    print(f"   • Registros duplicados: {duplicados}")
     print(f"   • Registros con error: {len(errores)}")
     
     # Mostrar estadísticas de los datos insertados
