@@ -36,50 +36,38 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
+# --- Lógica de Estado y Filtros ---
+
 # Sidebar - Filtros
 st.sidebar.header("🔍 Filtros")
 
-with engine.connect() as connection:
-    # Obtener años disponibles buscando tablas Estudiantes_XXXX
-    query_tables = text("SHOW TABLES LIKE 'Estudiantes_%'")
-    result_tables = connection.execute(query_tables)
-    available_years = sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
+# Filtro de Tipo de Población
+selected_population = st.sidebar.radio(
+    "Filtrar por tipo de población",
+    ["Estudiantes", "Docentes"],
+    index=0,
+    key="population_filter"
+)
+population_prefix = "Estudiantes" if selected_population == "Estudiantes" else "Docentes"
 
-    if not available_years:
-        st.error("❌ No se encontraron tablas de estudiantes por año (ej. 'Estudiantes_2016').")
-        st.stop()
+@st.cache_data
+def get_available_years(_engine, prefix):
+    with _engine.connect() as connection:
+        query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
+        result_tables = connection.execute(query_tables)
+        return sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
 
-    # Filtro de año
-    selected_year = st.sidebar.selectbox(
-        '📅 Año',
-        available_years,
-        index=0,
-        help="Selecciona el año para visualizar los datos."
-    )
+available_years = get_available_years(engine, population_prefix)
 
-st.sidebar.divider()
+if not available_years:
+    st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
+    st.stop()
 
-# Información general
-st.sidebar.header("📈 Estadísticas Generales")
+# Inicializar el año seleccionado en el estado de la sesión
+if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
+    st.session_state.selected_year = available_years[0]
 
-with engine.connect() as connection:
-    # Construir el nombre de la tabla dinámicamente
-    table_name = f"Estudiantes_{selected_year}"
-    
-    # Total matriculados
-    query_total = text(f"SELECT SUM(MATRICULADOS) FROM {table_name}")
-    total_matriculados = connection.execute(query_total).scalar() or 0
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
-    
-    # Total matriculados Etapa 1
-    query_etapa1 = text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1'")
-    total_etapa1 = connection.execute(query_etapa1).scalar() or 0
-    st.sidebar.metric(f"Matriculados Etapa 1 ({selected_year})", f"{int(total_etapa1):,}")
-    
-    # Total matriculados Etapa 2
-    query_etapa2 = text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '2'")
-    total_etapa2 = connection.execute(query_etapa2).scalar() or 0
-    st.sidebar.metric(f"Matriculados Etapa 2 ({selected_year})", f"{int(total_etapa2):,}")
+selected_year = st.session_state.selected_year
 
 st.sidebar.divider()
 
@@ -91,10 +79,8 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
         st.warning("No hay datos para esta etapa.")
         return
 
-    # Convertir cantidad a numérico para evitar errores de tipo
     df_data['cantidad'] = pd.to_numeric(df_data['cantidad'])
 
-    # Agrupar las sedes más pequeñas en "Otras" para mejorar la visualización
     df_pie = df_data.copy()
     if len(df_pie) > 10:
         pie_top = df_pie.nlargest(10, 'cantidad')
@@ -102,11 +88,9 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
         pie_top.loc[len(pie_top)] = {'SEDE_NODAL': 'Otras Sedes', 'cantidad': otras_sum}
         df_pie = pie_top
 
-    # Crear el gráfico de pastel
     fig, ax = plt.subplots(figsize=(8, 6))
     colors = plt.cm.viridis(np.linspace(0, 1, len(df_pie)))
     explode = [0.05 if i == 0 else 0 for i in range(len(df_pie))]
-    
     wedges, texts, autotexts = ax.pie(
         df_pie['cantidad'], 
         labels=df_pie['SEDE_NODAL'],
@@ -125,79 +109,74 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
     plt.tight_layout()
     st.pyplot(fig)
 
-    # Crear la tabla de resumen
     st.subheader("📋 Resumen")
     df_data['porcentaje'] = (df_data['cantidad'] / float(total_etapa) * 100) if total_etapa > 0 else 0
-    
     df_display = df_data.copy()
     df_display['#'] = range(1, len(df_display) + 1)
     df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
     df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.1f}%")
     df_display = df_display[['#', 'SEDE_NODAL', 'cantidad', 'porcentaje']]
     df_display.columns = ['#', 'Sede Nodal', 'Matriculados', 'Porcentaje']
-    
     st.dataframe(df_display, use_container_width=True, hide_index=True)
 
-# Consultas principales
+# --- Carga de Datos ---
+@st.cache_data
+def load_data_by_stage(_engine, year, prefix, stage):
+    table_name = f"{prefix}_{year}"
+    with _engine.connect() as connection:
+        query = text(f"""
+            SELECT 
+                SEDE_NODAL, COALESCE(SUM(MATRICULADOS), 0) as cantidad
+            FROM {table_name}
+            WHERE ETAPA = '{stage}'
+              AND SEDE_NODAL IS NOT NULL AND SEDE_NODAL != '' AND SEDE_NODAL != 'SIN INFORMACION'
+            GROUP BY SEDE_NODAL
+            ORDER BY cantidad DESC
+        """)
+        result = connection.execute(query)
+        df = pd.DataFrame(result.fetchall(), columns=["SEDE_NODAL", "cantidad"])
+        total_matriculados_stage = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '{stage}'")).scalar() or 0
+        return df, total_matriculados_stage
+
 try:
-    with engine.connect() as connection:
-        table_name = f"Estudiantes_{selected_year}"
-        
-        # Consulta para Etapa 1
-        query_etapa1_data = text(f"""
-            SELECT 
-                SEDE_NODAL,
-                COALESCE(SUM(MATRICULADOS), 0) as cantidad
-            FROM {table_name}
-            WHERE ETAPA = '1'
-              AND SEDE_NODAL IS NOT NULL 
-              AND SEDE_NODAL != '' 
-              AND SEDE_NODAL != 'SIN INFORMACION'
-            GROUP BY SEDE_NODAL
-            ORDER BY cantidad DESC
-        """)
-        result_etapa1 = connection.execute(query_etapa1_data)
-        df_etapa1 = pd.DataFrame(result_etapa1.fetchall(), columns=["SEDE_NODAL", "cantidad"])
+    df_etapa1, total_etapa1 = load_data_by_stage(engine, selected_year, population_prefix, '1')
+    df_etapa2, total_etapa2 = load_data_by_stage(engine, selected_year, population_prefix, '2')
+    total_matriculados = total_etapa1 + total_etapa2
 
-        # Consulta para Etapa 2
-        query_etapa2_data = text(f"""
-            SELECT 
-                SEDE_NODAL,
-                COALESCE(SUM(MATRICULADOS), 0) as cantidad
-            FROM {table_name}
-            WHERE ETAPA = '2'
-              AND SEDE_NODAL IS NOT NULL 
-              AND SEDE_NODAL != '' 
-              AND SEDE_NODAL != 'SIN INFORMACION'
-            GROUP BY SEDE_NODAL
-            ORDER BY cantidad DESC
-        """)
-        result_etapa2 = connection.execute(query_etapa2_data)
-        df_etapa2 = pd.DataFrame(result_etapa2.fetchall(), columns=["SEDE_NODAL", "cantidad"])
+    # --- Visualización ---
+    st.sidebar.header("📈 Estadísticas Generales")
+    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
+    st.sidebar.metric(f"Matriculados Etapa 1 ({selected_year})", f"{int(total_etapa1):,}")
+    st.sidebar.metric(f"Matriculados Etapa 2 ({selected_year})", f"{int(total_etapa2):,}")
+    st.sidebar.divider()
 
-        # Crear layout de dos columnas
-        col1, col2 = st.columns(2)
-
-        with col1:
-            create_pie_chart_and_table(df_etapa1, total_etapa1, f"📊 Etapa 1 - Año {selected_year}")
-
-        with col2:
-            create_pie_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
-        
-        # Información adicional
-        st.success(f"""
-        ✅ **Datos cargados exitosamente**
-        
-        📌 **Información del reporte:**
-        - **Año**: {selected_year}
-        - **Total estudiantes matriculados**: {int(total_matriculados):,}
-        - **Matriculados Etapa 1**: {int(total_etapa1):,}
-        - **Matriculados Etapa 2**: {int(total_etapa2):,}
-        """)
+    col1, col2 = st.columns(2)
+    with col1:
+        create_pie_chart_and_table(df_etapa1, total_etapa1, f"📊 Etapa 1 - Año {selected_year}")
+    with col2:
+        create_pie_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
+    
+    # --- Botones de Año ---
+    st.divider()
+    st.markdown("#### Seleccionar otro año")
+    cols = st.columns(len(available_years))
+    for i, year in enumerate(available_years):
+        if cols[i].button(year, key=f"year_btn_{year}", use_container_width=True, type="primary" if year == selected_year else "secondary"):
+            st.session_state.selected_year = year
+            st.rerun()
+    
+    st.success(f"""
+    ✅ **Datos cargados exitosamente**
+    
+    📌 **Información del reporte:**
+    - **Año**: {selected_year}
+    - **Total estudiantes matriculados**: {int(total_matriculados):,}
+    - **Matriculados Etapa 1**: {int(total_etapa1):,}
+    - **Matriculados Etapa 2**: {int(total_etapa2):,}
+    """)
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
     st.exception(e)
-    
     with st.expander("Ver detalles técnicos del error"):
         st.code(traceback.format_exc())

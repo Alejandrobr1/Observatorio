@@ -36,124 +36,119 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
+# --- Lógica de Estado y Filtros ---
+
 # Sidebar - Filtros
 st.sidebar.header("🔍 Filtros")
 
-with engine.connect() as connection:
-    # Obtener años disponibles buscando tablas Estudiantes_XXXX
-    query_tables = text("SHOW TABLES LIKE 'Estudiantes_%'")
-    result_tables = connection.execute(query_tables)
-    available_years = sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
+# Filtro de Tipo de Población
+selected_population_type = st.sidebar.radio(
+    "Filtrar por tipo de población",
+    ["Estudiantes", "Docentes"],
+    index=0,
+    key="population_filter"
+)
+population_prefix = "Estudiantes" if selected_population_type == "Estudiantes" else "Docentes"
 
-    if not available_years:
-        st.error("❌ No se encontraron tablas de estudiantes por año (ej. 'Estudiantes_2016').")
-        st.stop()
+@st.cache_data
+def get_available_years(_engine, prefix):
+    with _engine.connect() as connection:
+        query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
+        result_tables = connection.execute(query_tables)
+        return sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
 
-    # Filtro de año
-    selected_year = st.sidebar.selectbox(
-        '📅 Año',
-        available_years,
-        index=0,
-        help="Selecciona el año para visualizar los datos."
-    )
+available_years = get_available_years(engine, population_prefix)
 
-st.sidebar.divider()
+if not available_years:
+    st.warning(f"⚠️ No se encontraron datos para '{selected_population_type}'.")
+    st.stop()
 
-# Información general
-st.sidebar.header("📈 Estadísticas Generales")
+# Inicializar el año seleccionado en el estado de la sesión
+if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
+    st.session_state.selected_year = available_years[0]
 
-with engine.connect() as connection:
-    # Construir el nombre de la tabla dinámicamente
-    table_name = f"Estudiantes_{selected_year}"
-    
-    # Total matriculados
-    query_total = text(f"SELECT SUM(MATRICULADOS) FROM {table_name}")
-    total_matriculados = connection.execute(query_total).scalar() or 0
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
-    
-    # Total tipos de población
-    query_poblacion = text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE POBLACION IS NOT NULL AND POBLACION != '' AND POBLACION != 'SIN INFORMACION'")
-    total_poblacion = connection.execute(query_poblacion).scalar() or 0
-    st.sidebar.metric(f"Total Tipos de Población ({selected_year})", f"{total_poblacion:,}")
+selected_year = st.session_state.selected_year
 
 st.sidebar.divider()
 
-# Consulta principal
-try:
-    with engine.connect() as connection:
-        table_name = f"Estudiantes_{selected_year}"
-        
-        # Consulta para obtener matriculados por tipo de población
+# --- Carga de Datos ---
+@st.cache_data
+def load_data(_engine, year, prefix):
+    table_name = f"{prefix}_{year}"
+    with _engine.connect() as connection:
         query = text(f"""
             SELECT 
-                POBLACION,
-                COALESCE(SUM(MATRICULADOS), 0) as cantidad
+                POBLACION, COALESCE(SUM(MATRICULADOS), 0) as cantidad
             FROM {table_name}
-            WHERE POBLACION IS NOT NULL 
-              AND POBLACION != '' 
-              AND POBLACION != 'SIN INFORMACION'
+            WHERE POBLACION IS NOT NULL AND POBLACION != '' AND POBLACION != 'SIN INFORMACION'
             GROUP BY POBLACION
             ORDER BY cantidad DESC
         """)
-        
         result = connection.execute(query)
         df = pd.DataFrame(result.fetchall(), columns=["POBLACION", "cantidad"])
+        
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name}")).scalar() or 0
+        total_poblacion = connection.execute(text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE POBLACION IS NOT NULL AND POBLACION != ''")).scalar() or 0
+        
+        return df, total_matriculados, total_poblacion
 
-        if df.empty:
-            st.warning(f"⚠️ No hay datos de matriculados por población para el año {selected_year}.")
-            st.stop()
+try:
+    df, total_matriculados, total_poblacion = load_data(engine, selected_year, population_prefix)
 
+    # --- Visualización ---
+    st.sidebar.header("📈 Estadísticas Generales")
+    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
+    st.sidebar.metric(f"Total Tipos de Población ({selected_year})", f"{total_poblacion:,}")
+    st.sidebar.divider()
+
+    if df.empty:
+        st.warning(f"⚠️ No hay datos de matriculados por población para el año {selected_year}.")
+    else:
         # Crear gráfico de barras verticales
         st.header(f"📊 Matriculados por Tipo de Población - Año {selected_year}")
-        
         fig, ax = plt.subplots(figsize=(12, 7))
-        
-        # Colores para las barras
         colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df)))
-        
         bars = ax.bar(df['POBLACION'], df['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
         
-        # Agregar etiquetas en las barras
         for bar in bars:
             height = bar.get_height()
             if height > 0:
                 ax.annotate(f'{int(height):,}',
                             xy=(bar.get_x() + bar.get_width() / 2, height),
-                            xytext=(0, 3),  # 3 points vertical offset
+                            xytext=(0, 3),
                             textcoords="offset points",
                             ha='center', va='bottom', fontsize=10, fontweight='bold')
         
-        # Configuración del gráfico
         ax.set_xlabel('Tipo de Población', fontsize=13, fontweight='bold')
         ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
         ax.set_title(f'Estudiantes Matriculados por Tipo de Población\nAño {selected_year}',
                      fontsize=16, fontweight='bold', pad=20)
         plt.xticks(rotation=45, ha="right")
         
-        # Configurar límite del eje Y y prevenir error de tipo
         max_val = df['cantidad'].max() if not df.empty else 1
         ax.set_ylim(0, float(max_val) * 1.2)
-        
-        # Grid
         ax.grid(axis='y', alpha=0.3, linestyle='--')
-        
         plt.tight_layout()
         st.pyplot(fig)
 
+        # --- Botones de Año ---
+        st.divider()
+        st.markdown("#### Seleccionar otro año")
+        cols = st.columns(len(available_years))
+        for i, year in enumerate(available_years):
+            if cols[i].button(year, key=f"year_btn_{year}", use_container_width=True, type="primary" if year == selected_year else "secondary"):
+                st.session_state.selected_year = year
+                st.rerun()
+
         # Tabla de datos detallada
         st.header("📋 Tabla Detallada por Población")
-        
-        # Calcular porcentajes
         df['porcentaje'] = (pd.to_numeric(df['cantidad']) / float(total_matriculados) * 100) if total_matriculados > 0 else 0
-        
-        # Formatear para visualización
         df_display = df.copy()
         df_display['#'] = range(1, len(df_display) + 1)
         df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
         df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.1f}%")
         df_display = df_display[['#', 'POBLACION', 'cantidad', 'porcentaje']]
         df_display.columns = ['#', 'Población', 'Matriculados', 'Porcentaje']
-        
         st.dataframe(df_display, use_container_width=True, hide_index=True)
         
         st.success(f"""
@@ -168,6 +163,5 @@ try:
 except Exception as e:
     st.error("❌ Error al cargar los datos")
     st.exception(e)
-    
     with st.expander("Ver detalles técnicos del error"):
         st.code(traceback.format_exc())

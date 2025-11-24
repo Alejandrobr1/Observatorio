@@ -36,77 +36,77 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
+# --- Lógica de Estado y Filtros ---
+
 # Sidebar - Filtros
 st.sidebar.header("🔍 Filtros")
 
-with engine.connect() as connection:
-    # Obtener años disponibles buscando tablas Estudiantes_XXXX
-    query_tables = text("SHOW TABLES LIKE 'Estudiantes_%'")
-    result_tables = connection.execute(query_tables)
-    available_years = sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
+# Filtro de Tipo de Población
+selected_population = st.sidebar.radio(
+    "Filtrar por tipo de población",
+    ["Estudiantes", "Docentes"],
+    index=0,
+    key="population_filter"
+)
+population_prefix = "Estudiantes" if selected_population == "Estudiantes" else "Docentes"
 
-    if not available_years:
-        st.error("❌ No se encontraron tablas de estudiantes por año (ej. 'Estudiantes_2016').")
-        st.stop()
+@st.cache_data
+def get_available_years(_engine, prefix):
+    with _engine.connect() as connection:
+        query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
+        result_tables = connection.execute(query_tables)
+        return sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
 
-    # Filtro de año
-    selected_year = st.sidebar.selectbox(
-        '📅 Año',
-        available_years,
-        index=0,
-        help="Selecciona el año para visualizar los datos."
-    )
+available_years = get_available_years(engine, population_prefix)
 
-st.sidebar.divider()
+if not available_years:
+    st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
+    st.stop()
 
-# Información general
-st.sidebar.header("📈 Estadísticas Generales")
+# Inicializar el año seleccionado en el estado de la sesión
+if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
+    st.session_state.selected_year = available_years[0]
 
-with engine.connect() as connection:
-    # Construir el nombre de la tabla dinámicamente
-    table_name = f"Estudiantes_{selected_year}"
-    
-    # Total matriculados
-    query_total = text(f"SELECT SUM(MATRICULADOS) FROM {table_name}")
-    total_matriculados = connection.execute(query_total).scalar() or 0
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
-    
-    # Total sedes nodales
-    query_sedes = text(f"SELECT COUNT(DISTINCT SEDE_NODAL) FROM {table_name} WHERE SEDE_NODAL IS NOT NULL AND SEDE_NODAL != '' AND SEDE_NODAL != 'SIN INFORMACION'")
-    total_sedes = connection.execute(query_sedes).scalar() or 0
-    st.sidebar.metric(f"Total Sedes Nodales ({selected_year})", f"{total_sedes:,}")
+selected_year = st.session_state.selected_year
 
 st.sidebar.divider()
 
-# Consulta principal
-try:
-    with engine.connect() as connection:
-        table_name = f"Estudiantes_{selected_year}"
-        
-        # Consulta para obtener matriculados por sede nodal
+# --- Carga de Datos ---
+@st.cache_data
+def load_data(_engine, year, prefix):
+    table_name = f"{prefix}_{year}"
+    with _engine.connect() as connection:
         query = text(f"""
             SELECT 
-                SEDE_NODAL,
-                COALESCE(SUM(MATRICULADOS), 0) as cantidad
+                SEDE_NODAL, COALESCE(SUM(MATRICULADOS), 0) as cantidad
             FROM {table_name}
-            WHERE SEDE_NODAL IS NOT NULL 
-              AND SEDE_NODAL != '' 
-              AND SEDE_NODAL != 'SIN INFORMACION'
+            WHERE SEDE_NODAL IS NOT NULL AND SEDE_NODAL != '' AND SEDE_NODAL != 'SIN INFORMACION'
             GROUP BY SEDE_NODAL
             ORDER BY cantidad DESC
         """)
-        
         result = connection.execute(query)
         df = pd.DataFrame(result.fetchall(), columns=["SEDE_NODAL", "cantidad"])
+        
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name}")).scalar() or 0
+        total_sedes = connection.execute(text(f"SELECT COUNT(DISTINCT SEDE_NODAL) FROM {table_name} WHERE SEDE_NODAL IS NOT NULL AND SEDE_NODAL != ''")).scalar() or 0
+        
+        return df, total_matriculados, total_sedes
 
-        if df.empty:
-            st.warning(f"⚠️ No hay datos de matriculados por sede nodal para el año {selected_year}.")
-            st.stop()
+try:
+    df, total_matriculados, total_sedes = load_data(engine, selected_year, population_prefix)
 
+    # --- Visualización ---
+    st.sidebar.header("📈 Estadísticas Generales")
+    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
+    st.sidebar.metric(f"Total Sedes Nodales ({selected_year})", f"{total_sedes:,}")
+    st.sidebar.divider()
+
+    if df.empty:
+        st.warning(f"⚠️ No hay datos de matriculados por sede nodal para el año {selected_year}.")
+    else:
         # Convertir cantidad a numérico para evitar errores de tipo
         df['cantidad'] = pd.to_numeric(df['cantidad'])
         
-        # Mostrar estadísticas en sidebar
         st.sidebar.header(f"📊 Top 5 Sedes Nodales - {selected_year}")
         top_5 = df.head(5)
         for idx, row in top_5.iterrows():
@@ -116,25 +116,20 @@ try:
             st.sidebar.write(f"**{idx+1}. {nombre_corto}**")
             st.sidebar.write(f"   {int(total):,} matriculados")
 
-        # Crear gráfico de pastel principal
         st.header(f"📊 Distribución de Matriculados por Sede Nodal - Año {selected_year}")
         
-        # Agrupar las sedes más pequeñas en "Otras" para mejorar la visualización
         df_pie = df.copy()
         if len(df_pie) > 10:
             pie_top = df_pie.nlargest(10, 'cantidad')
             otras_sum = df_pie.nsmallest(len(df_pie) - 10, 'cantidad')['cantidad'].sum()
             pie_top.loc[len(pie_top)] = {'SEDE_NODAL': 'Otras Sedes', 'cantidad': otras_sum}
             df_pie = pie_top
-        
         col1, col2 = st.columns([2, 1])
         
         with col1:
             fig, ax = plt.subplots(figsize=(10, 8))
-            
             colors = plt.cm.viridis(np.linspace(0, 1, len(df_pie)))
             explode = [0.05 if i == 0 else 0 for i in range(len(df_pie))]
-            
             wedges, texts, autotexts = ax.pie(
                 df_pie['cantidad'], 
                 labels=df_pie['SEDE_NODAL'],
@@ -145,31 +140,34 @@ try:
                 textprops={'fontsize': 10, 'fontweight': 'bold'},
                 shadow=True
             )
-            
             for autotext in autotexts:
                 autotext.set_color('white')
                 autotext.set_fontsize(11)
                 autotext.set_fontweight('bold')
-            
             ax.set_title(f'Participación por Sede Nodal\nAño {selected_year}', 
                         fontsize=18, fontweight='bold', pad=20)
-            
             plt.tight_layout()
             st.pyplot(fig)
         
         with col2:
             st.subheader("📋 Resumen")
-            
             df['porcentaje'] = (df['cantidad'] / float(total_matriculados) * 100) if total_matriculados > 0 else 0
-            
             df_display = df.copy()
             df_display['#'] = range(1, len(df_display) + 1)
             df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
             df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.1f}%")
             df_display = df_display[['#', 'SEDE_NODAL', 'cantidad', 'porcentaje']]
             df_display.columns = ['#', 'Sede Nodal', 'Matriculados', 'Porcentaje']
-            
             st.dataframe(df_display, use_container_width=True, hide_index=True)
+
+        # --- Botones de Año ---
+        st.divider()
+        st.markdown("#### Seleccionar otro año")
+        cols = st.columns(len(available_years))
+        for i, year in enumerate(available_years):
+            if cols[i].button(year, key=f"year_btn_{year}", use_container_width=True, type="primary" if year == selected_year else "secondary"):
+                st.session_state.selected_year = year
+                st.rerun()
         
         st.success(f"""
         ✅ **Datos cargados exitosamente**
@@ -183,6 +181,5 @@ try:
 except Exception as e:
     st.error("❌ Error al cargar los datos")
     st.exception(e)
-    
     with st.expander("Ver detalles técnicos del error"):
         st.code(traceback.format_exc())
