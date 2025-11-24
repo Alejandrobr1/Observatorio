@@ -48,12 +48,12 @@ selected_population = st.sidebar.radio(
     index=0,
     key="population_filter"
 )
-population_prefix = "Estudiantes" if selected_population == "Estudiantes" else "Docentes"
+population_prefix = "estudiantes" if selected_population == "Estudiantes" else "docentes"
 
 @st.cache_data
 def get_available_years(_engine, prefix):
     with _engine.connect() as connection:
-        query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
+        query_tables = text(f"SHOW TABLES LIKE '{prefix.lower()}_%'")
         result_tables = connection.execute(query_tables)
         return sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
 
