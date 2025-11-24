@@ -15,7 +15,7 @@ from Base_datos.conexion import get_engine
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Jornada y Día")
 st.title("📊 Estudiantes Matriculados por Jornada y Día")
 
-# Inicializar conexión
+# Inicializar conexióne
 try:
     engine = get_engine()
     st.sidebar.success("✅ Conexión establecida")
