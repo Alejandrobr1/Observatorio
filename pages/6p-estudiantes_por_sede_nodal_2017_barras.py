@@ -11,8 +11,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Comparativa de Etapas")
-st.title("📊 Comparativa de Etapas por Sede Nodal.")
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Etapa")
+st.title("📊 Comparativa de Estudiantes por Etapa y Sede Nodal.")
 
 @st.cache_resource
 def get_engine():
@@ -41,14 +41,8 @@ except Exception as e:
 # Sidebar - Filtros
 st.sidebar.header("🔍 Filtros")
 
-# Filtro de Tipo de Población
-selected_population = st.sidebar.radio(
-    "Filtrar por tipo de población",
-    ["Estudiantes", "Docentes"],
-    index=0,
-    key="population_filter"
-)
-population_prefix = "estudiantes" if selected_population == "Estudiantes" else "docentes"
+# El prefijo ahora está fijo para 'estudiantes'
+population_prefix = "estudiantes"
 
 @st.cache_data
 def get_available_years(_engine, prefix):
@@ -60,7 +54,7 @@ def get_available_years(_engine, prefix):
 available_years = get_available_years(engine, population_prefix)
 
 if not available_years:
-    st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
+    st.warning("⚠️ No se encontraron datos de estudiantes para ningún año.")
     st.stop()
 
 # Filtro de Año
