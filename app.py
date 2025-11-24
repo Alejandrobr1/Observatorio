@@ -138,6 +138,7 @@ with tab2:
     with col2:
         st.page_link("pages/4p-estudiantes_participacion_porcentaje_2016.py", label="Participación % por Sede Nodal", icon="🥧")
         st.page_link("pages/5p-estudiantes_por_sede_nodal_2017.py", label="Comparativa de Etapas por Sede", icon="⚖️")
+        st.page_link("pages/6p-estudiantes_por_sede_nodal_2017_barras.py", label="Estudiantes por Etapa (Barras)", icon="📊")
     st.divider()
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")
