@@ -127,43 +127,18 @@ with tab2:
     st.markdown("""
     Haz clic en cualquier dashboard para acceder a análisis específicos sobre los programas educativos.
     """)
-    st.markdown("")
+    st.markdown("---")
     
-    # Formación Sábados
-    st.markdown("#### 📚 Formación Sábados (6 Dashboards)")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.page_link("pages/1_📊_Estudiantes_Sabados.py", label="📊 Estudiantes")
-        st.page_link("pages/6_📊_Estado_Estudiantes_Sabados.py", label="📊 Estado")
-    with col2:
-        st.page_link("pages/2_👥_Genero_Grado_Sabados.py", label="👥 Genero y Grado")
-        st.page_link("pages/8_📚_Niveles_MCER_Sabados.py", label="📚 Niveles MCER")
-    with col3:
-        st.page_link("pages/10_🏫_Instituciones_Sabados.py", label="🏫 Instituciones")
-        st.page_link("pages/14_📚_Asistencia_Institucion_Sabados.py", label="📍 Asistencia x Institución")
-    st.divider()
-    
-    # Formación Docentes
-    st.markdown("#### 🎓 Formación Docentes (2 Dashboards)")
+    # Nueva sección para los dashboards de producción
+    st.markdown("#### 📊 Análisis de Matrículas")
     col1, col2 = st.columns(2)
     with col1:
-        st.page_link("pages/3_👥_Genero_Grado_Docentes.py", label="👥 Genero y Grado")
+        st.page_link("pages/1p-estudiantes_por_sede_nodal_2016.py", label="Matriculados por Sede Nodal", icon="🏫")
+        st.page_link("pages/2p-estudiantes_por_jornada_dia_2016.py", label="Matriculados por Jornada y Día", icon="📅")
+        st.page_link("pages/3p-estudiantes_por_poblacion_2016.py", label="Matriculados por Población", icon="👥")
     with col2:
-        st.page_link("pages/12_🏫_Asistencia_Institucion_Docentes.py", label="📍 Asistencia x Institución")
-    st.divider()
-    
-    # Formación Intensificación
-    st.markdown("#### ⚡ Formación Intensificación (6 Dashboards)")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.page_link("pages/4_⚡_Estudiantes_Intensificacion.py", label="⚡ Estudiantes")
-        st.page_link("pages/7_⚡_Estado_Estudiantes_Intensificacion.py", label="⚡ Estado")
-    with col2:
-        st.page_link("pages/5_📈_Genero_Grado_Intensificacion.py", label="📊 Genero y Grado")
-        st.page_link("pages/9_📚_Niveles_MCER_Intensificacion.py", label="📚 Niveles MCER")
-    with col3:
-        st.page_link("pages/11_🏫_Instituciones_Intensificacion.py", label="🏫 Instituciones")
-        st.page_link("pages/13_⚡_Asistencia_Institucion_Intensificacion.py", label="📍 Asistencia x Institución")
+        st.page_link("pages/4p-estudiantes_participacion_porcentaje_2016.py", label="Participación % por Sede Nodal", icon="🥧")
+        st.page_link("pages/5p-estudiantes_por_sede_nodal_2017.py", label="Comparativa de Etapas por Sede", icon="⚖️")
     st.divider()
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")
