@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
 st.set_page_config(layout="wide", page_title="Dashboard Comparativa de Etapas")
-st.title("📊 Comparativa de Etapas por Sede Nodal")
+st.title("📊 Comparativa de Etapas por Sede Nodal.")
 
 @st.cache_resource
 def get_engine():
