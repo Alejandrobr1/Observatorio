@@ -101,7 +101,6 @@ with tab1:
         - 📊 Múltiples dashboards analíticos
         - 👥 Análisis de estudiantes y docentes
         - 🏫 Estadísticas por institución
-        - 📉 Seguimiento de niveles MCER
         - 💾 Exportación de datos completos
         """)
     
