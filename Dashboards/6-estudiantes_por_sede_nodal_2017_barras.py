@@ -15,6 +15,34 @@ from Base_datos.conexion import get_engine
 st.set_page_config(layout="wide", page_title="Dashboard Participación por Etapa y Sede Nodal.")
 st.title("📊 Participación por Etapa y Sede Nodal.")
 
+# Inicializar el estado de la sesión para el año si no existe
+if 'selected_year' not in st.session_state:
+    # Esta parte necesita acceso a la DB para obtener los años, se moverá más abajo
+    pass
+
+# Selectores en la parte superior
+col_selector1, col_selector2 = st.columns(2)
+with col_selector1:
+    dashboard_choice = st.selectbox(
+        "Seleccionar Dashboard",
+        ["Estudiantes", "Docentes"],
+        help="Elige el tipo de dashboard a visualizar."
+    )
+
+with col_selector2:
+    if dashboard_choice == "Estudiantes":
+        report_choice = st.selectbox(
+            "Seleccionar Reporte de Estudiantes",
+            ["Participación por Etapa y Sede Nodal", "Otro Reporte de Estudiantes"],
+            help="Elige el reporte específico de estudiantes."
+        )
+    else: # Docentes
+        report_choice = st.selectbox(
+            "Seleccionar Reporte de Docentes",
+            ["Reporte A de Docentes", "Reporte B de Docentes"],
+            help="Elige el reporte específico de docentes."
+        )
+
 # Inicializar conexión
 try:
     engine = get_engine()
@@ -23,9 +51,6 @@ except Exception as e:
     st.error("❌ No se pudo conectar a la base de datos")
     st.exception(e)
     st.stop()
-
-# Sidebar - Filtros
-st.sidebar.header("🔍 Filtros")
 
 with engine.connect() as connection:
     # Obtener años disponibles buscando tablas Estudiantes_XXXX
@@ -37,16 +62,12 @@ with engine.connect() as connection:
         st.error("❌ No se encontraron tablas de estudiantes por año (ej. 'Estudiantes_2016').")
         st.stop()
 
-    # Filtro de año
-    selected_year = st.sidebar.selectbox(
-        '📅 Año',
-        available_years,
-        index=0,
-        help="Selecciona el año para visualizar los datos."
-    )
+    if 'selected_year' not in st.session_state:
+        st.session_state.selected_year = available_years[0] if available_years else None
 
-st.sidebar.divider()
+selected_year = st.session_state.selected_year
 
+st.sidebar.header("🔍 Filtros Aplicados")
 # Información general
 st.sidebar.header("📈 Estadísticas Generales")
 
@@ -161,6 +182,22 @@ try:
         with col2:
             create_bar_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
         
+        # --- Selección de Año con Botones ---
+        st.divider()
+        with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
+            st.write("Haz clic en un botón para cambiar el año de los datos mostrados en los gráficos.")
+            
+            cols = st.columns(len(available_years))
+            
+            def set_year(year):
+                st.session_state.selected_year = year
+
+            for i, year in enumerate(available_years):
+                with cols[i]:
+                    button_type = "primary" if year == selected_year else "secondary"
+                    if st.button(year, key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,)):
+                        pass
+
         # Información adicional
         st.success(f"""
         ✅ **Datos cargados exitosamente**

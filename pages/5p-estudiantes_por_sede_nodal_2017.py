@@ -29,7 +29,7 @@ def get_engine():
 try:
     engine = get_engine()
     st.sidebar.success("✅ Conexión establecida")
-    st.sidebar.page_link("app.py", label="🏠 Volver al Inicio", icon="🏠")
+    st.sidebar.page_link("app.py", label="Volver al Inicio", icon="🏠")
     st.sidebar.divider()
 except Exception as e:
     st.error("❌ No se pudo conectar a la base de datos")
@@ -38,18 +38,6 @@ except Exception as e:
 
 # --- Lógica de Estado y Filtros ---
 
-# Sidebar - Filtros
-st.sidebar.header("🔍 Filtros")
-
-# Filtro de Tipo de Población
-selected_population = st.sidebar.radio(
-    "Filtrar por tipo de población",
-    ["Estudiantes", "Docentes"],
-    index=0,
-    key="population_filter"
-)
-population_prefix = "Estudiantes" if selected_population == "Estudiantes" else "Docentes"
-
 @st.cache_data
 def get_available_years(_engine, prefix):
     with _engine.connect() as connection:
@@ -57,19 +45,31 @@ def get_available_years(_engine, prefix):
         result_tables = connection.execute(query_tables)
         return sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
 
+col1, col2 = st.columns([1, 3])
+with col1:
+    selected_population = st.selectbox(
+        "Filtrar por tipo de población",
+        ["Estudiantes", "Docentes"],
+        key="population_filter",
+        help="Selecciona si quieres ver datos de Estudiantes o Docentes."
+    )
+
+population_prefix = "Estudiantes" if selected_population == "Estudiantes" else "Docentes"
 available_years = get_available_years(engine, population_prefix)
 
 if not available_years:
     st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
     st.stop()
 
-# Filtro de Año
-selected_year = st.sidebar.selectbox(
-    'Seleccionar Año',
-    available_years,
-    index=0,
-    key='year_filter'
-)
+# Inicializar el estado de la sesión para el año si no existe o si cambió la población
+if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
+    st.session_state.selected_year = available_years[0]
+
+selected_year = st.session_state.selected_year
+
+st.sidebar.header("🔍 Filtros Aplicados")
+st.sidebar.info(f"**Población:** {selected_population}")
+st.sidebar.info(f"**Año:** {selected_year}")
 st.sidebar.divider()
 
 # Función para generar gráfico de pastel y tabla
@@ -122,7 +122,7 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
 
 # --- Carga de Datos ---
 @st.cache_data
-def load_data_by_stage(_engine, year, prefix, stage):
+def load_data_by_stage(_engine, prefix, year, stage):
     table_name = f"{prefix}_{year}"
     with _engine.connect() as connection:
         query = text(f"""
@@ -140,8 +140,8 @@ def load_data_by_stage(_engine, year, prefix, stage):
         return df, total_matriculados_stage
 
 try:
-    df_etapa1, total_etapa1 = load_data_by_stage(engine, selected_year, population_prefix, '1')
-    df_etapa2, total_etapa2 = load_data_by_stage(engine, selected_year, population_prefix, '2')
+    df_etapa1, total_etapa1 = load_data_by_stage(engine, population_prefix, selected_year, '1')
+    df_etapa2, total_etapa2 = load_data_by_stage(engine, population_prefix, selected_year, '2')
     total_matriculados = total_etapa1 + total_etapa2
 
     # --- Visualización ---
@@ -156,6 +156,22 @@ try:
         create_pie_chart_and_table(df_etapa1, total_etapa1, f"📊 Etapa 1 - Año {selected_year}")
     with col2:
         create_pie_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
+    
+    # --- Selección de Año con Botones ---
+    st.divider()
+    with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
+        st.write("Haz clic en un botón para cambiar el año de los datos mostrados en los gráficos.")
+        
+        cols_buttons = st.columns(len(available_years))
+        
+        def set_year(year):
+            st.session_state.selected_year = year
+
+        for i, year in enumerate(available_years):
+            with cols_buttons[i]:
+                button_type = "primary" if year == selected_year else "secondary"
+                st.button(year, key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+
     
     st.success(f"""
     ✅ **Datos cargados exitosamente**
