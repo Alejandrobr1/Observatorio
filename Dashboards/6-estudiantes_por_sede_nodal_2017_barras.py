@@ -12,8 +12,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Base_datos.conexion import get_engine
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Participación por Etapa y Sede Nodal")
-st.title("📊 Participación por Etapa y Sede Nodal")
+st.set_page_config(layout="wide", page_title="Dashboard Participación por Etapa y Sede Nodal.")
+st.title("📊 Participación por Etapa y Sede Nodal.")
 
 # Inicializar conexión
 try:
