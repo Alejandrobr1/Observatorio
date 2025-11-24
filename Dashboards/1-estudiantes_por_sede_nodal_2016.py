@@ -36,14 +36,12 @@ with engine.connect() as connection:
     if not available_years:
         st.error("❌ No se encontraron tablas de estudiantes por año (ej. 'Estudiantes_2016').")
         st.stop()
+    
+# Inicializar el año seleccionado en el estado de la sesión
+if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
+    st.session_state.selected_year = available_years[0]
 
-    # Filtro de año
-    selected_year = st.sidebar.selectbox(
-        '📅 Año',
-        available_years,
-        index=0,
-        help="Selecciona el año para visualizar los datos de matriculados."
-    )
+selected_year = st.session_state.selected_year
 
 st.sidebar.divider()
 
@@ -132,6 +130,16 @@ try:
         
         plt.tight_layout()
         st.pyplot(fig)
+
+        # --- Botones de Año ---
+        st.divider()
+        st.markdown("#### Seleccionar otro año")
+        cols = st.columns(len(available_years))
+        for i, year in enumerate(available_years):
+            # Usa un botón para cada año. Si se hace clic, actualiza el estado y vuelve a ejecutar.
+            if cols[i].button(year, key=f"year_btn_{year}", use_container_width=True, type="primary" if year == selected_year else "secondary"):
+                st.session_state.selected_year = year
+                st.rerun()
 
         # Tabla resumen
         st.header("📋 Tabla Detallada por Sede Nodal")
