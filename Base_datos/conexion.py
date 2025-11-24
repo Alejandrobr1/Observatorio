@@ -23,3 +23,6 @@ def get_engine():
     connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
     engine = create_engine(connection_string)
     return engine
+
+# Crear instancia global del engine para uso en otros módulos
+engine = get_engine()
