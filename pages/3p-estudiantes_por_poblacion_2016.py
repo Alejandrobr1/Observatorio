@@ -63,12 +63,13 @@ if not available_years:
     st.warning(f"⚠️ No se encontraron datos para '{selected_population_type}'.")
     st.stop()
 
-# Inicializar el año seleccionado en el estado de la sesión
-if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
-    st.session_state.selected_year = available_years[0]
-
-selected_year = st.session_state.selected_year
-
+# Filtro de Año
+selected_year = st.sidebar.selectbox(
+    'Seleccionar Año',
+    available_years,
+    index=0,
+    key='year_filter'
+)
 st.sidebar.divider()
 
 # --- Carga de Datos ---
@@ -130,15 +131,6 @@ try:
         ax.grid(axis='y', alpha=0.3, linestyle='--')
         plt.tight_layout()
         st.pyplot(fig)
-
-        # --- Botones de Año ---
-        st.divider()
-        st.markdown("#### Seleccionar otro año")
-        cols = st.columns(len(available_years))
-        for i, year in enumerate(available_years):
-            if cols[i].button(year, key=f"year_btn_{year}", use_container_width=True, type="primary" if year == selected_year else "secondary"):
-                st.session_state.selected_year = year
-                st.rerun()
 
         # Tabla de datos detallada
         st.header("📋 Tabla Detallada por Población")
