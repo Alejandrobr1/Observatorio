@@ -167,10 +167,13 @@ with tab3:
 
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("### ℹ️ Información")
+st.sidebar.markdown("### Programa Municipal de Bilingüismo")
 st.sidebar.markdown("""
 **Observatorio de Bilingüismo**
 - Versión: 1.0
 - Última actualización: 2025
-- [Documentación](https://github.com/observatorio)
+- El programa de bilingüismo busca fortalecer 
+    las competencias comunicativas en inglés de 
+    los estudiantes del municipio, promoviendo 
+    una educación inclusiva y de calidad.
 """)
