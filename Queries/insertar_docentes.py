@@ -1,6 +1,6 @@
 """
-Script para insertar datos de tabla_2019.csv en la tabla Estudiantes_2019
-Nueva estructura: Tablas independientes por años sin valores vacíos ni nulos
+Script para insertar datos de tabla_docentes.csv en la tabla Docentes.
+Permite la inserción de registros duplicados.
 """
 
 import pandas as pd
@@ -17,10 +17,10 @@ logger = get_logger(__name__)
 
 # Definir la ruta del archivo CSV
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-ruta_archivo = os.path.join(project_root, "CSVs", "tabla_2019.csv")
+ruta_archivo = os.path.join(project_root, "CSVs", "Tabla_docentes.csv")
 
 print("\n" + "="*70)
-print("INSERCIÓN DE DATOS - TABLA ESTUDIANTES_2019")
+print("INSERCIÓN DE DATOS - TABLA DOCENTES")
 print("="*70)
 
 try:
@@ -71,42 +71,30 @@ try:
     for idx, row in df.iterrows():
         try:
             # Extraer y convertir valores según la estructura de la tabla
-            fecha = int(row['Año']) if pd.notna(row['Año']) else None
-            sede_nodal = str(row['Sede Nodal']).strip() if pd.notna(row['Sede Nodal']) else None
-            poblacion = str(row['Población']).strip() if pd.notna(row['Población']) else None
-            nivel = int(row['Nivel']) if pd.notna(row['Nivel']) else None
-            dia = str(row['Día']).strip() if pd.notna(row['Día']) else None
-            jornada = str(row['Jornada']).strip() if pd.notna(row['Jornada']) else None
-            matriculados = int(row['Matriculados']) if pd.notna(row['Matriculados']) else None
-            etapa = int(row['Etapa']) if pd.notna(row['Etapa']) else None
+            fecha = int(row['FECHA']) if pd.notna(row['FECHA']) else None
+            institucion = str(row['INSTITUCIÓN EDUCATIVA']).strip() if pd.notna(row['INSTITUCIÓN EDUCATIVA']) else None
+            nivel = str(row['NIVEL_MCER']).strip() if pd.notna(row['NIVEL_MCER']) else None
+            idioma = str(row['IDIOMA']).strip() if pd.notna(row['IDIOMA']) else None
             
             # Validar que los campos requeridos tengan valor
-            if None in [fecha, sede_nodal, poblacion, nivel, dia, jornada, matriculados, etapa]:
+            if None in [fecha, institucion, nivel, idioma] or '' in [institucion, nivel, idioma]:
                 errores.append({
                     'fila': idx + 2,
                     'razon': 'Valores nulos o vacíos',
                     'valores': {
                         'FECHA': fecha,
-                        'SEDE_NODAL': sede_nodal,
-                        'POBLACION': poblacion,
+                        'INSTITUCION_EDUCATIVA': institucion,
                         'NIVEL': nivel,
-                        'DIA': dia,
-                        'JORNADA': jornada,
-                        'MATRICULADOS': matriculados,
-                        'ETAPA': etapa
+                        'IDIOMA': idioma
                     }
                 })
                 continue
             
             registros.append({
                 'FECHA': fecha,
-                'SEDE_NODAL': sede_nodal,
-                'POBLACION': poblacion,
+                'INSTITUCION_EDUCATIVA': institucion,
                 'NIVEL': nivel,
-                'DIA': dia,
-                'JORNADA': jornada,
-                'MATRICULADOS': matriculados,
-                'ETAPA': etapa
+                'IDIOMA': idioma
             })
         
         except Exception as e:
@@ -133,32 +121,26 @@ try:
     
     with engine.connect() as connection:
         inseridos = 0
+        omitidos = 0
         
         for reg in registros:
             try:
-                # Insertar registro sin verificar duplicados
-                # Se permiten valores duplicados tal como vienen en el Excel
-                connection.execute(text(
-                    """INSERT INTO Estudiantes_2019 
-                       (FECHA, SEDE_NODAL, POBLACION, NIVEL, DIA, JORNADA, MATRICULADOS, ETAPA)
-                       VALUES (:fecha, :sede_nodal, :poblacion, :nivel, :dia, :jornada, :matriculados, :etapa)"""
-                ), {
-                    'fecha': reg['FECHA'],
-                    'sede_nodal': reg['SEDE_NODAL'],
-                    'poblacion': reg['POBLACION'],
-                    'nivel': reg['NIVEL'],
-                    'dia': reg['DIA'],
-                    'jornada': reg['JORNADA'],
-                    'matriculados': reg['MATRICULADOS'],
-                    'etapa': reg['ETAPA']
+                # Insertar registro (ahora sin verificar duplicados)
+                insert_query = text("""
+                    INSERT INTO Docentes (FECHA, INSTITUCION_EDUCATIVA, NIVEL, IDIOMA)
+                    VALUES (:fecha, :institucion, :nivel, :idioma)
+                """)
+                connection.execute(insert_query, {
+                    'fecha': reg['FECHA'], 'institucion': reg['INSTITUCION_EDUCATIVA'],
+                    'nivel': reg['NIVEL'], 'idioma': reg['IDIOMA']
                 })
                 
                 inseridos += 1
                 
                 # Commit cada 100 registros
-                if inseridos % 100 == 0:
+                if (inseridos + omitidos) % 100 == 0:
                     connection.commit()
-                    print(f"   ✓ {inseridos} registros procesados...")
+                    print(f"   ✓ {inseridos + omitidos} registros procesados...")
             
             except Exception as e:
                 print(f"   ✗ Error al insertar: {str(e)[:100]}")
@@ -172,54 +154,39 @@ try:
     # Verificar resultados
     print(f"\n📊 Estadísticas de inserción:")
     print(f"   • Registros insertados: {inseridos}")
+    print(f"   • Registros omitidos (por error): {omitidos}") # Se mantiene 'omitidos' pero ahora solo cuenta errores lógicos
     print(f"   • Registros con error: {len(errores)}")
     
     # Mostrar estadísticas de los datos insertados
     with engine.connect() as connection:
         # Total de registros
-        total_query = connection.execute(text("SELECT COUNT(*) FROM Estudiantes_2019"))
+        total_query = connection.execute(text("SELECT COUNT(*) FROM Docentes"))
         total = total_query.scalar()
         
         # Distribución por año
-        print(f"\n📈 Distribución de datos en Estudiantes_2019:")
+        print(f"\n📈 Distribución de datos en Docentes:")
         print(f"   • Total de registros: {total}")
         
         # Verificar año
         año_query = connection.execute(text(
-            "SELECT DISTINCT FECHA, COUNT(*) as cantidad FROM Estudiantes_2019 GROUP BY FECHA"
+            "SELECT FECHA, COUNT(*) as cantidad FROM Docentes GROUP BY FECHA ORDER BY FECHA DESC"
         ))
         for row in año_query:
             print(f"   • Año {row[0]}: {row[1]} registros")
         
-        # Distribución por población
-        pob_query = connection.execute(text(
-            "SELECT POBLACION, COUNT(*) as cantidad FROM Estudiantes_2019 GROUP BY POBLACION ORDER BY cantidad DESC LIMIT 5"
-        ))
-        print(f"\n   Población (top 5):")
-        for i, row in enumerate(pob_query):
-            print(f"      • {row[0]}: {row[1]}")
-        
         # Distribución por nivel
         nivel_query = connection.execute(text(
-            "SELECT NIVEL, COUNT(*) as cantidad FROM Estudiantes_2019 GROUP BY NIVEL ORDER BY NIVEL"
+            "SELECT NIVEL, COUNT(*) as cantidad FROM Docentes GROUP BY NIVEL ORDER BY cantidad DESC LIMIT 5"
         ))
-        print(f"\n   Niveles:")
+        print(f"\n   Niveles (top 5):")
         for row in nivel_query:
             print(f"      • Nivel {row[0]}: {row[1]} registros")
-        
-        # Distribución por día
-        dia_query = connection.execute(text(
-            "SELECT DIA, COUNT(*) as cantidad FROM Estudiantes_2019 GROUP BY DIA ORDER BY cantidad DESC"
-        ))
-        print(f"\n   Días:")
-        for row in dia_query:
-            print(f"      • {row[0]}: {row[1]}")
     
     print("\n" + "="*70)
     print("✅ PROCESO COMPLETADO EXITOSAMENTE")
     print("="*70)
     
-    logger.info(f"Successfully inserted {inseridos} records into Estudiantes_2019")
+    logger.info(f"Successfully inserted {inseridos} records into Docentes. No duplicate check performed.")
 
 except FileNotFoundError:
     print(f"\n❌ Error: Archivo no encontrado")

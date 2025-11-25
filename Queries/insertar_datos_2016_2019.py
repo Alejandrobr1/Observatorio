@@ -1,5 +1,5 @@
 """
-Script para insertar datos de tabla_2018.csv en la tabla Estudiantes_2018
+Script para insertar datos de tabla_2016_2019.csv en la tabla Estudiantes_2016_2019
 Nueva estructura: Tablas independientes por años sin valores vacíos ni nulos
 """
 
@@ -17,10 +17,10 @@ logger = get_logger(__name__)
 
 # Definir la ruta del archivo CSV
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-ruta_archivo = os.path.join(project_root, "CSVs", "tabla_2018.csv")
+ruta_archivo = os.path.join(project_root, "CSVs", "Tabla_2016_2019.csv")
 
 print("\n" + "="*70)
-print("INSERCIÓN DE DATOS - TABLA ESTUDIANTES_2018")
+print("INSERCIÓN DE DATOS - TABLA ESTUDIANTES_2016_2019")
 print("="*70)
 
 try:
@@ -139,7 +139,7 @@ try:
                 # Insertar registro sin verificar duplicados
                 # Se permiten valores duplicados tal como vienen en el Excel
                 connection.execute(text(
-                    """INSERT INTO Estudiantes_2018 
+                    """INSERT INTO Estudiantes_2016_2019 
                        (FECHA, SEDE_NODAL, POBLACION, NIVEL, DIA, JORNADA, MATRICULADOS, ETAPA)
                        VALUES (:fecha, :sede_nodal, :poblacion, :nivel, :dia, :jornada, :matriculados, :etapa)"""
                 ), {
@@ -177,23 +177,23 @@ try:
     # Mostrar estadísticas de los datos insertados
     with engine.connect() as connection:
         # Total de registros
-        total_query = connection.execute(text("SELECT COUNT(*) FROM Estudiantes_2018"))
+        total_query = connection.execute(text("SELECT COUNT(*) FROM Estudiantes_2016_2019"))
         total = total_query.scalar()
         
         # Distribución por año
-        print(f"\n📈 Distribución de datos en Estudiantes_2018:")
+        print(f"\n📈 Distribución de datos en Estudiantes_2016_2019:")
         print(f"   • Total de registros: {total}")
         
         # Verificar año
         año_query = connection.execute(text(
-            "SELECT DISTINCT FECHA, COUNT(*) as cantidad FROM Estudiantes_2018 GROUP BY FECHA"
+            "SELECT DISTINCT FECHA, COUNT(*) as cantidad FROM Estudiantes_2016_2019 GROUP BY FECHA"
         ))
         for row in año_query:
             print(f"   • Año {row[0]}: {row[1]} registros")
         
         # Distribución por población
         pob_query = connection.execute(text(
-            "SELECT POBLACION, COUNT(*) as cantidad FROM Estudiantes_2018 GROUP BY POBLACION ORDER BY cantidad DESC LIMIT 5"
+            "SELECT POBLACION, COUNT(*) as cantidad FROM Estudiantes_2016_2019 GROUP BY POBLACION ORDER BY cantidad DESC LIMIT 5"
         ))
         print(f"\n   Población (top 5):")
         for i, row in enumerate(pob_query):
@@ -201,7 +201,7 @@ try:
         
         # Distribución por nivel
         nivel_query = connection.execute(text(
-            "SELECT NIVEL, COUNT(*) as cantidad FROM Estudiantes_2018 GROUP BY NIVEL ORDER BY NIVEL"
+            "SELECT NIVEL, COUNT(*) as cantidad FROM Estudiantes_2016_2019 GROUP BY NIVEL ORDER BY NIVEL"
         ))
         print(f"\n   Niveles:")
         for row in nivel_query:
@@ -209,7 +209,7 @@ try:
         
         # Distribución por día
         dia_query = connection.execute(text(
-            "SELECT DIA, COUNT(*) as cantidad FROM Estudiantes_2018 GROUP BY DIA ORDER BY cantidad DESC"
+            "SELECT DIA, COUNT(*) as cantidad FROM Estudiantes_2016_2019 GROUP BY DIA ORDER BY cantidad DESC"
         ))
         print(f"\n   Días:")
         for row in dia_query:
@@ -219,7 +219,7 @@ try:
     print("✅ PROCESO COMPLETADO EXITOSAMENTE")
     print("="*70)
     
-    logger.info(f"Successfully inserted {inseridos} records into Estudiantes_2018")
+    logger.info(f"Successfully inserted {inseridos} records into Estudiantes_2016_2019")
 
 except FileNotFoundError:
     print(f"\n❌ Error: Archivo no encontrado")
