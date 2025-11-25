@@ -8,7 +8,7 @@ import sys
 import os
 
 # Añadir el directorio raíz del proyecto a sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Base_datos.conexion import get_engine
 
 # Configurar streamlit
