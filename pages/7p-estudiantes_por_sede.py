@@ -75,12 +75,12 @@ def create_bar_chart_and_table(df_data, total_grupo, title):
 try:
     with engine.connect() as connection:
         # 1. Obtener años disponibles
-        query_years = text("SELECT DISTINCT FECHA FROM Estudiantes_escuela ORDER BY FECHA DESC")
+        query_years = text("SELECT DISTINCT FECHA FROM Escuela_nueva ORDER BY FECHA DESC")
         result_years = connection.execute(query_years)
         available_years = [row[0] for row in result_years.fetchall()]
 
         if not available_years:
-            st.error("❌ No se encontraron años en la tabla 'Estudiantes_escuela'.")
+            st.error("❌ No se encontraron años en la tabla 'Escuela_nueva'.")
             st.stop()
 
         if 'selected_year' not in st.session_state:
@@ -90,7 +90,7 @@ try:
 
         # 2. Calcular estadísticas para la barra lateral
         st.sidebar.header("📈 Estadísticas Generales")
-        table_name = "Estudiantes_escuela"
+        table_name = "Escuela_nueva"
         
         query_total = text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE FECHA = :year")
         total_matriculados = connection.execute(query_total, {'year': selected_year}).scalar() or 0
