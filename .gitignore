@@ -62,7 +62,7 @@ logs/
 .streamlit/secrets.toml
 
 # CSV files (local only)
-CSVs/
+# CSVs/
 
 # Pycache
 .pytest_cache/
