@@ -25,37 +25,6 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
-with engine.connect() as connection:
-    # Obtener años disponibles de la tabla Docentes
-    query_years = text("SELECT DISTINCT FECHA FROM Docentes ORDER BY FECHA DESC")
-    result_years = connection.execute(query_years)
-    available_years = [row[0] for row in result_years.fetchall()]
-
-    if not available_years:
-        st.error("❌ No se encontraron años en la columna 'FECHA' de la tabla 'Docentes'.")
-        st.stop()
-
-    if 'selected_year' not in st.session_state:
-        st.session_state.selected_year = available_years[0] if available_years else None
-
-selected_year = st.session_state.selected_year
-st.sidebar.header("📈 Estadísticas Generales")
-
-with engine.connect() as connection:
-    table_name = "Docentes"
-    
-    # Total docentes
-    query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
-    total_docentes = connection.execute(query_total, {'year': selected_year}).scalar() or 0
-    st.sidebar.metric(f"Total Docentes ({selected_year})", f"{int(total_docentes):,}")
-    
-    # Total instituciones
-    query_instituciones = text(f"SELECT COUNT(DISTINCT INSTITUCION_EDUCATIVA) FROM {table_name} WHERE FECHA = :year")
-    total_instituciones = connection.execute(query_instituciones, {'year': selected_year}).scalar() or 0
-    st.sidebar.metric(f"Instituciones con Docentes ({selected_year})", f"{int(total_instituciones):,}")
-
-st.sidebar.divider()
-
 # Función para generar gráfico de dona y tabla
 def create_donut_chart_and_table(df_data, total_docentes, title):
     st.header(f"📊 {title} - Año {selected_year}")
@@ -108,7 +77,32 @@ def create_donut_chart_and_table(df_data, total_docentes, title):
 # Consultas principales
 try:
     with engine.connect() as connection:
+        # 1. Obtener años disponibles
+        query_years = text("SELECT DISTINCT FECHA FROM Docentes ORDER BY FECHA DESC")
+        result_years = connection.execute(query_years)
+        available_years = [row[0] for row in result_years.fetchall()]
+
+        if not available_years:
+            st.error("❌ No se encontraron años en la columna 'FECHA' de la tabla 'Docentes'.")
+            st.stop()
+
+        if 'selected_year' not in st.session_state:
+            st.session_state.selected_year = available_years[0] if available_years else None
+
+        selected_year = st.session_state.selected_year
+
+        # 2. Calcular estadísticas para la barra lateral
+        st.sidebar.header("📈 Estadísticas Generales")
         table_name = "Docentes"
+        
+        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
+        total_docentes = connection.execute(query_total, {'year': selected_year}).scalar() or 0
+        st.sidebar.metric(f"Total Docentes ({selected_year})", f"{int(total_docentes):,}")
+        
+        query_instituciones = text(f"SELECT COUNT(DISTINCT INSTITUCION_EDUCATIVA) FROM {table_name} WHERE FECHA = :year")
+        total_instituciones = connection.execute(query_instituciones, {'year': selected_year}).scalar() or 0
+        st.sidebar.metric(f"Instituciones con Docentes ({selected_year})", f"{int(total_instituciones):,}")
+        st.sidebar.divider()
         
         # Consulta para Docentes por Nivel
         query_docentes_data = text(f"""

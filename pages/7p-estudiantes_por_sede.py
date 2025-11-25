@@ -25,44 +25,6 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
-# --- Lógica de Selección de Año ---
-with engine.connect() as connection:
-    query_years = text("SELECT DISTINCT FECHA FROM Estudiantes_escuela ORDER BY FECHA DESC")
-    result_years = connection.execute(query_years)
-    available_years = [row[0] for row in result_years.fetchall()]
-
-    if not available_years:
-        st.error("❌ No se encontraron años en la tabla 'Estudiantes_escuela'.")
-        st.stop()
-
-    if 'selected_year' not in st.session_state:
-        st.session_state.selected_year = available_years[0] if available_years else None
-
-selected_year = st.session_state.selected_year
-
-# --- Estadísticas en la Barra Lateral ---
-st.sidebar.header("📈 Estadísticas Generales")
-with engine.connect() as connection:
-    table_name = "Estudiantes_escuela"
-    
-    query_total = text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE FECHA = :year")
-    total_matriculados = connection.execute(query_total, {'year': selected_year}).scalar() or 0
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
-    
-    query_grupo1 = text(f"SELECT SUM(GRUPO_1) FROM {table_name} WHERE FECHA = :year")
-    total_grupo1 = connection.execute(query_grupo1, {'year': selected_year}).scalar() or 0
-    st.sidebar.metric(f"Matriculados Grupo 1 ({selected_year})", f"{int(total_grupo1):,}")
-    
-    query_grupo2 = text(f"SELECT SUM(GRUPO_2) FROM {table_name} WHERE FECHA = :year")
-    total_grupo2 = connection.execute(query_grupo2, {'year': selected_year}).scalar() or 0
-    st.sidebar.metric(f"Matriculados Grupo 2 ({selected_year})", f"{int(total_grupo2):,}")
-
-    query_grupo3 = text(f"SELECT SUM(GRUPO_3) FROM {table_name} WHERE FECHA = :year")
-    total_grupo3 = connection.execute(query_grupo3, {'year': selected_year}).scalar() or 0
-    st.sidebar.metric(f"Matriculados Grupo 3 ({selected_year})", f"{int(total_grupo3):,}")
-
-st.sidebar.divider()
-
 # --- Función de Visualización ---
 def create_bar_chart_and_table(df_data, total_grupo, title):
     st.header(title)
@@ -112,7 +74,40 @@ def create_bar_chart_and_table(df_data, total_grupo, title):
 # --- Consultas y Visualización Principal ---
 try:
     with engine.connect() as connection:
+        # 1. Obtener años disponibles
+        query_years = text("SELECT DISTINCT FECHA FROM Estudiantes_escuela ORDER BY FECHA DESC")
+        result_years = connection.execute(query_years)
+        available_years = [row[0] for row in result_years.fetchall()]
+
+        if not available_years:
+            st.error("❌ No se encontraron años en la tabla 'Estudiantes_escuela'.")
+            st.stop()
+
+        if 'selected_year' not in st.session_state:
+            st.session_state.selected_year = available_years[0] if available_years else None
+
+        selected_year = st.session_state.selected_year
+
+        # 2. Calcular estadísticas para la barra lateral
+        st.sidebar.header("📈 Estadísticas Generales")
         table_name = "Estudiantes_escuela"
+        
+        query_total = text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE FECHA = :year")
+        total_matriculados = connection.execute(query_total, {'year': selected_year}).scalar() or 0
+        st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
+        
+        query_grupo1 = text(f"SELECT SUM(GRUPO_1) FROM {table_name} WHERE FECHA = :year")
+        total_grupo1 = connection.execute(query_grupo1, {'year': selected_year}).scalar() or 0
+        st.sidebar.metric(f"Matriculados Grupo 1 ({selected_year})", f"{int(total_grupo1):,}")
+        
+        query_grupo2 = text(f"SELECT SUM(GRUPO_2) FROM {table_name} WHERE FECHA = :year")
+        total_grupo2 = connection.execute(query_grupo2, {'year': selected_year}).scalar() or 0
+        st.sidebar.metric(f"Matriculados Grupo 2 ({selected_year})", f"{int(total_grupo2):,}")
+
+        query_grupo3 = text(f"SELECT SUM(GRUPO_3) FROM {table_name} WHERE FECHA = :year")
+        total_grupo3 = connection.execute(query_grupo3, {'year': selected_year}).scalar() or 0
+        st.sidebar.metric(f"Matriculados Grupo 3 ({selected_year})", f"{int(total_grupo3):,}")
+        st.sidebar.divider()
         
         # Consultas para cada grupo
         query_grupo1_data = text(f"SELECT SEDE as sede, COALESCE(SUM(GRUPO_1), 0) as cantidad FROM {table_name} WHERE FECHA = :year AND SEDE IS NOT NULL AND SEDE != '' AND SEDE != 'SIN INFORMACION' GROUP BY sede ORDER BY cantidad DESC")
