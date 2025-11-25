@@ -2,18 +2,28 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import traceback
-from sqlalchemy import text
+from sqlalchemy import create_engine, text
 import sys
 import os
 import numpy as np
 
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from Base_datos.conexion import get_engine
 
 # Configurar streamlit
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Población")
 st.title("📊 Estudiantes Matriculados por Población")
+
+@st.cache_resource
+def get_engine():
+    # En producción (Streamlit Cloud), lee desde st.secrets
+    db_user = st.secrets["DB_USER"]
+    db_pass = st.secrets["DB_PASS"]
+    db_host = st.secrets["DB_HOST"]
+    db_port = st.secrets["DB_PORT"]
+    db_name = st.secrets["DB_NAME"]
+    connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+    return create_engine(connection_string)
 
 # Inicializar conexión
 try:
@@ -24,73 +34,87 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
-# Sidebar - Filtros
-st.sidebar.header("🔍 Filtros")
+# --- Lógica de Estado y Filtros ---
 
-with engine.connect() as connection:
-    # Obtener años disponibles buscando tablas Estudiantes_XXXX
-    query_tables = text("SHOW TABLES LIKE 'Estudiantes_%'")
-    result_tables = connection.execute(query_tables)
-    available_years = sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
+@st.cache_data
+def get_available_years(_engine, prefix):
+    table_name = "Estudiantes_2016_2019" # Tabla consolidada
+    if prefix == "Estudiantes":
+        with _engine.connect() as connection:
+            # Verificar si la tabla consolidada existe
+            inspector = _engine.dialect.has_table(connection, table_name)
+            if inspector:
+                query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
+                result_years = connection.execute(query_years)
+                return [row[0] for row in result_years.fetchall()]
+    return [] # Retorna vacío si no es 'Estudiantes' o la tabla no existe
 
-    if not available_years:
-        st.error("❌ No se encontraron tablas de estudiantes por año (ej. 'Estudiantes_2016').")
-        st.stop()
-
-    # Filtro de año
-    selected_year = st.sidebar.selectbox(
-        '📅 Año',
-        available_years,
-        index=0,
-        help="Selecciona el año para visualizar los datos."
+col1, col2 = st.columns([1, 3])
+with col1:
+    selected_population = st.selectbox(
+        "Filtrar por tipo de población",
+        ["Estudiantes", "Docentes"],
+        key="population_filter",
+        help="Selecciona si quieres ver datos de Estudiantes o Docentes."
     )
 
+population_prefix = "Estudiantes" if selected_population == "Estudiantes" else "Docentes"
+available_years = get_available_years(engine, population_prefix)
+
+if not available_years:
+    st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
+    st.stop()
+
+# Inicializar el estado de la sesión para el año si no existe o si cambió la población
+if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
+    st.session_state.selected_year = available_years[0]
+
+selected_year = st.session_state.selected_year
+
+st.sidebar.header("🔍 Filtros Aplicados")
+st.sidebar.info(f"**Población:** {selected_population}")
+st.sidebar.info(f"**Año:** {selected_year}")
 st.sidebar.divider()
 
-# Información general
-st.sidebar.header("📈 Estadísticas Generales")
-
-with engine.connect() as connection:
-    # Construir el nombre de la tabla dinámicamente
-    table_name = f"Estudiantes_{selected_year}"
-    
-    # Total matriculados
-    query_total = text(f"SELECT SUM(MATRICULADOS) FROM {table_name}")
-    total_matriculados = connection.execute(query_total).scalar() or 0
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
-    
-    # Total tipos de población
-    query_poblacion = text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE POBLACION IS NOT NULL AND POBLACION != '' AND POBLACION != 'SIN INFORMACION'")
-    total_poblacion = connection.execute(query_poblacion).scalar() or 0
-    st.sidebar.metric(f"Total Tipos de Población ({selected_year})", f"{total_poblacion:,}")
-
-st.sidebar.divider()
-
-# Consulta principal
-try:
-    with engine.connect() as connection:
-        table_name = f"Estudiantes_{selected_year}"
-        
-        # Consulta para obtener matriculados por tipo de población
+# --- Carga de Datos ---
+@st.cache_data
+def load_data(_engine, prefix, year):
+    table_name = "Estudiantes_2016_2019" if prefix == "Estudiantes" else f"{prefix}_{year}"
+    with _engine.connect() as connection:
+        if not _engine.dialect.has_table(connection, table_name):
+            return pd.DataFrame(columns=["POBLACION", "cantidad"]), 0, 0
+    with _engine.connect() as connection:
+        params = {'year': year}
         query = text(f"""
             SELECT 
-                POBLACION,
-                COALESCE(SUM(MATRICULADOS), 0) as cantidad
+                POBLACION, COALESCE(SUM(MATRICULADOS), 0) as cantidad
             FROM {table_name}
-            WHERE POBLACION IS NOT NULL 
-              AND POBLACION != '' 
-              AND POBLACION != 'SIN INFORMACION'
+            WHERE POBLACION IS NOT NULL AND POBLACION != '' AND POBLACION != 'SIN INFORMACION'
+              AND ETAPA = '1'
+              AND FECHA = :year
             GROUP BY POBLACION
             ORDER BY cantidad DESC
         """)
-        
-        result = connection.execute(query)
+        result = connection.execute(query, params)
         df = pd.DataFrame(result.fetchall(), columns=["POBLACION", "cantidad"])
+        
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year"), params).scalar() or 0
+        total_poblacion = connection.execute(text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year AND POBLACION IS NOT NULL AND POBLACION != ''"), params).scalar() or 0
+        
+        return df, total_matriculados, total_poblacion
 
-        if df.empty:
-            st.warning(f"⚠️ No hay datos de matriculados por población para el año {selected_year}.")
-            st.stop()
+try:
+    df, total_matriculados, total_poblacion = load_data(engine, population_prefix, selected_year)
 
+    # --- Visualización ---
+    st.sidebar.header("📈 Estadísticas Generales")
+    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
+    st.sidebar.metric(f"Total Tipos de Población ({selected_year})", f"{total_poblacion:,}")
+    st.sidebar.divider()
+
+    if df.empty:
+        st.warning(f"⚠️ No hay datos de matriculados por población para el año {selected_year}.")
+    else:
         # Crear gráfico de barras verticales
         st.header(f"📊 Matriculados por Tipo de Población - Año {selected_year}")
         
@@ -128,11 +152,26 @@ try:
         plt.tight_layout()
         st.pyplot(fig)
 
+        # --- Selección de Año con Botones ---
+        st.divider()
+        with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
+            st.write("Haz clic en un botón para cambiar el año de los datos mostrados en los gráficos.")
+            
+            cols = st.columns(len(available_years))
+            
+            def set_year(year):
+                st.session_state.selected_year = year
+
+            for i, year in enumerate(available_years):
+                with cols[i]:
+                    button_type = "primary" if year == selected_year else "secondary"
+                    st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+
         # Tabla de datos detallada
         st.header("📋 Tabla Detallada por Población")
         
         # Calcular porcentajes
-        df['porcentaje'] = (df['cantidad'] / total_matriculados * 100) if total_matriculados > 0 else 0
+        df['porcentaje'] = (pd.to_numeric(df['cantidad']) / float(total_matriculados) * 100) if total_matriculados > 0 else 0
         
         # Formatear para visualización
         df_display = df.copy()

@@ -159,7 +159,7 @@ try:
                 for i, year in enumerate(available_years):
                     with cols_buttons[i]:
                         button_type = "primary" if year == selected_year else "secondary"
-                        st.button(year, key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+                        st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
 
             st.divider()
 
