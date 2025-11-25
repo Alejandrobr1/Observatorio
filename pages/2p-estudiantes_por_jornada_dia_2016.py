@@ -23,7 +23,7 @@ def get_engine():
     db_port = st.secrets["DB_PORT"]
     db_name = st.secrets["DB_NAME"]
     connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
-    return create_engine(connection_string)
+    return create_engine(connection_string, pool_pre_ping=True)
 
 # Inicializar conexión
 try:
