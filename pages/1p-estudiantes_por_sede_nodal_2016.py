@@ -88,6 +88,7 @@ def load_data(_engine, prefix, year):
             WHERE SEDE_NODAL IS NOT NULL 
               AND SEDE_NODAL != '' 
               AND SEDE_NODAL != 'SIN INFORMACION'
+              AND ETAPA = '1'
             GROUP BY SEDE_NODAL
             ORDER BY cantidad DESC
         """)

@@ -91,6 +91,7 @@ def load_data(_engine, prefix, year):
             FROM {table_name}
             WHERE DIA IS NOT NULL AND DIA != '' AND DIA != 'SIN INFORMACION'
               AND JORNADA IS NOT NULL AND JORNADA != '' AND JORNADA != 'SIN INFORMACION'
+              AND ETAPA = '1'
             GROUP BY DIA, JORNADA
             ORDER BY DIA, JORNADA
         """)
@@ -98,9 +99,9 @@ def load_data(_engine, prefix, year):
         df = pd.DataFrame(result.fetchall(), columns=["DIA", "JORNADA", "cantidad"])
         
         # Métricas
-        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name}")).scalar() or 0
-        total_jornadas = connection.execute(text(f"SELECT COUNT(DISTINCT JORNADA) FROM {table_name} WHERE JORNADA IS NOT NULL AND JORNADA != ''")).scalar() or 0
-        total_dias = connection.execute(text(f"SELECT COUNT(DISTINCT DIA) FROM {table_name} WHERE DIA IS NOT NULL AND DIA != ''")).scalar() or 0
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1'")).scalar() or 0
+        total_jornadas = connection.execute(text(f"SELECT COUNT(DISTINCT JORNADA) FROM {table_name} WHERE ETAPA = '1' AND JORNADA IS NOT NULL AND JORNADA != ''")).scalar() or 0
+        total_dias = connection.execute(text(f"SELECT COUNT(DISTINCT DIA) FROM {table_name} WHERE ETAPA = '1' AND DIA IS NOT NULL AND DIA != ''")).scalar() or 0
         
         return df, total_matriculados, total_jornadas, total_dias
 

@@ -28,3 +28,28 @@ class Estudiantes_2017(Base):
     JORNADA = Column(String(100))
     MATRICULADOS = Column(Integer)
     ETAPA = Column(Integer)
+
+class Estudiantes_2018(Base):
+    __tablename__ = 'Estudiantes_2018'
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    FECHA = Column(Integer)
+    SEDE_NODAL = Column(String(255))
+    POBLACION = Column(String(150))
+    NIVEL = Column(String(100))
+    DIA = Column(String(255))
+    JORNADA = Column(String(100))
+    MATRICULADOS = Column(Integer)
+    ETAPA = Column(Integer)
+
+class Estudiantes_2019(Base):
+    __tablename__ = 'Estudiantes_2019'
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    FECHA = Column(Integer)
+    SEDE_NODAL = Column(String(255))
+    POBLACION = Column(String(150))
+    NIVEL = Column(String(100))
+    DIA = Column(String(255))
+    JORNADA = Column(String(100))
+    MATRICULADOS = Column(Integer)
+    ETAPA = Column(Integer)
+

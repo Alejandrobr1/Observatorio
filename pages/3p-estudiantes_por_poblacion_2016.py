@@ -86,14 +86,15 @@ def load_data(_engine, prefix, year):
                 POBLACION, COALESCE(SUM(MATRICULADOS), 0) as cantidad
             FROM {table_name}
             WHERE POBLACION IS NOT NULL AND POBLACION != '' AND POBLACION != 'SIN INFORMACION'
+              AND ETAPA = '1'
             GROUP BY POBLACION
             ORDER BY cantidad DESC
         """)
         result = connection.execute(query)
         df = pd.DataFrame(result.fetchall(), columns=["POBLACION", "cantidad"])
         
-        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name}")).scalar() or 0
-        total_poblacion = connection.execute(text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE POBLACION IS NOT NULL AND POBLACION != ''")).scalar() or 0
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1'")).scalar() or 0
+        total_poblacion = connection.execute(text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE ETAPA = '1' AND POBLACION IS NOT NULL AND POBLACION != ''")).scalar() or 0
         
         return df, total_matriculados, total_poblacion
 
