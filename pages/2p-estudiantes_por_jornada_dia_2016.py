@@ -40,10 +40,16 @@ except Exception as e:
 
 @st.cache_data
 def get_available_years(_engine, prefix):
-    with _engine.connect() as connection:
-        query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
-        result_tables = connection.execute(query_tables)
-        return sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
+    table_name = "Estudiantes_2016_2019" # Tabla consolidada
+    if prefix == "Estudiantes":
+        with _engine.connect() as connection:
+            # Verificar si la tabla consolidada existe
+            inspector = _engine.dialect.has_table(connection, table_name)
+            if inspector:
+                query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
+                result_years = connection.execute(query_years)
+                return [row[0] for row in result_years.fetchall()]
+    return [] # Retorna vacío si no es 'Estudiantes' o la tabla no existe
 
 col1, col2 = st.columns([1, 3])
 with col1:
@@ -75,13 +81,12 @@ st.sidebar.divider()
 # --- Carga de Datos ---
 @st.cache_data
 def load_data(_engine, prefix, year):
-    table_name = f"{prefix}_{year}"
+    # Si son estudiantes, usar la tabla consolidada. Si no, mantener la lógica anterior.
+    table_name = "Estudiantes_2016_2019" if prefix == "Estudiantes" else f"{prefix}_{year}"
     
     # Verificar si la tabla existe antes de consultarla
     with _engine.connect() as connection:
-        # Esta es una forma simple, para dialectos como MySQL. Puede variar.
-        table_exists_query = text(f"SHOW TABLES LIKE '{table_name}'")
-        if connection.execute(table_exists_query).fetchone() is None:
+        if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(columns=["DIA", "JORNADA", "cantidad"]), 0, 0, 0
 
     with _engine.connect() as connection:
@@ -92,16 +97,18 @@ def load_data(_engine, prefix, year):
             WHERE DIA IS NOT NULL AND DIA != '' AND DIA != 'SIN INFORMACION'
               AND JORNADA IS NOT NULL AND JORNADA != '' AND JORNADA != 'SIN INFORMACION'
               AND ETAPA = '1'
+              AND FECHA = :year
             GROUP BY DIA, JORNADA
             ORDER BY DIA, JORNADA
         """)
-        result = connection.execute(query)
+        result = connection.execute(query, {'year': year})
         df = pd.DataFrame(result.fetchall(), columns=["DIA", "JORNADA", "cantidad"])
         
         # Métricas
-        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1'")).scalar() or 0
-        total_jornadas = connection.execute(text(f"SELECT COUNT(DISTINCT JORNADA) FROM {table_name} WHERE ETAPA = '1' AND JORNADA IS NOT NULL AND JORNADA != ''")).scalar() or 0
-        total_dias = connection.execute(text(f"SELECT COUNT(DISTINCT DIA) FROM {table_name} WHERE ETAPA = '1' AND DIA IS NOT NULL AND DIA != ''")).scalar() or 0
+        params = {'year': year}
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year"), params).scalar() or 0
+        total_jornadas = connection.execute(text(f"SELECT COUNT(DISTINCT JORNADA) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year AND JORNADA IS NOT NULL AND JORNADA != ''"), params).scalar() or 0
+        total_dias = connection.execute(text(f"SELECT COUNT(DISTINCT DIA) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year AND DIA IS NOT NULL AND DIA != ''"), params).scalar() or 0
         
         return df, total_matriculados, total_jornadas, total_dias
 
