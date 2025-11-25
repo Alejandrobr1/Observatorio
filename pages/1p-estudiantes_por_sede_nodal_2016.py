@@ -42,7 +42,12 @@ def get_available_years(_engine, prefix):
     with _engine.connect() as connection:
         query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
         result_tables = connection.execute(query_tables)
-        return sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
+        years = []
+        for row in result_tables.fetchall():
+            parts = row[0].split('_')
+            if len(parts) > 1 and parts[1].isdigit():
+                years.append(parts[1])
+        return sorted(years, reverse=True)
 
 # --- Lógica de Estado y Filtros ---
 

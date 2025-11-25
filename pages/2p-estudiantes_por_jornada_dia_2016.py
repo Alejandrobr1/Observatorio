@@ -41,15 +41,21 @@ except Exception as e:
 @st.cache_data
 def get_available_years(_engine, prefix):
     table_name = "Estudiantes_2016_2019" # Tabla consolidada
-    if prefix == "Estudiantes":
-        with _engine.connect() as connection:
-            # Verificar si la tabla consolidada existe
-            inspector = _engine.dialect.has_table(connection, table_name)
-            if inspector:
+    with _engine.connect() as connection:
+        if prefix == "Estudiantes":
+            # Para estudiantes, usar la tabla consolidada
+            if _engine.dialect.has_table(connection, table_name):
                 query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
-                result_years = connection.execute(query_years)
-                return [row[0] for row in result_years.fetchall()]
-    return [] # Retorna vacío si no es 'Estudiantes' o la tabla no existe
+                return [row[0] for row in connection.execute(query_years).fetchall()]
+        else: # Para Docentes u otros, buscar tablas por año
+            query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
+            years = []
+            for row in connection.execute(query_tables).fetchall():
+                parts = row[0].split('_')
+                if len(parts) > 1 and parts[1].isdigit():
+                    years.append(parts[1])
+            return sorted(years, reverse=True)
+    return []
 
 col1, col2 = st.columns([1, 3])
 with col1:
