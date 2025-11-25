@@ -27,17 +27,18 @@ except Exception as e:
     st.stop()
 
 @st.cache_data
-def get_available_years(_engine, prefix):
+def get_available_years(_engine):
+    """Obtener los años disponibles en la tabla Docentes"""
     with _engine.connect() as connection:
-        query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
-        result_tables = connection.execute(query_tables)
-        return sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
+        query = text("SELECT DISTINCT FECHA FROM Docentes ORDER BY FECHA DESC")
+        result = connection.execute(query)
+        years = [str(row[0]) for row in result.fetchall()]
+        return sorted(years, reverse=True) if years else []
 
 # --- Lógica de Estado y Filtros ---
 selected_population = "Docentes" # Fijo para este reporte
-population_prefix = "Docentes"
 
-available_years = get_available_years(engine, population_prefix)
+available_years = get_available_years(engine)
 
 if not available_years:
     st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
@@ -55,20 +56,19 @@ st.sidebar.divider()
 
 # --- Carga de Datos ---
 @st.cache_data
-def load_data(_engine, prefix, year):
-    table_name = f"{prefix}_{year}"
+def load_data(_engine, year):
     with _engine.connect() as connection:
-        # Asumiendo que la tabla de docentes tiene una columna 'NIVEL' y 'MATRICULADOS' representa el conteo de docentes
-        query = text(f"""
+        # Consulta a la tabla Docentes usando los campos reales del modelo
+        query = text("""
             SELECT 
                 NIVEL,
-                COALESCE(SUM(MATRICULADOS), 0) as cantidad
-            FROM {table_name}
-            WHERE NIVEL IS NOT NULL AND NIVEL != '' AND NIVEL != 'SIN INFORMACION'
+                COUNT(*) as cantidad
+            FROM Docentes
+            WHERE FECHA = :year AND NIVEL IS NOT NULL AND NIVEL != '' AND NIVEL != 'SIN INFORMACION'
             GROUP BY NIVEL
             ORDER BY NIVEL ASC
         """)
-        result = connection.execute(query)
+        result = connection.execute(query, {'year': int(year)})
         df = pd.DataFrame(result.fetchall(), columns=["NIVEL", "cantidad"])
         
         total_docentes = df['cantidad'].sum()
@@ -77,7 +77,7 @@ def load_data(_engine, prefix, year):
         return df, total_docentes, total_niveles
 
 try:
-    df, total_docentes, total_niveles = load_data(engine, population_prefix, selected_year)
+    df, total_docentes, total_niveles = load_data(engine, selected_year)
 
     if df.empty:
         st.warning(f"⚠️ No hay datos de docentes por nivel para el año {selected_year}.")

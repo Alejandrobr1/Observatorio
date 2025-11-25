@@ -26,50 +26,21 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
-@st.cache_data
-def get_available_years(_engine, prefix):
-    with _engine.connect() as connection:
-        query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
-        result_tables = connection.execute(query_tables)
-        return sorted([row[0].split('_')[1] for row in result_tables.fetchall()], reverse=True)
-
-# --- Lógica de Estado y Filtros ---
-selected_population = "Estudiantes" # Fijo para este reporte
-population_prefix = "Estudiantes"
-
-available_years = get_available_years(engine, population_prefix)
-
-if not available_years:
-    st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
-    st.stop()
-
-if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
-    st.session_state.selected_year = available_years[0]
-
-selected_year = st.session_state.selected_year
-
-st.sidebar.header("🔍 Filtros Aplicados")
-st.sidebar.info(f"**Población:** {selected_population}")
-st.sidebar.info(f"**Año:** {selected_year}")
-st.sidebar.divider()
-
 # --- Carga de Datos ---
 @st.cache_data
-def load_data(_engine, prefix, year):
-    table_name = f"{prefix}_{year}"
+def load_data(_engine):
     with _engine.connect() as connection:
-        # Asumiendo que la columna 'POBLACION' contiene el nombre de la institución para este contexto
-        query = text(f"""
+        query = text("""
             SELECT 
-                POBLACION AS INSTITUCION,
-                COALESCE(SUM(MATRICULADOS), 0) as cantidad
-            FROM {table_name}
-            WHERE POBLACION IS NOT NULL AND POBLACION != '' AND POBLACION != 'SIN INFORMACION'
-            GROUP BY POBLACION
+                SEDE,
+                COUNT(*) as cantidad
+            FROM Estudiantes_escuela
+            WHERE SEDE IS NOT NULL AND SEDE != '' AND SEDE != 'SIN INFORMACION'
+            GROUP BY SEDE
             ORDER BY cantidad DESC
         """)
         result = connection.execute(query)
-        df = pd.DataFrame(result.fetchall(), columns=["INSTITUCION", "cantidad"])
+        df = pd.DataFrame(result.fetchall(), columns=["SEDE", "cantidad"])
         
         total_matriculados = df['cantidad'].sum()
         total_instituciones = len(df)
@@ -77,17 +48,17 @@ def load_data(_engine, prefix, year):
         return df, total_matriculados, total_instituciones
 
 try:
-    df, total_matriculados, total_instituciones = load_data(engine, population_prefix, selected_year)
+    df, total_matriculados, total_instituciones = load_data(engine)
 
     if df.empty:
-        st.warning(f"⚠️ No hay datos de estudiantes por institución para el año {selected_year}.")
+        st.warning(f"⚠️ No hay datos de estudiantes por institución. Verifique que la tabla 'Estudiantes_escuela' exista y contenga datos.")
     else:
         st.sidebar.header("📈 Estadísticas Generales")
-        st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{int(total_matriculados):,}")
-        st.sidebar.metric(f"Total Instituciones ({selected_year})", f"{total_instituciones:,}")
+        st.sidebar.metric(f"Total Registros", f"{int(total_matriculados):,}")
+        st.sidebar.metric(f"Total Instituciones", f"{total_instituciones:,}")
         st.sidebar.divider()
 
-        st.header(f"📊 Cantidad de Estudiantes por Institución - Año {selected_year}")
+        st.header(f"📊 Cantidad de Registros por Institución")
         
         df['cantidad'] = pd.to_numeric(df['cantidad'])
         df_sorted = df.sort_values('cantidad', ascending=True)
@@ -102,24 +73,12 @@ try:
             ax.text(width + (df_sorted['cantidad'].max() * 0.01), bar.get_y() + bar.get_height()/2, f'{int(width):,}', ha='left', va='center')
 
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(df_sorted['INSTITUCION'])
-        ax.set_xlabel('Cantidad de Estudiantes')
-        ax.set_title('Estudiantes por Institución Educativa')
+        ax.set_yticklabels(df_sorted['SEDE'])
+        ax.set_xlabel('Cantidad de Registros')
+        ax.set_title('Registros por Institución')
         ax.grid(axis='x', linestyle='--', alpha=0.6)
         plt.tight_layout()
         st.pyplot(fig)
-
-        # --- Selección de Año con Botones ---
-        st.divider()
-        with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
-            cols = st.columns(len(available_years))
-            def set_year(year):
-                st.session_state.selected_year = year
-
-            for i, year in enumerate(available_years):
-                with cols[i]:
-                    button_type = "primary" if year == selected_year else "secondary"
-                    st.button(year, key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
 
         st.header("📋 Tabla Detallada por Institución")
         st.dataframe(df, use_container_width=True, hide_index=True)
@@ -129,4 +88,3 @@ except Exception as e:
     st.exception(e)
     with st.expander("Ver detalles técnicos del error"):
         st.code(traceback.format_exc())
-

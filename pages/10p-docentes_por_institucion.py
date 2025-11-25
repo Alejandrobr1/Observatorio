@@ -32,12 +32,12 @@ def load_data(_engine):
     with _engine.connect() as connection:
         query = text("""
             SELECT 
-                i.NOMBRE_INSTITUCION,
-                COUNT(d.ID_DOCENTE) as cantidad
-            FROM Docentes d
-            JOIN Instituciones i ON d.ID_INSTITUCION = i.ID_INSTITUCION
-            GROUP BY i.NOMBRE_INSTITUCION
-            ORDER BY cantidad DESC;
+                INSTITUCION_EDUCATIVA,
+                COUNT(*) as cantidad
+            FROM Docentes
+            WHERE INSTITUCION_EDUCATIVA IS NOT NULL AND INSTITUCION_EDUCATIVA != '' AND INSTITUCION_EDUCATIVA != 'SIN INFORMACION'
+            GROUP BY INSTITUCION_EDUCATIVA
+            ORDER BY cantidad DESC
         """)
         try:
             result = connection.execute(query)
@@ -46,7 +46,7 @@ def load_data(_engine):
             total_instituciones = len(df)
             return df, total_docentes, total_instituciones
         except Exception as e:
-            # Manejar el caso donde las tablas no existen
+            # Manejar el caso donde la tabla no existe
             if "doesn't exist" in str(e):
                 return pd.DataFrame(columns=["INSTITUCION", "cantidad"]), 0, 0
             raise e
