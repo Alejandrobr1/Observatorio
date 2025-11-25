@@ -23,7 +23,7 @@ def get_engine():
     db_port = st.secrets["DB_PORT"]
     db_name = st.secrets["DB_NAME"]
     connection_string = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
-    return create_engine(connection_string)
+    return create_engine(connection_string, pool_pre_ping=True)
 
 # Inicializar conexión
 try:
@@ -40,15 +40,18 @@ except Exception as e:
 
 @st.cache_data
 def get_available_years(_engine, prefix):
+    table_name = "Estudiantes_2016_2019" # Tabla consolidada
     with _engine.connect() as connection:
-        query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
-        result_tables = connection.execute(query_tables)
-        years = []
-        for row in result_tables.fetchall():
-            parts = row[0].split('_')
-            if len(parts) > 1 and parts[1].isdigit():
-                years.append(parts[1])
-        return sorted(years, reverse=True)
+        if prefix == "Estudiantes":
+            # Para estudiantes, usar la tabla consolidada
+            if _engine.dialect.has_table(connection, table_name):
+                query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
+                return [row[0] for row in connection.execute(query_years).fetchall()]
+        else: # Para Docentes u otros, buscar tablas por año
+            query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
+            years = [row[0].split('_')[1] for row in connection.execute(query_tables).fetchall() if len(row[0].split('_')) > 1 and row[0].split('_')[1].isdigit()]
+            return sorted(years, reverse=True)
+    return []
 
 col1, col2 = st.columns([1, 3])
 with col1:
@@ -80,26 +83,28 @@ st.sidebar.divider()
 # --- Carga de Datos ---
 @st.cache_data
 def load_data(_engine, prefix, year):
-    table_name = f"{prefix}_{year}"
+    # Si son estudiantes, usar la tabla consolidada. Si no, mantener la lógica anterior.
+    table_name = "Estudiantes_2016_2019" if prefix == "Estudiantes" else f"{prefix}_{year}"
     with _engine.connect() as connection:
-        table_exists_query = text(f"SHOW TABLES LIKE '{table_name}'")
-        if connection.execute(table_exists_query).fetchone() is None:
+        if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(columns=["POBLACION", "cantidad"]), 0, 0
-    with _engine.connect() as connection:
+        params = {'year': year}
         query = text(f"""
             SELECT 
                 POBLACION, COALESCE(SUM(MATRICULADOS), 0) as cantidad
             FROM {table_name}
             WHERE POBLACION IS NOT NULL AND POBLACION != '' AND POBLACION != 'SIN INFORMACION'
               AND ETAPA = '1'
+              AND FECHA = :year
             GROUP BY POBLACION
             ORDER BY cantidad DESC
         """)
-        result = connection.execute(query)
+        result = connection.execute(query, params)
         df = pd.DataFrame(result.fetchall(), columns=["POBLACION", "cantidad"])
         
-        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1'")).scalar() or 0
-        total_poblacion = connection.execute(text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE ETAPA = '1' AND POBLACION IS NOT NULL AND POBLACION != ''")).scalar() or 0
+        # Métricas
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year"), params).scalar() or 0
+        total_poblacion = connection.execute(text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year AND POBLACION IS NOT NULL AND POBLACION != ''"), params).scalar() or 0
         
         return df, total_matriculados, total_poblacion
 
@@ -155,7 +160,7 @@ try:
             for i, year in enumerate(available_years):
                 with cols[i]:
                     button_type = "primary" if year == selected_year else "secondary"
-                    st.button(year, key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+                    st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
 
         # Tabla de datos detallada
         df['porcentaje'] = (pd.to_numeric(df['cantidad']) / float(total_matriculados) * 100) if total_matriculados > 0 else 0
