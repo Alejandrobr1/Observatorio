@@ -40,15 +40,18 @@ except Exception as e:
 
 @st.cache_data
 def get_available_years(_engine, prefix):
+    table_name = "Estudiantes_2016_2019" # Tabla consolidada
     with _engine.connect() as connection:
-        query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
-        result_tables = connection.execute(query_tables)
-        years = []
-        for row in result_tables.fetchall():
-            parts = row[0].split('_')
-            if len(parts) > 1 and parts[1].isdigit():
-                years.append(parts[1])
-        return sorted(years, reverse=True)
+        if prefix == "Estudiantes":
+            # Para estudiantes, usar la tabla consolidada
+            if _engine.dialect.has_table(connection, table_name):
+                query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
+                return [row[0] for row in connection.execute(query_years).fetchall()]
+        else: # Para Docentes u otros, buscar tablas por año
+            query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
+            years = [row[0].split('_')[1] for row in connection.execute(query_tables).fetchall() if len(row[0].split('_')) > 1 and row[0].split('_')[1].isdigit()]
+            return sorted(years, reverse=True)
+    return []
 
 col1, col2 = st.columns([1, 3])
 with col1:
@@ -80,26 +83,28 @@ st.sidebar.divider()
 # --- Carga de Datos ---
 @st.cache_data
 def load_data(_engine, prefix, year):
-    table_name = f"{prefix}_{year}"
+    # Si son estudiantes, usar la tabla consolidada. Si no, mantener la lógica anterior.
+    table_name = "Estudiantes_2016_2019" if prefix == "Estudiantes" else f"{prefix}_{year}"
     with _engine.connect() as connection:
-        table_exists_query = text(f"SHOW TABLES LIKE '{table_name}'")
-        if connection.execute(table_exists_query).fetchone() is None:
+        if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(columns=["SEDE_NODAL", "cantidad"]), 0, 0
-    with _engine.connect() as connection:
+        params = {'year': year}
         query = text(f"""
             SELECT 
                 SEDE_NODAL, COALESCE(SUM(MATRICULADOS), 0) as cantidad
             FROM {table_name}
             WHERE SEDE_NODAL IS NOT NULL AND SEDE_NODAL != '' AND SEDE_NODAL != 'SIN INFORMACION'
               AND ETAPA = '1'
+              AND FECHA = :year
             GROUP BY SEDE_NODAL
             ORDER BY cantidad DESC
         """)
-        result = connection.execute(query)
+        result = connection.execute(query, params)
         df = pd.DataFrame(result.fetchall(), columns=["SEDE_NODAL", "cantidad"])
         
-        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1'")).scalar() or 0
-        total_sedes = connection.execute(text(f"SELECT COUNT(DISTINCT SEDE_NODAL) FROM {table_name} WHERE ETAPA = '1' AND SEDE_NODAL IS NOT NULL AND SEDE_NODAL != ''")).scalar() or 0
+        # Métricas
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year"), params).scalar() or 0
+        total_sedes = connection.execute(text(f"SELECT COUNT(DISTINCT SEDE_NODAL) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year AND SEDE_NODAL IS NOT NULL AND SEDE_NODAL != ''"), params).scalar() or 0
         
         return df, total_matriculados, total_sedes
 
