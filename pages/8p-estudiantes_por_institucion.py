@@ -96,37 +96,14 @@ try:
         total_matriculados = connection.execute(query_total, {'year': selected_year}).scalar() or 0
         st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
         
-        query_grupo1 = text(f"SELECT SUM(GRUPO_1) FROM {table_name} WHERE FECHA = :year")
-        total_grupo1 = connection.execute(query_grupo1, {'year': selected_year}).scalar() or 0
-        st.sidebar.metric(f"Matriculados Grupo 1 ({selected_year})", f"{int(total_grupo1):,}")
-        
-        query_grupo2 = text(f"SELECT SUM(GRUPO_2) FROM {table_name} WHERE FECHA = :year")
-        total_grupo2 = connection.execute(query_grupo2, {'year': selected_year}).scalar() or 0
-        st.sidebar.metric(f"Matriculados Grupo 2 ({selected_year})", f"{int(total_grupo2):,}")
-
-        query_grupo3 = text(f"SELECT SUM(GRUPO_3) FROM {table_name} WHERE FECHA = :year")
-        total_grupo3 = connection.execute(query_grupo3, {'year': selected_year}).scalar() or 0
-        st.sidebar.metric(f"Matriculados Grupo 3 ({selected_year})", f"{int(total_grupo3):,}")
         st.sidebar.divider()
         
-        # Consultas para cada grupo
-        query_grupo1_data = text(f"SELECT INSTITUCION_EDUCATIVA as institucion, COALESCE(SUM(GRUPO_1), 0) as cantidad FROM {table_name} WHERE FECHA = :year AND INSTITUCION_EDUCATIVA IS NOT NULL AND INSTITUCION_EDUCATIVA != '' AND INSTITUCION_EDUCATIVA != 'SIN INFORMACION' GROUP BY institucion ORDER BY cantidad DESC")
-        df_grupo1 = pd.DataFrame(connection.execute(query_grupo1_data, {'year': selected_year}).fetchall(), columns=["institucion", "cantidad"])
+        # Consulta para obtener el total de matriculados por institución
+        query_total_data = text(f"SELECT INSTITUCION_EDUCATIVA as institucion, COALESCE(SUM(MATRICULADOS), 0) as cantidad FROM {table_name} WHERE FECHA = :year AND INSTITUCION_EDUCATIVA IS NOT NULL AND INSTITUCION_EDUCATIVA != '' AND INSTITUCION_EDUCATIVA != 'SIN INFORMACION' GROUP BY institucion ORDER BY cantidad DESC")
+        df_total = pd.DataFrame(connection.execute(query_total_data, {'year': selected_year}).fetchall(), columns=["institucion", "cantidad"])
 
-        query_grupo2_data = text(f"SELECT INSTITUCION_EDUCATIVA as institucion, COALESCE(SUM(GRUPO_2), 0) as cantidad FROM {table_name} WHERE FECHA = :year AND INSTITUCION_EDUCATIVA IS NOT NULL AND INSTITUCION_EDUCATIVA != '' AND INSTITUCION_EDUCATIVA != 'SIN INFORMACION' GROUP BY institucion ORDER BY cantidad DESC")
-        df_grupo2 = pd.DataFrame(connection.execute(query_grupo2_data, {'year': selected_year}).fetchall(), columns=["institucion", "cantidad"])
-
-        query_grupo3_data = text(f"SELECT INSTITUCION_EDUCATIVA as institucion, COALESCE(SUM(GRUPO_3), 0) as cantidad FROM {table_name} WHERE FECHA = :year AND INSTITUCION_EDUCATIVA IS NOT NULL AND INSTITUCION_EDUCATIVA != '' AND INSTITUCION_EDUCATIVA != 'SIN INFORMACION' GROUP BY institucion ORDER BY cantidad DESC")
-        df_grupo3 = pd.DataFrame(connection.execute(query_grupo3_data, {'year': selected_year}).fetchall(), columns=["institucion", "cantidad"])
-
-        # Layout de tres columnas
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            create_bar_chart_and_table(df_grupo1, total_grupo1, f"📊 Grupo 1 - Año {selected_year}")
-        with col2:
-            create_bar_chart_and_table(df_grupo2, total_grupo2, f"📊 Grupo 2 - Año {selected_year}")
-        with col3:
-            create_bar_chart_and_table(df_grupo3, total_grupo3, f"📊 Grupo 3 - Año {selected_year}")
+        # Visualización única para el total de matriculados
+        create_bar_chart_and_table(df_total, total_matriculados, f"📊 Total Matriculados por Institución - Año {selected_year}")
         
         # --- Selección de Año con Botones ---
         st.divider()
@@ -147,9 +124,6 @@ try:
         st.success(f"""
         ✅ **Datos cargados para el año {selected_year}**
         - **Total estudiantes matriculados**: {int(total_matriculados):,}
-        - **Matriculados Grupo 1**: {int(total_grupo1):,}
-        - **Matriculados Grupo 2**: {int(total_grupo2):,}
-        - **Matriculados Grupo 3**: {int(total_grupo3):,}
         """)
 
 except Exception as e:
