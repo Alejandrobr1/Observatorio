@@ -28,9 +28,9 @@ def create_nav_buttons(selected_pop):
             "Sede Nodal": "pages/1p-estudiantes_matriculados_por_sede_nodal.py",
             "Jornada/Día": "pages/2p-estudiantes_por_jornada_dia.py",
             "Población": "pages/3p-estudiantes_por_poblacion.py",
-            "Participación %": "pages/4p-estudiantes_matriculados_sede_porcentaje.py",
-            "Etapas (Pastel)": "pages/5p-comparativa_etapas_por_sede.py",
-            "Etapas (Barras)": "pages/6p-comparativa_etapas_barras.py",
+            "Participación %": "pages/4p-estudiantes_sede_etapa1_etapa2.py",
+            "Etapas (Pastel)": "pages/5p-estudiantes_por_sede_nodal_etapa1_2.py",
+            "Etapas (Barras)": "pages/6p-estudiantes_por_sede_nodal_barras_etp1_2.py",
             "Escuela Nueva (Sede)": "pages/7p-estudiantes_escuela_nueva.py",
             "Escuela Nueva (IE)": "pages/8p-estudiantes_por_institucion.py"
         }

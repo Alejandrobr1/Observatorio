@@ -24,14 +24,23 @@ def create_nav_buttons(selected_pop):
         st.page_link("app.py", label="Inicio", icon="🏠")
 
     if selected_pop == "Estudiantes Comfenalco":
-        with nav_cols[1]:
-            st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Sede Nodal", icon="🏫")
-        with nav_cols[2]:
-            st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Jornada y Día", icon="📅")
-        with nav_cols[3]:
-            st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Población", icon="👥")
-        with nav_cols[4]:
-            st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Escuela Nueva", icon="🏫")
+        links = {
+            "Sede Nodal": "pages/1p-estudiantes_matriculados_por_sede_nodal.py",
+            "Jornada/Día": "pages/2p-estudiantes_por_jornada_dia.py",
+            "Población": "pages/3p-estudiantes_por_poblacion.py",
+            "Participación %": "pages/4p-estudiantes_sede_etapa1_etapa2.py",
+            "Etapas (Pastel)": "pages/5p-estudiantes_por_sede_nodal_etapa1_2.py",
+            "Etapas (Barras)": "pages/6p-estudiantes_por_sede_nodal_barras_etp1_2.py",
+            "Escuela Nueva (Sede)": "pages/7p-estudiantes_escuela_nueva.py",
+            "Escuela Nueva (IE)": "pages/8p-estudiantes_por_institucion.py"
+        }
+        # Re-ajustar columnas para acomodar todos los botones
+        nav_cols = st.columns(len(links) + 1)
+        with nav_cols[0]:
+            st.page_link("app.py", label="Inicio", icon="🏠")
+        for i, (label, page) in enumerate(links.items()):
+            with nav_cols[i+1]:
+                st.page_link(page, label=label)
 
     elif selected_pop == "Docentes":
         with nav_cols[1]:
