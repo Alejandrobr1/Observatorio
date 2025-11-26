@@ -29,8 +29,8 @@ def create_nav_buttons(selected_pop):
             "Jornada/Día": "pages/2p-estudiantes_por_jornada_dia.py",
             "Población": "pages/3p-estudiantes_por_poblacion.py",
             "Participación %": "pages/4p-estudiantes_matriculados_sede_porcentaje.py",
-            "Etapas (Pastel)": "pages/5p-comparativa_etapas_por_sede.py",
-            "Etapas (Barras)": "pages/6p-comparativa_etapas_barras.py",
+            "Etapas (Pastel)": "pages/5p-estudiantes_por_sede_nodal_etapa1_2.py",
+            "Etapas (Barras)": "pages/6p-estudiantes_por_sede_nodal_barras_etp1_2.py",
             "Escuela Nueva (Sede)": "pages/7p-estudiantes_escuela_nueva.py",
             "Escuela Nueva (IE)": "pages/8p-estudiantes_por_institucion.py"
         }
@@ -170,6 +170,20 @@ def load_data(_engine, year):
         return df, total_estudiantes, total_instituciones
 
 try:
+    st.sidebar.header("Filtros")
+    selected_population = st.sidebar.selectbox(
+        "Filtrar por tipo de población",
+        ["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"],
+        index=["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"].index(st.session_state.population_filter),
+        key="population_filter",
+        help="Selecciona el grupo de datos a visualizar."
+    )
+    st.sidebar.divider()
+
+    if selected_population != "Estudiantes Colombo":
+        st.info(f"Este dashboard es para 'Estudiantes Colombo'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
+        st.stop()
+
     available_years = get_available_years(engine)
     if not available_years:
         st.warning("⚠️ No se encontraron datos para 'Estudiantes Colombo'.")
@@ -181,7 +195,6 @@ try:
 
     df_estudiantes, total_estudiantes, total_instituciones = load_data(engine, selected_year)
 
-    st.sidebar.header("🔍 Filtros Aplicados")
     st.sidebar.info(f"**Año:** {selected_year}")
     st.sidebar.divider()
     st.sidebar.header("📈 Estadísticas Generales")
