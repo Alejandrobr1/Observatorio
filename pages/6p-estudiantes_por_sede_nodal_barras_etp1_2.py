@@ -11,12 +11,12 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Etapa y Sede")
-st.title("📊 Comparativa de Estudiantes por Etapa y Sede")
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Etapa")
+st.title("📊 Comparativa de Estudiantes por Etapa y Sede Nodal")
 
 @st.cache_resource
 def get_engine():
-    # Lee desde st.secrets
+    # En producción (Streamlit Cloud), lee desde st.secrets
     db_user = st.secrets["DB_USER"]
     db_pass = st.secrets["DB_PASS"]
     db_host = st.secrets["DB_HOST"]
@@ -28,7 +28,6 @@ def get_engine():
 # Inicializar conexión
 try:
     engine = get_engine()
-    # No mostrar mensaje de éxito, es redundante.
     st.sidebar.page_link("app.py", label="Volver al Inicio", icon="🏠")
     st.sidebar.divider()
 except Exception as e:
@@ -41,24 +40,24 @@ except Exception as e:
 @st.cache_data
 def get_available_years(_engine, prefix):
     table_name = "Estudiantes_2016_2019" # Tabla consolidada
-    with _engine.connect() as connection:
-        if prefix == "Estudiantes":
+    if prefix == "Estudiantes":
+        with _engine.connect() as connection:
             if _engine.dialect.has_table(connection, table_name):
                 query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
                 years = [row[0] for row in connection.execute(query_years).fetchall()]
                 if years:
                     return years
-                st.warning(f"La tabla '{table_name}' no contiene años en la columna 'FECHA'. Usando año por defecto.")
+            else:
+                st.warning(f"La tabla '{table_name}' no existe. Usando año por defecto.")
                 return [pd.Timestamp.now().year]
-        else: # Para Docentes
+                st.warning(f"La tabla '{table_name}' no contiene años en la columna 'FECHA'. Usando año por defecto.")
+                return [pd.Timestamp.now().year] # Devuelve el año actual si no hay datos
+    else: # Para Docentes
+        with _engine.connect() as connection:
             query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
-            years = []
-            for row in connection.execute(query_tables).fetchall():
-                parts = row[0].split('_')
-                if len(parts) > 1 and parts[1].isdigit():
-                    years.append(parts[1])
+            years = [row[0].split('_')[1] for row in connection.execute(query_tables).fetchall() if len(row[0].split('_')) > 1 and row[0].split('_')[1].isdigit()]
             if years:
-                return sorted(list(set(years)), reverse=True)
+                return sorted(years, reverse=True)
     return []
 
 col1, col2 = st.columns([1, 3])
@@ -77,7 +76,6 @@ if not available_years:
     st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
     st.stop()
 
-# FORZAR REINICIO DEL AÑO: Si el año guardado en la sesión no es válido para
 # los datos de ESTA PÁGINA, se reinicia al año más reciente disponible.
 if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
     st.session_state.selected_year = available_years[0]
@@ -88,6 +86,50 @@ st.sidebar.header("🔍 Filtros Aplicados")
 st.sidebar.info(f"**Población:** {selected_population}")
 st.sidebar.info(f"**Año:** {selected_year}")
 st.sidebar.divider()
+
+# Función para generar gráfico de barras y tabla
+def create_bar_chart_and_table(df_data, total_etapa, title):
+    st.header(title)
+    
+    if df_data.empty:
+        st.warning("No hay datos para esta etapa.")
+        return
+
+    df_data['cantidad'] = pd.to_numeric(df_data['cantidad'])
+
+    # Crear el gráfico de barras verticales
+    fig, ax = plt.subplots(figsize=(10, 6))
+    colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_data)))
+    bars = ax.bar(df_data['SEDE_NODAL'], df_data['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
+
+    for bar in bars:
+        height = bar.get_height()
+        if height > 0:
+            ax.annotate(f'{int(height):,}',
+                        xy=(bar.get_x() + bar.get_width() / 2, height),
+                        xytext=(0, 3),
+                        textcoords="offset points",
+                        ha='center', va='bottom', fontsize=9, fontweight='bold')
+
+    ax.set_xlabel('Sede Nodal', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Cantidad de Matriculados', fontsize=12, fontweight='bold')
+    ax.set_title('Matriculados por Sede Nodal', fontsize=14, fontweight='bold', pad=20)
+    plt.xticks(rotation=45, ha="right")
+    max_val = df_data['cantidad'].max() if not df_data.empty else 1
+    ax.set_ylim(0, float(max_val) * 1.2)
+    ax.grid(axis='y', alpha=0.3, linestyle='--')
+    plt.tight_layout()
+    st.pyplot(fig)
+
+    st.subheader("📋 Resumen")
+    df_data['porcentaje'] = (df_data['cantidad'] / float(total_etapa) * 100) if total_etapa > 0 else 0
+    df_display = df_data.copy()
+    df_display['#'] = range(1, len(df_display) + 1)
+    df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
+    df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.1f}%")
+    df_display = df_display[['#', 'SEDE_NODAL', 'cantidad', 'porcentaje']]
+    df_display.columns = ['#', 'Sede Nodal', 'Matriculados', 'Porcentaje']
+    st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 # --- Carga de Datos ---
 @st.cache_data
@@ -124,53 +166,12 @@ try:
     st.sidebar.metric(f"Matriculados Etapa 1 ({selected_year})", f"{int(total_etapa1):,}")
     st.sidebar.metric(f"Matriculados Etapa 2 ({selected_year})", f"{int(total_etapa2):,}")
     st.sidebar.divider()
-    
-    # Unir los dataframes para el gráfico de barras agrupadas
-    df_merged = pd.merge(df_etapa1, df_etapa2, on='SEDE_NODAL', how='outer', suffixes=('_e1', '_e2')).fillna(0)
-    df_merged = df_merged.rename(columns={'cantidad_e1': 'Etapa 1', 'cantidad_e2': 'Etapa 2'})
-    df_merged['Total'] = df_merged['Etapa 1'] + df_merged['Etapa 2']
-    df_merged = df_merged.sort_values('Total', ascending=False)
 
-    if df_merged.empty:
-        st.warning(f"⚠️ No hay datos de matriculados por sede nodal para el año {selected_year}.")
-    else:
-        st.header(f"📊 Comparativa de Matriculados por Etapa y Sede Nodal - Año {selected_year}")
-        fig, ax = plt.subplots(figsize=(14, 8))
-        
-        sedes = df_merged['SEDE_NODAL']
-        n_sedes = len(sedes)
-        x = np.arange(n_sedes)
-        width = 0.4
-
-        bars1 = ax.bar(x - width/2, df_merged['Etapa 1'], width, label='Etapa 1', color='skyblue', edgecolor='black')
-        bars2 = ax.bar(x + width/2, df_merged['Etapa 2'], width, label='Etapa 2', color='lightcoral', edgecolor='black')
-
-        def add_labels(bars):
-            for bar in bars:
-                height = bar.get_height()
-                if height > 0:
-                    ax.annotate(f'{int(height):,}',
-                                xy=(bar.get_x() + bar.get_width() / 2, height),
-                                xytext=(0, 3),
-                                textcoords="offset points",
-                                ha='center', va='bottom', fontsize=9, fontweight='bold')
-        
-        add_labels(bars1)
-        add_labels(bars2)
-
-        ax.set_xlabel('Sede Nodal', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-        ax.set_title(f'Estudiantes Matriculados por Etapa y Sede Nodal\nAño {selected_year}',
-                     fontsize=16, fontweight='bold', pad=20)
-        ax.set_xticks(x)
-        ax.set_xticklabels(sedes, rotation=45, ha='right', fontsize=10)
-        ax.legend(title='Etapa', fontsize=10)
-        ax.grid(axis='y', alpha=0.3, linestyle='--')
-        
-        max_val = df_merged[['Etapa 1', 'Etapa 2']].max().max()
-        ax.set_ylim(0, float(max_val) * 1.2)
-        plt.tight_layout()
-        st.pyplot(fig)
+    col1, col2 = st.columns(2)
+    with col1:
+        create_bar_chart_and_table(df_etapa1, total_etapa1, f"📊 Etapa 1 - Año {selected_year}")
+    with col2:
+        create_bar_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
 
     # --- Selección de Año con Botones ---
     st.divider()
