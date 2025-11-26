@@ -14,6 +14,20 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 st.set_page_config(layout="wide", page_title="Estudiantes por Institución Escuela Nueva")
 st.title("📊 Estudiantes por Institución Educativa Escuela Nueva")
 
+# --- Barra de Navegación ---
+col_nav1, col_nav2, col_nav3, col_nav4, col_nav5, col_nav6, col_nav7 = st.columns(7)
+with col_nav1:
+    st.page_link("app.py", label="Inicio", icon="🏠")
+with col_nav2:
+    st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Sede Nodal", icon="🏫")
+with col_nav3:
+    st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Jornada y Día", icon="📅")
+with col_nav4:
+    st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Población", icon="👥")
+with col_nav5:
+    st.page_link("pages/9p-docentes_por_nivel.py", label="Docentes", icon="👨‍🏫")
+st.markdown("---")
+
 @st.cache_resource
 def get_engine():
     # Lee desde st.secrets
@@ -28,8 +42,6 @@ def get_engine():
 # Inicializar conexión
 try:
     engine = get_engine()
-    st.sidebar.page_link("app.py", label="Volver al Inicio", icon="🏠")
-    st.sidebar.divider()
 except Exception as e:
     st.error("❌ No se pudo conectar a la base de datos")
     st.exception(e)

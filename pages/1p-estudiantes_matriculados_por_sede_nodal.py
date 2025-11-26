@@ -14,6 +14,20 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes Comfenalco por Sede Nodal")
 st.title("📊 Estudiantes Matriculados por Sede Nodal (Comfenalco)")
 
+# --- Barra de Navegación ---
+col_nav1, col_nav2, col_nav3, col_nav4, col_nav5, col_nav6, col_nav7 = st.columns(7)
+with col_nav1:
+    st.page_link("app.py", label="Inicio", icon="🏠")
+with col_nav2:
+    st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Sede Nodal", icon="🏫")
+with col_nav3:
+    st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Jornada y Día", icon="📅")
+with col_nav4:
+    st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Población", icon="👥")
+with col_nav5:
+    st.page_link("pages/9p-docentes_por_nivel.py", label="Docentes", icon="👨‍🏫")
+st.markdown("---")
+
 @st.cache_resource
 def get_engine():
     db_user = st.secrets["DB_USER"]
@@ -27,8 +41,6 @@ def get_engine():
 # Inicializar conexión
 try:
     engine = get_engine()
-    st.sidebar.page_link("app.py", label="Volver al Inicio", icon="🏠")
-    st.sidebar.divider()
 except Exception as e:
     st.error("❌ No se pudo conectar a la base de datos")
     st.exception(e)
@@ -56,15 +68,14 @@ def get_available_years(_engine, prefix):
 
 # --- Lógica de Estado y Filtros ---
 
-# Selectores en la parte superior
-col1, _ = st.columns([1, 3])
-with col1:
-    selected_population = st.selectbox(
-        "Filtrar por tipo de población",
-        ["Estudiantes", "Docentes"],
-        key="population_filter",
-        help="Selecciona si quieres ver datos de Estudiantes o Docentes."
-    )
+st.sidebar.header("Filtros Principales")
+selected_population = st.sidebar.selectbox(
+    "Filtrar por tipo de población",
+    ["Estudiantes", "Docentes"],
+    key="population_filter",
+    help="Selecciona si quieres ver datos de Estudiantes o Docentes."
+)
+st.sidebar.divider()
 
 population_prefix = "Estudiantes" if selected_population == "Estudiantes" else "Docentes"
 available_years = get_available_years(engine, population_prefix)
