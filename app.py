@@ -130,15 +130,11 @@ with tab2:
     
     # Nueva sección para los dashboards de producción
     st.markdown("#### 📊 Análisis de Matrículas")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.page_link("pages/1p-estudiantes_por_sede_nodal_2016.py", label="Matriculados por Sede Nodal", icon="🏫")
-        st.page_link("pages/2p-estudiantes_por_jornada_dia_2016.py", label="Matriculados por Jornada y Día", icon="📅")
-        st.page_link("pages/3p-estudiantes_por_poblacion_2016.py", label="Matriculados por Población", icon="👥")
-    with col2:
-        st.page_link("pages/4p-estudiantes_participacion_porcentaje_2016.py", label="Participación % por Sede Nodal", icon="🥧")
-        st.page_link("pages/5p-estudiantes_por_sede_nodal_2017.py", label="Comparativa de Etapas por Sede", icon="⚖️")
-        st.page_link("pages/6p-estudiantes_por_sede_nodal_2017_barras.py", label="Estudiantes por Etapa (Barras)", icon="📊")
+    
+    st.page_link("pages/1p-estudiantes_por_sede_nodal_2016.py", label="Matriculados por Sede Nodal (2016-2019)", icon="🏫")
+    # st.page_link("pages/2p-estudiantes_por_jornada_dia_2016.py", label="Matriculados por Jornada y Día", icon="📅")
+    # st.page_link("pages/3p-estudiantes_por_poblacion_2016.py", label="Matriculados por Población", icon="👥")
+    
     st.divider()
 
     # Nueva sección para los dashboards de Colombo
