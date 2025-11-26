@@ -2,7 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import traceback
-from sqlalchemy import text, create_engine
+from sqlalchemy import create_engine, text
 import sys 
 import os
 import numpy as np
@@ -10,14 +10,12 @@ import numpy as np
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-
 # Configurar streamlit
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Sede Nodal")
 st.title("📊 Estudiantes Matriculados por Sede Nodal")
 
 @st.cache_resource
 def get_engine():
-    # En producción (Streamlit Cloud), lee desde st.secrets
     db_user = st.secrets["DB_USER"]
     db_pass = st.secrets["DB_PASS"]
     db_host = st.secrets["DB_HOST"]
@@ -42,11 +40,10 @@ def get_available_years(_engine, prefix):
     table_name = "Estudiantes_2016_2019" # Tabla consolidada
     with _engine.connect() as connection:
         if prefix == "Estudiantes":
-            # Para estudiantes, usar la tabla consolidada
             if _engine.dialect.has_table(connection, table_name):
                 query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
                 return [row[0] for row in connection.execute(query_years).fetchall()]
-        else: # Para Docentes u otros, buscar tablas por año
+        else: # Para Docentes
             query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
             years = [row[0].split('_')[1] for row in connection.execute(query_tables).fetchall() if row[0].split('_')[1].isdigit()]
             return sorted(years, reverse=True)
@@ -55,7 +52,7 @@ def get_available_years(_engine, prefix):
 # --- Lógica de Estado y Filtros ---
 
 # Selectores en la parte superior
-col1, col2 = st.columns([1, 3])
+col1, _ = st.columns([1, 3])
 with col1:
     selected_population = st.selectbox(
         "Filtrar por tipo de población",
@@ -71,8 +68,6 @@ if not available_years:
     st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
     st.stop()
 
-# FORZAR REINICIO DEL AÑO: Si el año guardado en la sesión no es válido para
-# los datos de ESTA PÁGINA, se reinicia al año más reciente disponible.
 if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
     st.session_state.selected_year = available_years[0]
 
@@ -85,7 +80,6 @@ st.sidebar.divider()
 # --- Carga de Datos ---
 @st.cache_data
 def load_data(_engine, prefix, year):
-    # Si son estudiantes, usar la tabla consolidada. Si no, mantener la lógica anterior.
     table_name = "Estudiantes_2016_2019" if prefix == "Estudiantes" else f"{prefix}_{year}"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
@@ -108,13 +102,13 @@ def load_data(_engine, prefix, year):
         return pd.DataFrame(result.fetchall(), columns=["SEDE_NODAL", "cantidad"])
 
 try:
-    df = load_data(engine, population_prefix, selected_year)
+    df = load_data(engine, "Estudiantes", selected_year)
 
     if df.empty:
         st.warning(f"⚠️ No hay datos de matriculados por sede nodal para el año {selected_year}.")
     else:
         # --- Visualización ---
-        
+
         # Información general
         st.sidebar.header("📈 Estadísticas Generales")
         total_matriculados = pd.to_numeric(df['cantidad']).sum()
@@ -124,11 +118,11 @@ try:
         st.sidebar.divider()
 
         # Crear gráfico de barras horizontales
-        st.header(f"📊 Matriculados por Sede Nodal - Año {selected_year}")
-        
+        st.header(f"📊 Matriculados por Sede Nodal (Etapa 1) - Año {selected_year}")
+
         df['cantidad'] = pd.to_numeric(df['cantidad'])
         df_sorted = df.sort_values('cantidad', ascending=True)
-        
+
         fig, ax = plt.subplots(figsize=(12, max(8, len(df_sorted) * 0.5)))
         y_pos = range(len(df_sorted))
         colors_gradient = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_sorted)))
@@ -137,14 +131,14 @@ try:
         for i, (bar, valor) in enumerate(zip(bars, df_sorted['cantidad'])):
             ax.text(valor, i, f'  {int(valor):,}', ha='left', va='center', color='black', fontsize=10, fontweight='bold')
         
-        ax.set_yticks(y_pos)
+        ax.set_yticks(y_pos, labels=df_sorted['SEDE_NODAL'])
         ax.set_yticklabels(df_sorted['SEDE_NODAL'], fontsize=10)
         ax.set_xlabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
         ax.set_ylabel('Sede Nodal', fontsize=13, fontweight='bold')
         ax.set_title(f'Estudiantes Matriculados por Sede Nodal\nAño {selected_year}', fontsize=16, fontweight='bold', pad=20)
         
         max_val = df_sorted['cantidad'].max() if not df_sorted.empty else 1
-        ax.set_xlim(0, float(max_val) * 1.15)
+        ax.set_xlim(right=float(max_val) * 1.15)
         ax.grid(axis='x', alpha=0.3, linestyle='--')
         plt.tight_layout()
         st.pyplot(fig)
@@ -153,16 +147,16 @@ try:
         st.divider()
         with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
             st.write("Haz clic en un botón para cambiar el año de los datos mostrados en los gráficos.")
-            
+
             cols = st.columns(len(available_years))
-            
+
             def set_year(year):
                 st.session_state.selected_year = year
 
             for i, year in enumerate(available_years):
                 with cols[i]:
                     button_type = "primary" if year == selected_year else "secondary"
-                    st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), type=button_type, use_container_width=True)
+                    st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), use_container_width=True, type=button_type)
 
         # Tabla resumen
         df['porcentaje'] = (df['cantidad'] / float(total_matriculados) * 100) if total_matriculados > 0 else 0
@@ -176,11 +170,11 @@ try:
         st.dataframe(df_display, use_container_width=True, hide_index=True)
 
         # --- Información de Éxito ---
-        st.success(f"""
+        st.info(f"""
         ✅ **Datos cargados exitosamente**
         
         📌 **Información del reporte:**
-        - **Año**: {selected_year}
+        - **Año seleccionado**: {selected_year}
         - **Total estudiantes matriculados**: {int(total_matriculados):,}
         - **Total sedes nodales**: {total_sedes}
         """)
