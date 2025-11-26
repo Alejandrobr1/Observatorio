@@ -23,3 +23,6 @@ runOnOpen = true
 [runner]
 # Asegurar que se ejecuta desde la raíz
 magicEnabled = true
+
+[client]
+showSidebarNavigation = false
