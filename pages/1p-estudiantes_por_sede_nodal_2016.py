@@ -71,12 +71,12 @@ if not available_years:
     st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
     st.stop()
 
-# Inicializar el estado de la sesión para el año si no existe o si cambió la población
+# FORZAR REINICIO DEL AÑO: Si el año guardado en la sesión no es válido para
+# los datos de ESTA PÁGINA, se reinicia al año más reciente disponible.
 if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
     st.session_state.selected_year = available_years[0]
 
 selected_year = st.session_state.selected_year
-
 st.sidebar.header("🔍 Filtros Aplicados")
 st.sidebar.info(f"**Población:** {selected_population}")
 st.sidebar.info(f"**Año:** {selected_year}")

@@ -69,7 +69,7 @@ if not available_years:
     st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
     st.stop()
 
-# Inicializar el estado de la sesión para el año si no existe o si cambió la población
+# los datos de ESTA PÁGINA, se reinicia al año más reciente disponible.
 if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
     st.session_state.selected_year = available_years[0]
 
