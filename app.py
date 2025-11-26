@@ -153,8 +153,8 @@ with tab2:
             st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población", icon="👥")
             st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede", icon="🥧")
         with col2:
-            st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa Etapas por Sede (Pastel)", icon="⚖️")
-            st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa Etapas por Sede (Barras)", icon="📊")
+            st.page_link("pages/5p-estudiantes_por_sede_nodal_etapa1_2.py", label="Comparativa Etapas por Sede (Pastel)", icon="⚖️")
+            st.page_link("pages/6p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Comparativa Etapas por Sede (Barras)", icon="📊")
             st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Estudiantes por Grupo y Sede (Escuela Nueva)", icon="🏫")
             st.page_link("pages/8p-estudiantes_por_institucion.py", label="Estudiantes por Institución (Escuela Nueva)", icon="🏛️")
 
