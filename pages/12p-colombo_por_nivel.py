@@ -14,6 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes Colombo por Nivel")
 st.title("📊 Estudiantes Colombo por Nivel")
 
+<<<<<<< HEAD
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
     st.session_state.population_filter = "Estudiantes Colombo"
@@ -55,6 +56,20 @@ def create_nav_buttons(selected_pop):
             st.page_link("pages/12p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
 
 create_nav_buttons(st.session_state.population_filter)
+=======
+# --- Barra de Navegación ---
+col_nav1, col_nav2, col_nav3, col_nav4, col_nav5, col_nav6, col_nav7 = st.columns(7)
+with col_nav1:
+    st.page_link("app.py", label="Inicio", icon="🏠")
+with col_nav2:
+    st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Sede Nodal", icon="🏫")
+with col_nav3:
+    st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Jornada y Día", icon="📅")
+with col_nav4:
+    st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Población", icon="👥")
+with col_nav5:
+    st.page_link("pages/9p-docentes_por_nivel.py", label="Docentes", icon="👨‍🏫")
+>>>>>>> parent of f88edc4 (filtros colombo)
 st.markdown("---")
 
 @st.cache_resource
@@ -170,20 +185,6 @@ def load_data(_engine, year):
         return df, total_estudiantes, total_niveles
 
 try:
-    st.sidebar.header("Filtros")
-    selected_population = st.sidebar.selectbox(
-        "Filtrar por tipo de población",
-        ["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"],
-        index=["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"].index(st.session_state.population_filter),
-        key="population_filter",
-        help="Selecciona el grupo de datos a visualizar."
-    )
-    st.sidebar.divider()
-
-    if selected_population != "Estudiantes Colombo":
-        st.info(f"Este dashboard es para 'Estudiantes Colombo'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
-        st.stop()
-
     available_years = get_available_years(engine)
     if not available_years:
         st.warning("⚠️ No se encontraron datos para 'Estudiantes Colombo'.")
@@ -195,6 +196,7 @@ try:
 
     df_estudiantes, total_estudiantes, total_niveles = load_data(engine, selected_year)
 
+    st.sidebar.header("🔍 Filtros Aplicados")
     st.sidebar.info(f"**Año:** {selected_year}")
     st.sidebar.divider()
     st.sidebar.header("📈 Estadísticas Generales")
