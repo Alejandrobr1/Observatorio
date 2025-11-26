@@ -105,6 +105,11 @@ with tab1:
         """)
     
     with col2:
+        # Añadir el logo
+        logo_path = "assets/Logo_rionegro.png"
+        if os.path.exists(logo_path):
+            st.image(logo_path, width=250) # Ajusta el ancho según sea necesario
+
         try:
             engine = get_engine()
             with engine.connect() as conn:
