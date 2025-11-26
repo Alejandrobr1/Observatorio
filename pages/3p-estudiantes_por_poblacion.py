@@ -28,7 +28,6 @@ def get_engine():
 # Inicializar conexión
 try:
     engine = get_engine()
-    st.sidebar.success("✅ Conexión establecida")
     st.sidebar.page_link("app.py", label="Volver al Inicio", icon="🏠")
     st.sidebar.divider()
 except Exception as e:
@@ -41,16 +40,21 @@ except Exception as e:
 @st.cache_data
 def get_available_years(_engine, prefix):
     table_name = "Estudiantes_2016_2019" # Tabla consolidada
-    with _engine.connect() as connection:
-        if prefix == "Estudiantes":
-            # Para estudiantes, usar la tabla consolidada
+    if prefix == "Estudiantes":
+        with _engine.connect() as connection:
             if _engine.dialect.has_table(connection, table_name):
                 query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
-                return [row[0] for row in connection.execute(query_years).fetchall()]
-        else: # Para Docentes u otros, buscar tablas por año
+                years = [row[0] for row in connection.execute(query_years).fetchall()]
+                if years:
+                    return years
+                st.warning(f"La tabla '{table_name}' no contiene años en la columna 'FECHA'. Usando año por defecto.")
+                return [pd.Timestamp.now().year] # Devuelve el año actual si no hay datos
+    else: # Para Docentes
+        with _engine.connect() as connection:
             query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
             years = [row[0].split('_')[1] for row in connection.execute(query_tables).fetchall() if len(row[0].split('_')) > 1 and row[0].split('_')[1].isdigit()]
-            return sorted(years, reverse=True)
+            if years:
+                return sorted(years, reverse=True)
     return []
 
 col1, col2 = st.columns([1, 3])
@@ -173,15 +177,6 @@ try:
         df_display.columns = ['#', 'Población', 'Matriculados', 'Porcentaje']
         st.header("📋 Tabla Detallada por Población")
         st.dataframe(df_display, use_container_width=True, hide_index=True)
-        
-        st.success(f"""
-        ✅ **Datos cargados exitosamente**
-        
-        📌 **Información del reporte:**
-        - **Año**: {selected_year}
-        - **Total estudiantes matriculados**: {int(total_matriculados):,}
-        - **Total tipos de población**: {total_poblacion}
-        """)
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
