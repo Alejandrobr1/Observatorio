@@ -56,6 +56,19 @@ def create_nav_buttons(selected_pop):
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
+st.markdown("""
+<style>
+    /* Style for page links */
+    a[data-testid="stPageLink"] {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 8px;
+        text-align: center;
+        display: block;
+        text-decoration: none;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 @st.cache_resource
 def get_engine():
@@ -165,6 +178,9 @@ try:
         st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
         st.sidebar.metric(f"Total Sedes Nodales ({selected_year})", f"{total_sedes:,}")
         st.sidebar.divider()
+        # Añadir el logo al final del sidebar
+        if os.path.exists("assets/Logo_rionegro.png"):
+            st.sidebar.image("assets/Logo_rionegro.png")
 
         # Crear gráfico de barras horizontales
         st.header(f"📊 Matriculados por Sede Nodal (Etapa 1) - Año {selected_year}")

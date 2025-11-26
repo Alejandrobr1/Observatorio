@@ -56,6 +56,19 @@ def create_nav_buttons(selected_pop):
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
+st.markdown("""
+<style>
+    /* Style for page links */
+    a[data-testid="stPageLink"] {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 8px;
+        text-align: center;
+        display: block;
+        text-decoration: none;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 @st.cache_resource
 def get_engine():
@@ -201,6 +214,9 @@ try:
     st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{int(total_estudiantes):,}")
     st.sidebar.metric(f"Instituciones ({selected_year})", f"{int(total_instituciones):,}")
     st.sidebar.divider()
+    # Añadir el logo al final del sidebar
+    if os.path.exists("assets/Logo_rionegro.png"):
+        st.sidebar.image("assets/Logo_rionegro.png")
 
     create_bar_chart_and_table(df_estudiantes, total_estudiantes, "Distribución de Estudiantes Colombo por Institución")
     
