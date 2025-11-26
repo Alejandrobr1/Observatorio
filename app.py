@@ -136,9 +136,9 @@ with tab2:
     st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Matriculados por Sede Nodal (Comfenalco)", icon="🏫")
     st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día (Comfenalco)", icon="📅")
     st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población (Comfenalco)", icon="👥")
-    st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede (Comfenalco)", icon="🥧")
-    st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa de Etapas por Sede (Comfenalco)", icon="⚖️")
-    st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa de Etapas por Sede (Comfenalco)", icon="📊")
+    st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede (Comfenalco, Etapa 1)", icon="🥧")
+    st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa Etapas por Sede (Comfenalco, Pastel)", icon="⚖️")
+    st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa Etapas por Sede (Comfenalco, Barras)", icon="📊")
     st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Estudiantes por Grupo y Sede (Escuela Nueva)", icon="🏫")
     st.page_link("pages/8p-estudiantes_por_institucion.py", label="Estudiantes por Institución (Escuela Nueva)", icon="🏛️")
     
