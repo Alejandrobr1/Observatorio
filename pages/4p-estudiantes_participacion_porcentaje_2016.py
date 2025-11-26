@@ -79,23 +79,38 @@ st.sidebar.header("🔍 Filtros Aplicados")
 st.sidebar.info(f"**Población:** {selected_population}")
 st.sidebar.info(f"**Año:** {selected_year}")
 st.sidebar.divider()
+st.sidebar.header("📊 Filtros Adicionales")
+selected_stage = st.sidebar.selectbox(
+    "Filtrar por Etapa",
+    ["Ambas", "Etapa 1", "Etapa 2"],
+    key="stage_filter",
+    help="Selecciona la etapa de los estudiantes a visualizar."
+)
 
 # --- Carga de Datos ---
 @st.cache_data
-def load_data(_engine, prefix, year):
+def load_data(_engine, prefix, year, stage):
     # Si son estudiantes, usar la tabla consolidada. Si no, mantener la lógica anterior.
     table_name = "Estudiantes_2016_2019" if prefix == "Estudiantes" else f"{prefix}_{year}"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(columns=["SEDE_NODAL", "cantidad"]), 0, 0
         params = {'year': year}
+        
+        # Construir el filtro de etapa dinámicamente
+        stage_filter = ""
+        if stage == "Etapa 1":
+            stage_filter = "AND ETAPA = '1'"
+        elif stage == "Etapa 2":
+            stage_filter = "AND ETAPA = '2'"
+
         query = text(f"""
             SELECT 
                 SEDE_NODAL, COALESCE(SUM(MATRICULADOS), 0) as cantidad
             FROM {table_name}
             WHERE SEDE_NODAL IS NOT NULL AND SEDE_NODAL != '' AND SEDE_NODAL != 'SIN INFORMACION'
-              AND ETAPA = '1'
               AND FECHA = :year
+              {stage_filter}
             GROUP BY SEDE_NODAL
             ORDER BY cantidad DESC
         """)
@@ -103,22 +118,23 @@ def load_data(_engine, prefix, year):
         df = pd.DataFrame(result.fetchall(), columns=["SEDE_NODAL", "cantidad"])
         
         # Métricas
-        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year"), params).scalar() or 0
-        total_sedes = connection.execute(text(f"SELECT COUNT(DISTINCT SEDE_NODAL) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year AND SEDE_NODAL IS NOT NULL AND SEDE_NODAL != ''"), params).scalar() or 0
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE FECHA = :year {stage_filter}"), params).scalar() or 0
+        total_sedes = connection.execute(text(f"SELECT COUNT(DISTINCT SEDE_NODAL) FROM {table_name} WHERE FECHA = :year {stage_filter} AND SEDE_NODAL IS NOT NULL AND SEDE_NODAL != ''"), params).scalar() or 0
         
         return df, total_matriculados, total_sedes
 
 try:
-    df, total_matriculados, total_sedes = load_data(engine, population_prefix, selected_year)
+    df, total_matriculados, total_sedes = load_data(engine, population_prefix, selected_year, selected_stage)
 
     # --- Visualización ---
     st.sidebar.header("📈 Estadísticas Generales")
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
+    stage_label = "Ambas Etapas" if selected_stage == "Ambas" else selected_stage
+    st.sidebar.metric(f"Total Matriculados ({stage_label}, {selected_year})", f"{int(total_matriculados):,}")
     st.sidebar.metric(f"Total Sedes Nodales ({selected_year})", f"{total_sedes:,}")
     st.sidebar.divider()
 
     if df.empty:
-        st.warning(f"⚠️ No hay datos de matriculados por sede nodal para el año {selected_year}.")
+        st.warning(f"⚠️ No hay datos de matriculados por sede nodal para el año {selected_year} con el filtro de etapa '{stage_label}'.")
     else:
         # Convertir cantidad a numérico para evitar errores de tipo
         df['cantidad'] = pd.to_numeric(df['cantidad'])
