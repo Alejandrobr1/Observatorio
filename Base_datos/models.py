@@ -35,3 +35,10 @@ class Escuela_nueva(Base):
     GRUPO_2 = Column(Integer)
     GRUPO_3 = Column(Integer)
     MATRICULADOS = Column(Integer)
+
+class Estudiantes_Colombo(Base):
+    __tablename__ = 'Estudiantes_Colombo'
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    FECHA = Column(Integer)
+    INSTITUCION_EDUCATIVA = Column(String(255))
+    NIVEL = Column(String(100))

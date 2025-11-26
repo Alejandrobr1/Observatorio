@@ -140,6 +140,13 @@ with tab2:
         st.page_link("pages/5p-estudiantes_por_sede_nodal_2017.py", label="Comparativa de Etapas por Sede", icon="⚖️")
         st.page_link("pages/6p-estudiantes_por_sede_nodal_2017_barras.py", label="Estudiantes por Etapa (Barras)", icon="📊")
     st.divider()
+
+    # Nueva sección para los dashboards de Colombo
+    st.markdown("#### 🇨🇴 Análisis Colombo Americano")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.page_link("pages/11p-colombo_por_institucion.py", label="Colombo - Estudiantes por Institución", icon="🏫")
+        st.page_link("pages/12p-colombo_por_nivel.py", label="Colombo - Estudiantes por Nivel", icon="📈")
     
     st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")
 
