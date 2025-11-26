@@ -136,7 +136,7 @@ with tab2:
     st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Matriculados por Sede Nodal (2016-2019)", icon="🏫")
     st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día (2016-2019)", icon="📅")
     st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población (2016-2019)", icon="👥")
-    st.page_link("pages/4p-estudiantes_participacion_por_sede.py", label="Participación % por Sede Nodal (2016-2019)", icon="🥧")
+    st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede Nodal (2016-2019)", icon="🥧")
     
     st.divider()
 
