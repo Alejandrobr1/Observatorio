@@ -140,6 +140,7 @@ with tab2:
     st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa de Etapas por Sede (Pastel)", icon="⚖️")
     st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa de Etapas por Sede (Barras)", icon="📊")
     st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Estudiantes por Grupo y Sede (Escuela Nueva)", icon="🏫")
+    st.page_link("pages/8p-estudiantes_por_institucion.py", label="Estudiantes por Institución (Escuela Nueva)", icon="🏛️")
     
     st.divider()
 
