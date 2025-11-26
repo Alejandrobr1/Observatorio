@@ -137,7 +137,8 @@ with tab2:
     st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día (2016-2019)", icon="📅")
     st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población (2016-2019)", icon="👥")
     st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede (Etapa 1)", icon="🥧")
-    st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa de Etapas por Sede", icon="⚖️")
+    st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa de Etapas por Sede (Pastel)", icon="⚖️")
+    st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa de Etapas por Sede (Barras)", icon="📊")
     
     st.divider()
 
