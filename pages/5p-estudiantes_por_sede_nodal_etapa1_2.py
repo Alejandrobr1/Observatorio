@@ -28,8 +28,6 @@ def get_engine():
 # Inicializar conexión
 try:
     engine = get_engine()
-    st.sidebar.page_link("app.py", label="Volver al Inicio", icon="🏠")
-    st.sidebar.divider()
 except Exception as e:
     st.error("❌ No se pudo conectar a la base de datos")
     st.exception(e)
