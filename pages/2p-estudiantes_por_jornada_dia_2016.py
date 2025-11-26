@@ -28,7 +28,6 @@ def get_engine():
 # Inicializar conexión
 try:
     engine = get_engine()
-    st.sidebar.success("✅ Conexión establecida")
     st.sidebar.page_link("app.py", label="Volver al Inicio", icon="🏠")
     st.sidebar.divider()
 except Exception as e:
@@ -195,16 +194,6 @@ try:
         df_display['Total por Día'] = df_pivot.sum(axis=1).astype(int).apply('{:,}'.format)
         st.header("📋 Tabla Detallada")
         st.dataframe(df_display, use_container_width=True)
-        
-        st.success(f"""
-        ✅ **Datos cargados exitosamente**
-        
-        📌 **Información del reporte:**
-        - **Año**: {selected_year}
-        - **Total estudiantes matriculados**: {int(total_matriculados):,}
-        - **Total jornadas**: {total_jornadas}
-        - **Total días**: {total_dias}
-        """)
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")

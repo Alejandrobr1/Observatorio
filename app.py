@@ -118,7 +118,9 @@ with tab1:
             col2.metric("👥 Total de Personas", personas_count)
             col2.metric("🏫 Instituciones", inst_count)
         except Exception as e:
-            st.warning(f"No se pudo conectar a la base de datos: {e}")
+            # Si hay un error de conexión, no se muestran las métricas,
+            # pero se evita mostrar un mensaje de error al usuario en esta sección.
+            pass
 
 
 with tab2:
@@ -132,7 +134,7 @@ with tab2:
     st.markdown("#### 📊 Análisis de Matrículas")
     
     st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Matriculados por Sede Nodal (2016-2019)", icon="🏫")
-    # st.page_link("pages/2p-estudiantes_por_jornada_dia_2016.py", label="Matriculados por Jornada y Día", icon="📅")
+    st.page_link("pages/2p-estudiantes_por_jornada_dia_2016.py", label="Matriculados por Jornada y Día (2016-2019)", icon="📅")
     # st.page_link("pages/3p-estudiantes_por_poblacion_2016.py", label="Matriculados por Población", icon="👥")
     
     st.divider()

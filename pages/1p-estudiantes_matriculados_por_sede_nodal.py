@@ -27,7 +27,6 @@ def get_engine():
 # Inicializar conexión
 try:
     engine = get_engine()
-    st.sidebar.success("✅ Conexión establecida")
     st.sidebar.page_link("app.py", label="Volver al Inicio", icon="🏠")
     st.sidebar.divider()
 except Exception as e:
@@ -168,16 +167,6 @@ try:
         df_display.columns = ['#', 'Sede Nodal', 'Matriculados', 'Porcentaje']
         st.header("📋 Tabla Detallada por Sede Nodal")
         st.dataframe(df_display, use_container_width=True, hide_index=True)
-
-        # --- Información de Éxito ---
-        st.info(f"""
-        ✅ **Datos cargados exitosamente**
-        
-        📌 **Información del reporte:**
-        - **Año seleccionado**: {selected_year}
-        - **Total estudiantes matriculados**: {int(total_matriculados):,}
-        - **Total sedes nodales**: {total_sedes}
-        """)
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
