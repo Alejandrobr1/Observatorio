@@ -12,8 +12,41 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Etapa")
-st.title("📊 Comparativa de Estudiantes por Etapa y Sede Nodal")
+st.title("📊 Comparativa de Estudiantes por Etapa y Sede (Comfenalco)")
 
+# --- State and Navigation ---
+if 'population_filter' not in st.session_state:
+    st.session_state.population_filter = "Estudiantes Comfenalco"
+
+def create_nav_buttons(selected_pop):
+    nav_cols = st.columns(8)
+    with nav_cols[0]:
+        st.page_link("app.py", label="Inicio", icon="🏠")
+
+    if selected_pop == "Estudiantes Comfenalco":
+        with nav_cols[1]:
+            st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Sede Nodal", icon="🏫")
+        with nav_cols[2]:
+            st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Jornada y Día", icon="📅")
+        with nav_cols[3]:
+            st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Población", icon="👥")
+        with nav_cols[4]:
+            st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Escuela Nueva", icon="🏫")
+
+    elif selected_pop == "Docentes":
+        with nav_cols[1]:
+            st.page_link("pages/9p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
+        with nav_cols[2]:
+            st.page_link("pages/10p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
+
+    elif selected_pop == "Estudiantes Colombo":
+        with nav_cols[1]:
+            st.page_link("pages/11p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
+        with nav_cols[2]:
+            st.page_link("pages/12p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
+
+create_nav_buttons(st.session_state.population_filter)
+st.markdown("---")
 @st.cache_resource
 def get_engine():
     # En producción (Streamlit Cloud), lee desde st.secrets
@@ -48,8 +81,8 @@ def get_available_years(_engine, prefix):
             else:
                 st.warning(f"La tabla '{table_name}' no existe. Usando año por defecto.")
                 return [pd.Timestamp.now().year]
-                st.warning(f"La tabla '{table_name}' no contiene años en la columna 'FECHA'. Usando año por defecto.")
-                return [pd.Timestamp.now().year] # Devuelve el año actual si no hay datos
+            st.warning(f"La tabla '{table_name}' no contiene años en la columna 'FECHA'. Usando año por defecto.")
+            return [pd.Timestamp.now().year]
     else: # Para Docentes
         with _engine.connect() as connection:
             query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
@@ -58,29 +91,34 @@ def get_available_years(_engine, prefix):
                 return sorted(years, reverse=True)
     return []
 
-col1, col2 = st.columns([1, 3])
-with col1:
-    selected_population = st.selectbox(
-        "Filtrar por tipo de población",
-        ["Estudiantes", "Docentes"],
-        key="population_filter",
-        help="Selecciona si quieres ver datos de Estudiantes o Docentes."
-    )
+st.sidebar.header("Filtros")
+selected_population = st.sidebar.selectbox(
+    "Filtrar por tipo de población",
+    ["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"],
+    index=["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"].index(st.session_state.population_filter),
+    key="population_filter",
+    help="Selecciona el grupo de datos a visualizar."
+)
+st.sidebar.divider()
 
-population_prefix = "Estudiantes" if selected_population == "Estudiantes" else "Docentes"
+if selected_population != "Estudiantes Comfenalco":
+    st.info(f"Este dashboard es para 'Estudiantes Comfenalco'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
+    st.stop()
+
+population_prefix = "Estudiantes"
 available_years = get_available_years(engine, population_prefix)
 
 if not available_years:
     st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
     st.stop()
 
+# FORZAR REINICIO DEL AÑO: Si el año guardado en la sesión no es válido para
 # los datos de ESTA PÁGINA, se reinicia al año más reciente disponible.
 if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
     st.session_state.selected_year = available_years[0]
 
 selected_year = st.session_state.selected_year
 
-st.sidebar.header("🔍 Filtros Aplicados")
 st.sidebar.info(f"**Población:** {selected_population}")
 st.sidebar.info(f"**Año:** {selected_year}")
 st.sidebar.divider()
