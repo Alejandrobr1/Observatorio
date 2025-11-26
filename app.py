@@ -133,15 +133,22 @@ with tab2:
     # Nueva sección para los dashboards de producción
     st.markdown("#### 📊 Análisis de Matrículas")
     
-    st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Matriculados por Sede Nodal (2016-2019)", icon="🏫")
-    st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día (2016-2019)", icon="📅")
-    st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población (2016-2019)", icon="👥")
-    st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede (Etapa 1)", icon="🥧")
-    st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa de Etapas por Sede (Pastel)", icon="⚖️")
-    st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa de Etapas por Sede (Barras)", icon="📊")
+    st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Matriculados por Sede Nodal (Comfenalco)", icon="🏫")
+    st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día (Comfenalco)", icon="📅")
+    st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población (Comfenalco)", icon="👥")
+    st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede (Comfenalco)", icon="🥧")
+    st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa de Etapas por Sede (Comfenalco)", icon="⚖️")
+    st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa de Etapas por Sede (Comfenalco)", icon="📊")
     st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Estudiantes por Grupo y Sede (Escuela Nueva)", icon="🏫")
     st.page_link("pages/8p-estudiantes_por_institucion.py", label="Estudiantes por Institución (Escuela Nueva)", icon="🏛️")
     
+    st.divider()
+    
+    st.markdown("#### 👨‍🏫 Análisis de Docentes")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.page_link("pages/9p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
+        st.page_link("pages/10p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
     st.divider()
 
     # Nueva sección para los dashboards de Colombo

@@ -28,7 +28,6 @@ def get_engine():
 # Inicializar conexión
 try:
     engine = get_engine()
-    st.sidebar.success("✅ Conexión establecida")
     st.sidebar.page_link("app.py", label="Volver al Inicio", icon="🏠")
     st.sidebar.divider()
 except Exception as e:
@@ -36,9 +35,23 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
+@st.cache_data
+def get_available_years(_engine):
+    table_name = "Estudiantes_Colombo"
+    with _engine.connect() as connection:
+        if not _engine.dialect.has_table(connection, table_name):
+            st.warning(f"La tabla '{table_name}' no existe. No se pueden cargar los años.")
+            return []
+        query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
+        years = [row[0] for row in connection.execute(query_years).fetchall()]
+        if years:
+            return years
+    st.warning(f"No se encontraron años en la tabla '{table_name}'.")
+    return []
+
 # Función para generar gráfico de barras y tabla
 def create_bar_chart_and_table(df_data, total_estudiantes, title):
-    st.header(f"📊 {title} - Año {selected_year}")
+    st.header(f"📊 {title} - Año {st.session_state.selected_year}")
     
     if df_data.empty:
         st.warning("No hay datos de estudiantes para el año seleccionado.")
@@ -86,41 +99,17 @@ def create_bar_chart_and_table(df_data, total_estudiantes, title):
         df_display.columns = ['#', 'Nivel', 'Estudiantes', 'Porcentaje']
         st.dataframe(df_display, use_container_width=True, hide_index=True)
 
-# Consultas principales
-try:
-    with engine.connect() as connection:
-        # 1. Obtener años disponibles
-        query_years = text("SELECT DISTINCT FECHA FROM Estudiantes_Colombo ORDER BY FECHA DESC")
-        result_years = connection.execute(query_years)
-        available_years = [row[0] for row in result_years.fetchall()]
-
-        if not available_years:
-            st.error("❌ No se encontraron años en la columna 'FECHA' de la tabla 'Estudiantes_Colombo'.")
-            st.stop()
-
-        if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
-            st.session_state.selected_year = available_years[0] if available_years else None
-
-        selected_year = st.session_state.selected_year
-
-        # 2. Calcular estadísticas para la barra lateral
-        st.sidebar.header("📈 Estadísticas Generales")
-        table_name = "Estudiantes_Colombo"
+@st.cache_data
+def load_data(_engine, year):
+    table_name = "Estudiantes_Colombo"
+    with _engine.connect() as connection:
+        if not _engine.dialect.has_table(connection, table_name):
+            return pd.DataFrame(), 0, 0
         
-        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
-        total_estudiantes = connection.execute(query_total, {'year': selected_year}).scalar() or 0
-        st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{int(total_estudiantes):,}")
-        
-        query_niveles = text(f"SELECT COUNT(DISTINCT NIVEL) FROM {table_name} WHERE FECHA = :year")
-        total_niveles = connection.execute(query_niveles, {'year': selected_year}).scalar() or 0
-        st.sidebar.metric(f"Niveles ({selected_year})", f"{int(total_niveles):,}")
-        st.sidebar.divider()
-        
-        # Consulta para Estudiantes por Nivel
-        query_estudiantes_data = text(f"""
+        params = {'year': year}
+        query_data = text(f"""
             SELECT 
-                NIVEL as nivel,
-                COUNT(ID) as cantidad
+                NIVEL as nivel, COUNT(ID) as cantidad
             FROM {table_name}
             WHERE FECHA = :year
               AND NIVEL IS NOT NULL 
@@ -129,40 +118,49 @@ try:
             GROUP BY nivel
             ORDER BY cantidad DESC
         """)
-        result_estudiantes = connection.execute(query_estudiantes_data, {'year': selected_year})
-        df_estudiantes = pd.DataFrame(result_estudiantes.fetchall(), columns=["nivel", "cantidad"])
-
-        # Crear visualización
-        create_bar_chart_and_table(df_estudiantes, total_estudiantes, "Distribución de Estudiantes Colombo por Nivel")
+        df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["nivel", "cantidad"])
         
-        # --- Selección de Año con Botones ---
-        st.divider()
-        with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
-            st.write("Haz clic en un botón para cambiar el año de los datos mostrados.")
-            
-            cols = st.columns(len(available_years))
-            
-            def set_year(year):
-                st.session_state.selected_year = year
-
-            for i, year in enumerate(available_years):
-                with cols[i]:
-                    button_type = "primary" if str(year) == str(selected_year) else "secondary"
-                    if st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,)):
-                        pass
-
-        # Información adicional
-        st.success(f"""
-        ✅ **Datos cargados para el año {selected_year}**
+        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
+        total_estudiantes = connection.execute(query_total, params).scalar() or 0
         
-        📌 **Información del reporte:**
-        - **Total de estudiantes registrados**: {int(total_estudiantes):,}
-        - **Total de niveles con estudiantes**: {int(total_niveles):,}
-        """)
+        query_niveles = text(f"SELECT COUNT(DISTINCT NIVEL) FROM {table_name} WHERE FECHA = :year")
+        total_niveles = connection.execute(query_niveles, params).scalar() or 0
+        
+        return df, total_estudiantes, total_niveles
+
+try:
+    available_years = get_available_years(engine)
+    if not available_years:
+        st.warning("⚠️ No se encontraron datos para 'Estudiantes Colombo'.")
+        st.stop()
+
+    if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
+        st.session_state.selected_year = available_years[0]
+    selected_year = st.session_state.selected_year
+
+    df_estudiantes, total_estudiantes, total_niveles = load_data(engine, selected_year)
+
+    st.sidebar.header("🔍 Filtros Aplicados")
+    st.sidebar.info(f"**Año:** {selected_year}")
+    st.sidebar.divider()
+    st.sidebar.header("📈 Estadísticas Generales")
+    st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{int(total_estudiantes):,}")
+    st.sidebar.metric(f"Niveles ({selected_year})", f"{int(total_niveles):,}")
+    st.sidebar.divider()
+
+    create_bar_chart_and_table(df_estudiantes, total_estudiantes, "Distribución de Estudiantes Colombo por Nivel")
+    
+    st.divider()
+    with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
+        st.write("Haz clic en un botón para cambiar el año de los datos mostrados.")
+        cols = st.columns(len(available_years))
+        def set_year(year):
+            st.session_state.selected_year = year
+        for i, year in enumerate(available_years):
+            with cols[i]:
+                button_type = "primary" if year == selected_year else "secondary"
+                st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
 
 except Exception as e:
-    st.error(f"❌ Error al cargar los datos para el año {selected_year}")
+    st.error("❌ Error al cargar los datos")
     st.exception(e)
-    
-    with st.expander("Ver detalles técnicos del error"):
-        st.code(traceback.format_exc())

@@ -11,8 +11,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Participación por Sede Nodal")
-st.title("📊 Participación de Estudiantes por Sede Nodal")
+st.set_page_config(layout="wide", page_title="Dashboard Participación Comfenalco por Sede Nodal")
+st.title("📊 Participación de Estudiantes por Sede Nodal (Comfenalco)")
 
 @st.cache_resource
 def get_engine():

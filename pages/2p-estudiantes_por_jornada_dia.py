@@ -11,8 +11,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Jornada y Día")
-st.title("📊 Estudiantes Matriculados por Jornada y Día")
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes Comfenalco por Jornada y Día")
+st.title("📊 Estudiantes Matriculados por Jornada y Día (Comfenalco)")
 
 @st.cache_resource
 def get_engine():
