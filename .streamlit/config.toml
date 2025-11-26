@@ -8,6 +8,7 @@ font = "sans serif"
 [client]
 showErrorDetails = false
 toolbarMode = "minimal"
+showSidebarNavigation = false
 
 [logger]
 level = "info"
@@ -23,6 +24,3 @@ runOnOpen = true
 [runner]
 # Asegurar que se ejecuta desde la raíz
 magicEnabled = true
-
-[client]
-showSidebarNavigation = false
