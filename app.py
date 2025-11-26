@@ -139,6 +139,7 @@ with tab2:
     st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede (Etapa 1)", icon="🥧")
     st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa de Etapas por Sede (Pastel)", icon="⚖️")
     st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa de Etapas por Sede (Barras)", icon="📊")
+    st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Estudiantes por Sede (Escuela Nueva)", icon="🏫")
     
     st.divider()
 
