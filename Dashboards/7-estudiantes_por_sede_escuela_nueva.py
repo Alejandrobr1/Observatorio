@@ -12,9 +12,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Base_datos.conexion import get_engine
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Grupo y Sede")
-st.title("📊 Estudiantes por Grupo y Sede")
-
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Grupo y Sede de Escuela Nueva")
+st.title("📊 Estudiantes por Grupo y Sede de Escuela Nueva")
 # Inicializar el estado de la sesión para el año si no existe
 if 'selected_year' not in st.session_state:
     # Esta parte necesita acceso a la DB para obtener los años, se moverá más abajo
