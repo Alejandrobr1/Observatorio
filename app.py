@@ -125,40 +125,48 @@ with tab1:
 
 with tab2:
     st.markdown("### 📈 Dashboards Disponibles")
-    st.markdown("""
-    Haz clic en cualquier dashboard para acceder a análisis específicos sobre los programas educativos.
-    """)
+    st.markdown("Selecciona el tipo de población para ver los dashboards correspondientes.")
+
+    # Inicializar el estado de la sesión para el filtro de población
+    if 'population_filter' not in st.session_state:
+        st.session_state.population_filter = "Estudiantes Comfenalco"
+
+    def set_population(pop_type):
+        st.session_state.population_filter = pop_type
+
+    # Crear botones para seleccionar la población
+    pop_options = ["Estudiantes Comfenalco", "Docentes", "Estudiantes Colombo"]
+    cols = st.columns(len(pop_options))
+    for i, pop in enumerate(pop_options):
+        with cols[i]:
+            st.button(pop, key=f"pop_btn_{pop}", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if st.session_state.population_filter == pop else "secondary")
+
     st.markdown("---")
     
-    # Nueva sección para los dashboards de producción
-    st.markdown("#### 📊 Análisis de Matrículas")
-    
-    st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Matriculados por Sede Nodal (Comfenalco)", icon="🏫")
-    st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día (Comfenalco)", icon="📅")
-    st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población (Comfenalco)", icon="👥")
-    st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede (Comfenalco, Etapa 1)", icon="🥧")
-    st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa Etapas por Sede (Comfenalco, Pastel)", icon="⚖️")
-    st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa Etapas por Sede (Comfenalco, Barras)", icon="📊")
-    st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Estudiantes por Grupo y Sede (Escuela Nueva)", icon="🏫")
-    st.page_link("pages/8p-estudiantes_por_institucion.py", label="Estudiantes por Institución (Escuela Nueva)", icon="🏛️")
-    
-    st.divider()
-    
-    st.markdown("#### 👨‍🏫 Análisis de Docentes")
-    col1, col2 = st.columns(2)
-    with col1:
+    # Mostrar enlaces de dashboards según la población seleccionada
+    if st.session_state.population_filter == "Estudiantes Comfenalco":
+        st.markdown("#### 📊 Análisis de Matrículas (Comfenalco y Escuela Nueva)")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Matriculados por Sede Nodal", icon="🏫")
+            st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día", icon="📅")
+            st.page_link("pages/3p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población", icon="👥")
+            st.page_link("pages/4p-estudiantes_matriculados_sede_porcentaje.py", label="Participación % por Sede", icon="🥧")
+        with col2:
+            st.page_link("pages/5p-comparativa_etapas_por_sede.py", label="Comparativa Etapas por Sede (Pastel)", icon="⚖️")
+            st.page_link("pages/6p-comparativa_etapas_barras.py", label="Comparativa Etapas por Sede (Barras)", icon="📊")
+            st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Estudiantes por Grupo y Sede (Escuela Nueva)", icon="🏫")
+            st.page_link("pages/8p-estudiantes_por_institucion.py", label="Estudiantes por Institución (Escuela Nueva)", icon="🏛️")
+
+    elif st.session_state.population_filter == "Docentes":
+        st.markdown("#### 👨‍🏫 Análisis de Docentes")
         st.page_link("pages/9p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
         st.page_link("pages/10p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
-    st.divider()
 
-    # Nueva sección para los dashboards de Colombo
-    st.markdown("#### 🇨🇴 Análisis Colombo Americano")
-    col1, col2 = st.columns(2)
-    with col1:
+    elif st.session_state.population_filter == "Estudiantes Colombo":
+        st.markdown("#### 🇨🇴 Análisis Colombo Americano")
         st.page_link("pages/11p-colombo_por_institucion.py", label="Colombo - Estudiantes por Institución", icon="🏫")
         st.page_link("pages/12p-colombo_por_nivel.py", label="Colombo - Estudiantes por Nivel", icon="📈")
-    
-    st.info("💡 Los dashboards también están disponibles en el menú sidebar de Streamlit (esquina superior izquierda)")
 
 
 with tab3:
