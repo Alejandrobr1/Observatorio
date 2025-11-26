@@ -134,7 +134,7 @@ with tab2:
     st.markdown("#### 📊 Análisis de Matrículas")
     
     st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Matriculados por Sede Nodal (2016-2019)", icon="🏫")
-    st.page_link("pages/2p-estudiantes_por_jornada_dia_2016.py", label="Matriculados por Jornada y Día (2016-2019)", icon="📅")
+    st.page_link("pages/2p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día (2016-2019)", icon="📅")
     # st.page_link("pages/3p-estudiantes_por_poblacion_2016.py", label="Matriculados por Población", icon="👥")
     
     st.divider()
