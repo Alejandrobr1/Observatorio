@@ -19,6 +19,10 @@ if 'population_filter' not in st.session_state:
     st.session_state.population_filter = "Estudiantes Comfenalco"
 
 def create_nav_buttons(selected_pop):
+    nav_cols = st.columns(8)
+    with nav_cols[0]:
+        st.page_link("app.py", label="Inicio", icon="🏠")
+
     if selected_pop == "Estudiantes Comfenalco":
         links = {
             "Sede Nodal": "pages/1p-estudiantes_matriculados_por_sede_nodal.py",
