@@ -142,18 +142,7 @@ def load_data(_engine, year):
 # --- Consultas y Visualización Principal ---
 try:
     st.sidebar.header("Filtros")
-    selected_pop = st.sidebar.selectbox(
-        "Filtrar por tipo de población",
-        [COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL],
-        index=[COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL].index(st.session_state.population_filter),
-        key="population_filter",
-        help="Selecciona el grupo de datos a visualizar."
-    )
-    st.sidebar.divider()
-
-    if selected_pop != COMFENALCO_LABEL:
-        st.info(f"Este dashboard es para {COMFENALCO_LABEL}. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
-        st.stop()
+    selected_pop = st.session_state.population_filter
 
     available_years = get_available_years(engine)
 
