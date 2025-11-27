@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
 st.set_page_config(layout="wide", page_title="Docentes por Nivel MCER")
-st.title("📊 Docentes por Nivel")
+st.title("📊 Docentes por Nivel MCER")
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
@@ -41,7 +41,7 @@ def create_nav_buttons(selected_pop):
 
     elif selected_pop == "Docentes":
         with nav_cols[1]:
-            st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
+            st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por Nivel MCER", icon="🎓")
         with nav_cols[2]:
             st.page_link("pages/7p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
 
