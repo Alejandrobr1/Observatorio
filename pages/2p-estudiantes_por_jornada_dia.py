@@ -200,59 +200,55 @@ try:
         # Pivotear los datos para tener días como índice y jornadas como columnas
         df_pivot = df.pivot(index='DIA', columns='JORNADA', values='cantidad').fillna(0)
 
-        # Crear gráfico de barras verticales agrupadas
-        st.header(f"📊 Matriculados por Jornada y Día - Año {selected_year}")
-        fig, ax = plt.subplots(figsize=(14, 8))
-        dias = df_pivot.index
-        jornadas = df_pivot.columns
-        n_dias = len(dias)
-        n_jornadas = len(jornadas)
-        x = np.arange(n_dias)  # Posiciones de los grupos de barras (días)
-        width = 0.8 / n_jornadas  # Ancho de cada barra
-        colors = plt.cm.viridis(np.linspace(0, 1, n_jornadas))
-        
-        for i, jornada in enumerate(jornadas):
-            offset = width * (i - (n_jornadas - 1) / 2)
-            valores = df_pivot[jornada]
-            bars = ax.bar(x + offset, valores, width, label=jornada, color=colors[i], edgecolor='black', linewidth=1)
-            
-            for bar in bars:
-                height = bar.get_height()
-                if height > 0:
-                    ax.annotate(f'{int(height):,}',
-                                xy=(bar.get_x() + bar.get_width() / 2, height),
-                                xytext=(0, 3),
-                                textcoords="offset points",
-                                ha='center', va='bottom', fontsize=9, fontweight='bold')
+        # Layout en dos columnas: Gráfico a la izquierda, filtro de año a la derecha
+        col1, col2 = st.columns([3, 1])
 
-        ax.set_xlabel('Día de la Semana', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-        ax.set_title(f'Estudiantes Matriculados por Jornada y Día\nAño {selected_year}',
-                     fontsize=16, fontweight='bold', pad=20)
-        ax.set_xticks(x)
-        ax.set_xticklabels(dias, rotation=45, ha='right', fontsize=11)
-        ax.legend(title='Jornada', fontsize=10)
-        ax.grid(axis='y', alpha=0.3, linestyle='--')
-        
-        max_val = df_pivot.sum(axis=1).max()
-        ax.set_ylim(0, float(max_val) * 1.2)
-        plt.tight_layout()
-        st.pyplot(fig)
+        with col1:
+            # Crear gráfico de barras verticales agrupadas
+            st.header(f"📊 Matriculados por Jornada y Día - Año {selected_year}")
+            fig, ax = plt.subplots(figsize=(14, 8))
+            dias = df_pivot.index
+            jornadas = df_pivot.columns
+            n_dias = len(dias)
+            n_jornadas = len(jornadas)
+            x = np.arange(n_dias)  # Posiciones de los grupos de barras (días)
+            width = 0.8 / n_jornadas  # Ancho de cada barra
+            colors = plt.cm.viridis(np.linspace(0, 1, n_jornadas))
+            
+            for i, jornada in enumerate(jornadas):
+                offset = width * (i - (n_jornadas - 1) / 2)
+                valores = df_pivot[jornada]
+                bars = ax.bar(x + offset, valores, width, label=jornada, color=colors[i], edgecolor='black', linewidth=1)
+                
+                for bar in bars:
+                    height = bar.get_height()
+                    if height > 0:
+                        ax.annotate(f'{int(height):,}',
+                                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                                    xytext=(0, 3),
+                                    textcoords="offset points",
+                                    ha='center', va='bottom', fontsize=9, fontweight='bold')
 
-        # --- Selección de Año con Botones ---
-        st.divider()
-        with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
-            st.write("Haz clic en un botón para cambiar el año de los datos mostrados en los gráficos.")
-            
-            cols = st.columns(len(available_years))
-            
+            ax.set_xlabel('Día de la Semana', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
+            ax.set_title(f'Estudiantes Matriculados por Jornada y Día\nAño {selected_year}', fontsize=16, fontweight='bold', pad=20)
+            ax.set_xticks(x)
+            ax.set_xticklabels(dias, rotation=45, ha='right', fontsize=11)
+            ax.legend(title='Jornada', fontsize=10)
+            ax.grid(axis='y', alpha=0.3, linestyle='--')
+            max_val = df_pivot.sum(axis=1).max() if not df_pivot.empty else 1
+            ax.set_ylim(0, float(max_val) * 1.2)
+            plt.tight_layout()
+            st.pyplot(fig)
+
+        with col2:
+            st.write("📅 **Seleccionar Año**")
             def set_year(year):
                 st.session_state.selected_year = year
 
-            for i, year in enumerate(available_years):
-                with cols[i]:
-                    button_type = "primary" if year == selected_year else "secondary"
-                    st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+            for year in available_years:
+                button_type = "primary" if year == selected_year else "secondary"
+                st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), use_container_width=True, type=button_type)
 
         # Tabla de datos detallada
         df_display = df_pivot.copy()
