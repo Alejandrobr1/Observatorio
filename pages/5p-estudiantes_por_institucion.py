@@ -21,19 +21,22 @@ create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
 st.markdown("""
 <style>
-    /* Style for page links */
+    /* Style for page links with flexible height and text wrapping */
     a[data-testid="stPageLink"] {
         border: 1px solid #ddd;
         border-radius: 5px;
-        padding: 8px;
+        padding: 12px 8px;
         text-align: center;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        height: 4.5em; /* Altura fija para todos los botones */
-        line-height: 1.2; /* Espaciado para texto en varias líneas */
+        min-height: 4.5em;
+        line-height: 1.3;
         word-wrap: break-word;
+        white-space: normal;
+        font-size: 0.9em;
     }
 </style>
 """, unsafe_allow_html=True)
