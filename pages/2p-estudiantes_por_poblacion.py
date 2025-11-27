@@ -108,96 +108,108 @@ st.sidebar.divider()
 
 # --- Carga de Datos ---
 @st.cache_data
-def load_data(_engine, prefix, year):
+def load_data_by_stage(_engine, prefix, year, stage):
     # Si son estudiantes, usar la tabla consolidada. Si no, mantener la lógica anterior.
     table_name = "Estudiantes_2016_2019" if prefix == "Estudiantes" else f"{prefix}_{year}"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(columns=["POBLACION", "cantidad"]), 0, 0
-        params = {'year': year}
+        params = {'year': year, 'stage': stage}
         query = text(f"""
             SELECT 
                 POBLACION, COALESCE(SUM(MATRICULADOS), 0) as cantidad
             FROM {table_name}
             WHERE POBLACION IS NOT NULL AND POBLACION != '' AND POBLACION != 'SIN INFORMACION'
-              AND ETAPA = '1'
+              AND ETAPA = :stage
               AND FECHA = :year
             GROUP BY POBLACION
             ORDER BY cantidad DESC
         """)
         result = connection.execute(query, params)
         df = pd.DataFrame(result.fetchall(), columns=["POBLACION", "cantidad"])
-        
+
         # Métricas
-        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year"), params).scalar() or 0
-        total_poblacion = connection.execute(text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE ETAPA = '1' AND FECHA = :year AND POBLACION IS NOT NULL AND POBLACION != ''"), params).scalar() or 0
-        
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE ETAPA = :stage AND FECHA = :year"), params).scalar() or 0
+        total_poblacion = connection.execute(text(f"SELECT COUNT(DISTINCT POBLACION) FROM {table_name} WHERE ETAPA = :stage AND FECHA = :year AND POBLACION IS NOT NULL AND POBLACION != ''"), params).scalar() or 0
+
         return df, total_matriculados, total_poblacion
 
+def create_population_chart(df, total_matriculados, title):
+    """Función para crear un gráfico de barras y una tabla para una etapa específica."""
+    st.header(title)
+    if df.empty:
+        st.warning(f"No hay datos de matriculados por población para esta etapa.")
+        return
+
+    # Gráfico de barras verticales
+    fig, ax = plt.subplots(figsize=(12, 7))
+    colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df)))
+    bars = ax.bar(df['POBLACION'], df['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
+
+    for bar in bars:
+        height = bar.get_height()
+        if height > 0:
+            ax.annotate(f'{int(height):,}',
+                        xy=(bar.get_x() + bar.get_width() / 2, height),
+                        xytext=(0, 3),
+                        textcoords="offset points",
+                        ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+    ax.set_xlabel('Tipo de Población', fontsize=13, fontweight='bold')
+    ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
+    ax.set_title(f'Estudiantes Matriculados por Tipo de Población', fontsize=16, fontweight='bold', pad=20)
+    plt.xticks(rotation=45, ha="right")
+
+    max_val = df['cantidad'].max() if not df.empty else 1
+    ax.set_ylim(0, float(max_val) * 1.2)
+    ax.grid(axis='y', alpha=0.3, linestyle='--')
+    plt.tight_layout()
+    st.pyplot(fig)
+
+    # Tabla de datos detallada
+    df['porcentaje'] = (pd.to_numeric(df['cantidad']) / float(total_matriculados) * 100) if total_matriculados > 0 else 0
+    df_display = df.copy()
+    df_display['#'] = range(1, len(df_display) + 1)
+    df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
+    df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.1f}%")
+    df_display = df_display[['#', 'POBLACION', 'cantidad', 'porcentaje']]
+    df_display.columns = ['#', 'Población', 'Matriculados', 'Porcentaje']
+    st.header("📋 Tabla Detallada")
+    st.dataframe(df_display, use_container_width=True, hide_index=True)
+
 try:
-    df, total_matriculados, total_poblacion = load_data(engine, population_prefix, selected_year)
+    df_etapa1, total_matriculados_etapa1, total_poblacion_etapa1 = load_data_by_stage(engine, population_prefix, selected_year, '1')
+    df_etapa2, total_matriculados_etapa2, total_poblacion_etapa2 = load_data_by_stage(engine, population_prefix, selected_year, '2')
 
     # --- Visualización ---
     st.sidebar.header("📈 Estadísticas Generales")
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
-    st.sidebar.metric(f"Total Tipos de Población ({selected_year})", f"{total_poblacion:,}")
+    st.sidebar.metric(f"Matriculados Etapa 1 ({selected_year})", f"{int(total_matriculados_etapa1):,}")
+    st.sidebar.metric(f"Matriculados Etapa 2 ({selected_year})", f"{int(total_matriculados_etapa2):,}")
     st.sidebar.divider()
     # Añadir el logo al final del sidebar
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
 
-    if df.empty:
-        st.warning(f"⚠️ No hay datos de matriculados por población para el año {selected_year}.")
-    else:
-        # Layout en dos columnas: Gráfico a la izquierda, filtro de año a la derecha
-        col1, col2 = st.columns([3, 1])
+    # --- Selección de Año con Botones Horizontales ---
+    st.write("📅 **Seleccionar Año para Visualizar**")
+    cols_buttons = st.columns(len(available_years))
+    def set_year(year):
+        st.session_state.selected_year = year
 
-        with col1:
-            # Crear gráfico de barras verticales
-            st.header(f"📊 Matriculados por Tipo de Población - Año {selected_year}")
-            fig, ax = plt.subplots(figsize=(12, 7))
-            colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df)))
-            bars = ax.bar(df['POBLACION'], df['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
-            
-            for bar in bars:
-                height = bar.get_height()
-                if height > 0:
-                    ax.annotate(f'{int(height):,}',
-                                xy=(bar.get_x() + bar.get_width() / 2, height),
-                                xytext=(0, 3),
-                                textcoords="offset points",
-                                ha='center', va='bottom', fontsize=10, fontweight='bold')
-            
-            ax.set_xlabel('Tipo de Población', fontsize=13, fontweight='bold')
-            ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-            ax.set_title(f'Estudiantes Matriculados por Tipo de Población\nAño {selected_year}', fontsize=16, fontweight='bold', pad=20)
-            plt.xticks(rotation=45, ha="right")
-            
-            max_val = df['cantidad'].max() if not df.empty else 1
-            ax.set_ylim(0, float(max_val) * 1.2)
-            ax.grid(axis='y', alpha=0.3, linestyle='--')
-            plt.tight_layout()
-            st.pyplot(fig)
+    for i, year in enumerate(available_years):
+        with cols_buttons[i]:
+            button_type = "primary" if year == selected_year else "secondary"
+            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+    st.divider()
 
-        with col2:
-            st.write("📅 **Seleccionar Año**")
-            def set_year(year):
-                st.session_state.selected_year = year
+    # Layout en dos columnas para los gráficos
+    col1, col2 = st.columns(2)
 
-            for year in available_years:
-                button_type = "primary" if year == selected_year else "secondary"
-                st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), use_container_width=True, type=button_type)
+    with col1:
+        create_population_chart(df_etapa1, total_matriculados_etapa1, f"📊 Etapa 1 - Año {selected_year}")
 
-        # Tabla de datos detallada
-        df['porcentaje'] = (pd.to_numeric(df['cantidad']) / float(total_matriculados) * 100) if total_matriculados > 0 else 0
-        df_display = df.copy()
-        df_display['#'] = range(1, len(df_display) + 1)
-        df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
-        df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.1f}%")
-        df_display = df_display[['#', 'POBLACION', 'cantidad', 'porcentaje']]
-        df_display.columns = ['#', 'Población', 'Matriculados', 'Porcentaje']
-        st.header("📋 Tabla Detallada por Población")
-        st.dataframe(df_display, use_container_width=True, hide_index=True)
+    with col2:
+        create_population_chart(df_etapa2, total_matriculados_etapa2, f"📊 Etapa 2 - Año {selected_year}")
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
