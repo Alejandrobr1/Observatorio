@@ -188,8 +188,8 @@ try:
     st.sidebar.header("Filtros")
     selected_population = st.sidebar.selectbox(
         "Filtrar por tipo de población",
-        ["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"],
-        index=["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"].index(st.session_state.population_filter),
+        ["Formación a estudiantes Comfenalco Antioquia", "Formación a estudiantes Centro Colombo Americano de Medellín", "Formación a docentes"],
+        index=["Formación a estudiantes Comfenalco Antioquia", "Formación a estudiantes Centro Colombo Americano de Medellín", "Formación a docentes"].index(st.session_state.population_filter),
         key="population_filter",
         help="Selecciona el grupo de datos a visualizar."
     )
