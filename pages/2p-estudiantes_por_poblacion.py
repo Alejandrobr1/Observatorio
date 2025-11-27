@@ -6,7 +6,7 @@ import traceback
 from sqlalchemy import create_engine, text
 import sys 
 import os
-
+from app import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -23,7 +23,7 @@ def create_nav_buttons(selected_pop):
     with nav_cols[0]:
         st.page_link("app.py", label="Inicio", icon="🏠")
 
-    if selected_pop == "Estudiantes Comfenalco":
+    if selected_population != COMFENALCO_LABEL:
         links = {
             "Jornada/Día": "pages/1p-estudiantes_por_jornada_dia.py",
             "Población": "pages/2p-estudiantes_por_poblacion.py",
@@ -39,13 +39,13 @@ def create_nav_buttons(selected_pop):
             with nav_cols[i+1]:
                 st.page_link(page, label=label)
 
-    elif selected_pop == "Docentes":
+    elif selected_pop == DOCENTES_LABEL:
         with nav_cols[1]:
             st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
         with nav_cols[2]:
             st.page_link("pages/7p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
 
-    elif selected_pop == "Estudiantes Colombo":
+    elif selected_pop == COLOMBO_LABEL:
         with nav_cols[1]:
             st.page_link("pages/8p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
         with nav_cols[2]:
@@ -116,15 +116,15 @@ def get_available_years(_engine, prefix):
 st.sidebar.header("Filtros")
 selected_population = st.sidebar.selectbox(
     "Filtrar por tipo de población",
-    ["Formación a estudiantes Comfenalco Antioquia", "Formación a estudiantes Centro Colombo Americano de Medellín", "Formación a docentes"],
-    index=["Formación a estudiantes Comfenalco Antioquia", "Formación a estudiantes Centro Colombo Americano de Medellín", "Formación a docentes"].index(st.session_state.population_filter),
+    [COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL],
+    index=[COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL].index(st.session_state.population_filter),
     key="population_filter",
     help="Selecciona el grupo de datos a visualizar."
 )
 st.sidebar.divider()
 
-if selected_population != "Formación a estudiantes Comfenalco Antioquia":
-    st.info(f"Este dashboard es para 'Formación a estudiantes Comfenalco Antioquia'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
+if selected_population != COMFENALCO_LABEL:
+    st.info(f"Este dashboard es para {COMFENALCO_LABEL}. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
     st.stop()
 
 population_prefix = "Estudiantes"
