@@ -90,21 +90,11 @@ def get_available_years(_engine, prefix):
                 return sorted(years, reverse=True)
     return []
 
-st.sidebar.header("Filtros")
-selected_pop = st.sidebar.selectbox(
-    "Filtrar por tipo de población",
-    [COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL],
-    index=[COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL].index(st.session_state.population_filter),
-    key="population_filter",
-    help="Selecciona el grupo de datos a visualizar."
-)
-st.sidebar.divider()
-
 population_prefix = "Estudiantes"
 available_years = get_available_years(engine, population_prefix)
 
 if not available_years:
-    st.warning(f"⚠️ No se encontraron datos para '{selected_pop}'.")
+    st.warning(f"⚠️ No se encontraron datos para '{st.session_state.population_filter}'.")
     st.stop()
 
 # FORZAR REINICIO DEL AÑO: Si el año guardado en la sesión no es válido para
@@ -114,7 +104,7 @@ if 'selected_year' not in st.session_state or st.session_state.selected_year not
 
 selected_year = st.session_state.selected_year
 
-st.sidebar.info(f"**Población:** {selected_pop}")
+st.sidebar.info(f"**Población:** {st.session_state.population_filter}")
 st.sidebar.info(f"**Año:** {selected_year}")
 st.sidebar.divider()
 
