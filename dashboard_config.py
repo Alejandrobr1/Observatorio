@@ -73,17 +73,25 @@ def create_nav_buttons(selected_pop):
             st.session_state.population_filter = new_pop
             st.rerun()
     
-    # Botones de navegación justo debajo, ocupando todo el ancho
+    # Botones de navegación con máximo 4 por fila
     if selected_pop in DASHBOARD_CATEGORIES:
         pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
-        num_buttons = len(pages) + 1  # +1 para Inicio
-        nav_cols = st.columns(num_buttons)
+        all_buttons = [("app.py", "Inicio", "🏠")] + [(f"pages/{pf}", label, icon) for pf, label, icon in pages]
         
-        with nav_cols[0]:
-            st.page_link("app.py", label="Inicio", icon="🏠")
+        # Primera fila: máximo 4 botones
+        first_row = all_buttons[:4]
+        nav_cols_1 = st.columns(len(first_row))
+        for i, (page_path, label, icon) in enumerate(first_row):
+            with nav_cols_1[i]:
+                st.page_link(page_path, label=label, icon=icon)
         
-        for i, (page_file, label, icon) in enumerate(pages):
-            with nav_cols[i + 1]:
-                st.page_link(f"pages/{page_file}", label=label, icon=icon)
+        # Segunda fila: botones restantes (si hay más de 4)
+        if len(all_buttons) > 4:
+            second_row = all_buttons[4:]
+            nav_cols_2 = st.columns(len(second_row))
+            for i, (page_path, label, icon) in enumerate(second_row):
+                with nav_cols_2[i]:
+                    st.page_link(page_path, label=label, icon=icon)
+
 
 
