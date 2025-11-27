@@ -261,3 +261,13 @@ except Exception as e:
     st.exception(e)
     with st.expander("Ver detalles técnicos del error"):
         st.code(traceback.format_exc())
+
+def add_interest_links():
+    st.markdown("---")
+    st.markdown("### 🔗 Enlaces de Interés")
+    st.markdown("""
+    - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx)
+    - [Agencia Pública de Empleo Municipio de Rionegro](https://rionegro.gov.co/publicaciones/508/agencia-publica-de-empleo-de-rionegro/)
+    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    """)
+add_interest_links()
