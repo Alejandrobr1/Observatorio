@@ -62,31 +62,32 @@ def create_nav_buttons(selected_pop):
     """
     Create navigation buttons for the selected population category and
     a selector to allow changing between populations.
+    Selector is placed to the left of the Home button.
     """
-    col1, col2 = st.columns([3, 1])
+    nav_cols = st.columns([1.5, 1, 1, 1, 1, 1, 1, 1])
     
-    # Population selector dropdown
-    with col2:
+    # Population selector dropdown (left side, before Inicio button)
+    with nav_cols[0]:
         new_pop = st.selectbox(
-            "Cambiar a:",
+            "Población:",
             options=list(DASHBOARD_CATEGORIES.keys()),
             index=list(DASHBOARD_CATEGORIES.keys()).index(selected_pop),
-            key="population_selector"
+            key="population_selector",
+            label_visibility="collapsed"
         )
         # Update session state if selection changed
         if new_pop != selected_pop:
             st.session_state.population_filter = new_pop
             st.rerun()
     
-    # Navigation buttons for current category
-    with col1:
-        nav_cols = st.columns(8)
-        with nav_cols[0]:
-            st.page_link("app.py", label="Inicio", icon="🏠")
-        
-        # Get pages for the selected population category
-        if selected_pop in DASHBOARD_CATEGORIES:
-            pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
-            for i, (page_file, label, icon) in enumerate(pages):
-                with nav_cols[i + 1]:
+    # Home button
+    with nav_cols[1]:
+        st.page_link("app.py", label="Inicio", icon="🏠")
+    
+    # Get pages for the selected population category
+    if selected_pop in DASHBOARD_CATEGORIES:
+        pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
+        for i, (page_file, label, icon) in enumerate(pages):
+            if i + 2 < len(nav_cols):  # Make sure we don't exceed column count
+                with nav_cols[i + 2]:
                     st.page_link(f"pages/{page_file}", label=label, icon=icon)
