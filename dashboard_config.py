@@ -15,7 +15,7 @@ DASHBOARD_CATEGORIES = {
             ("3p-estudiantes_por_sede_nodal_etapa1_2.py", "“Participación % por sede nodal", "⚖️"),
             ("4p-estudiantes_por_sede_nodal_barras_etp1_2.py", "Matriculados por sede nodal", "📊"),
             ("5p-estudiantes_por_institucion.py", "Estudiantes por Institución (Escuela Nueva)", "🏛️"),
-            ("12p-estudiantes_por_institucion_2021_2025.py", "Estudiantes por Institución (2021-2025)", "🏫"),
+            ("10p-estudiantes_por_institucion_2021_2025.py", "Estudiantes por Institución (2021-2025)", "🏫"),
         ],
         "first_page": "1p-estudiantes_por_jornada_dia.py"
     },
@@ -79,17 +79,26 @@ def create_nav_buttons(selected_pop):
         pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
         all_buttons = [("app.py", "Inicio", "🏠")] + [(f"pages/{pf}", label, icon) for pf, label, icon in pages]
         
-        # Primera fila: máximo 3 botones
+        # Primera fila: botones 1-3
         first_row = all_buttons[:3]
         nav_cols_1 = st.columns(len(first_row))
         for i, (page_path, label, icon) in enumerate(first_row):
             with nav_cols_1[i]:
                 st.page_link(page_path, label=label, icon=icon)
         
-        # Segunda fila: botones restantes (a partir del cuarto)
+        # Segunda fila: botones 4-6
         if len(all_buttons) > 3:
-            second_row = all_buttons[3:]
+            second_row = all_buttons[3:6]
             nav_cols_2 = st.columns(len(second_row))
             for i, (page_path, label, icon) in enumerate(second_row):
                 with nav_cols_2[i]:
                     st.page_link(page_path, label=label, icon=icon)
+        
+        # Tercera fila: botones 7 en adelante
+        if len(all_buttons) > 6:
+            third_row = all_buttons[6:]
+            nav_cols_3 = st.columns(len(third_row))
+            for i, (page_path, label, icon) in enumerate(third_row):
+                with nav_cols_3[i]:
+                    st.page_link(page_path, label=label, icon=icon)
+
