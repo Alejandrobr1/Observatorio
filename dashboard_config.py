@@ -49,26 +49,44 @@ def get_current_page_category(current_page_file):
 
 def update_filter_by_page(current_page_file):
     """
-    Update the population_filter in session_state based on the current page.
-    This ensures the filter always matches the active page's category.
+    Initialize the filter based on current page only if not already set.
+    This allows the filter to be set when first visiting a page, but respects
+    user changes afterward.
     """
-    category = get_current_page_category(current_page_file)
-    if category and st.session_state.population_filter != category:
-        st.session_state.population_filter = category
+    # This function is now a no-op - filter is managed by user selection
+    # and initial page context
+    pass
 
 
 def create_nav_buttons(selected_pop):
     """
-    Create navigation buttons for the selected population category.
-    Only displays pages belonging to the selected population.
+    Create navigation buttons for the selected population category and
+    a selector to allow changing between populations.
     """
-    nav_cols = st.columns(8)
-    with nav_cols[0]:
-        st.page_link("app.py", label="Inicio", icon="🏠")
+    col1, col2 = st.columns([3, 1])
     
-    # Get pages for the selected population category
-    if selected_pop in DASHBOARD_CATEGORIES:
-        pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
-        for i, (page_file, label, icon) in enumerate(pages):
-            with nav_cols[i + 1]:
-                st.page_link(f"pages/{page_file}", label=label, icon=icon)
+    # Population selector dropdown
+    with col2:
+        new_pop = st.selectbox(
+            "Cambiar a:",
+            options=list(DASHBOARD_CATEGORIES.keys()),
+            index=list(DASHBOARD_CATEGORIES.keys()).index(selected_pop),
+            key="population_selector"
+        )
+        # Update session state if selection changed
+        if new_pop != selected_pop:
+            st.session_state.population_filter = new_pop
+            st.rerun()
+    
+    # Navigation buttons for current category
+    with col1:
+        nav_cols = st.columns(8)
+        with nav_cols[0]:
+            st.page_link("app.py", label="Inicio", icon="🏠")
+        
+        # Get pages for the selected population category
+        if selected_pop in DASHBOARD_CATEGORIES:
+            pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
+            for i, (page_file, label, icon) in enumerate(pages):
+                with nav_cols[i + 1]:
+                    st.page_link(f"pages/{page_file}", label=label, icon=icon)

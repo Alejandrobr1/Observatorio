@@ -5,7 +5,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL, create_nav_buttons, DASHBOARD_CATEGORIES, update_filter_by_page# Añadir el directorio raíz del proyecto a sys.path
+from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL, create_nav_buttons# Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
@@ -15,14 +15,6 @@ st.title("📊 Estudiantes por Institución Educativa Escuela Nueva")
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
     st.session_state.population_filter = COMFENALCO_LABEL
-
-# Actualizar filtro basado en la página actual
-update_filter_by_page(__file__)
-
-# Determinar categoría de esta página
-page_category = COMFENALCO_LABEL
-if st.session_state.population_filter not in DASHBOARD_CATEGORIES:
-    st.session_state.population_filter = page_category
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
