@@ -41,15 +41,16 @@ def create_nav_buttons(selected_pop):
 
     elif selected_pop == "Docentes":
         with nav_cols[1]:
-            st.page_link("pages/8p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
+            st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
+        with nav_cols[2]:
+            st.page_link("pages/7p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
 
     elif selected_pop == "Estudiantes Colombo":
         with nav_cols[1]:
-            st.page_link("pages/10p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
+            st.page_link("pages/8p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
         with nav_cols[2]:
-            st.page_link("pages/11p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
-        with nav_cols[3]:
-            st.page_link("pages/9p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
+            st.page_link("pages/9p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
+        
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
