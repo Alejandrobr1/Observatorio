@@ -34,6 +34,29 @@ DASHBOARD_CATEGORIES = {
     }
 }
 
+def get_current_page_category(current_page_file):
+    """
+    Determine the category of the current page based on its filename.
+    Returns the category label (COMFENALCO_LABEL, DOCENTES_LABEL, or COLOMBO_LABEL)
+    or None if not found.
+    """
+    for category, config in DASHBOARD_CATEGORIES.items():
+        for page_file, _, _ in config["pages"]:
+            if current_page_file in page_file or page_file in current_page_file:
+                return category
+    return None
+
+
+def update_filter_by_page(current_page_file):
+    """
+    Update the population_filter in session_state based on the current page.
+    This ensures the filter always matches the active page's category.
+    """
+    category = get_current_page_category(current_page_file)
+    if category and st.session_state.population_filter != category:
+        st.session_state.population_filter = category
+
+
 def create_nav_buttons(selected_pop):
     """
     Create navigation buttons for the selected population category.

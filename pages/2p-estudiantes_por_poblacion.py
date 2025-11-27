@@ -6,7 +6,7 @@ import traceback
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL, create_nav_buttons, DASHBOARD_CATEGORIES
+from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL, create_nav_buttons, DASHBOARD_CATEGORIES, update_filter_by_page
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -17,6 +17,9 @@ st.title("📊 Estudiantes Matriculados por Población (Comfenalco)")
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
     st.session_state.population_filter = COMFENALCO_LABEL
+
+# Actualizar filtro basado en la página actual
+update_filter_by_page(__file__)
 
 # Determinar categoría de esta página
 page_category = COMFENALCO_LABEL
@@ -31,18 +34,20 @@ st.markdown("""
     a[data-testid="stPageLink"] {
         border: 1px solid #ddd;
         border-radius: 5px;
-        padding: 12px 8px;
+        padding: 15px 10px;
         text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        min-height: 4.5em;
-        line-height: 1.3;
+        min-height: 5.5em;
+        line-height: 1.4;
         word-wrap: break-word;
         white-space: normal;
-        font-size: 0.9em;
+        font-size: 0.85em;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 </style>
 """, unsafe_allow_html=True)
