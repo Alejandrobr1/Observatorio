@@ -85,40 +85,38 @@ def create_grade_donut_chart(df_data, total_estudiantes, title):
         st.warning("No hay datos de estudiantes por grado para el año seleccionado.")
         return
 
-    col1, col2 = st.columns([1, 2])
+    # Gráfico de dona
+    st.subheader("Visualización de Porcentajes")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    
+    labels = df_data['grado']
+    sizes = df_data['cantidad']
+    colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(labels)))
+    
+    wedges, texts, autotexts = ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90,
+                                      colors=colors, pctdistance=0.85,
+                                      wedgeprops=dict(width=0.4, edgecolor='w'))
+    
+    plt.setp(autotexts, size=10, weight="bold", color="white")
+    ax.set_title("Distribución de Estudiantes por Grado", pad=20)
+    
+    centre_circle = plt.Circle((0,0),0.60,fc='white')
+    fig.gca().add_artist(centre_circle)
+    
+    ax.axis('equal')
+    plt.tight_layout()
+    st.pyplot(fig)
 
-    with col1:
-        st.subheader("📋 Resumen por Grado")
-        df_data['porcentaje'] = (df_data['cantidad'] / float(total_estudiantes) * 100) if total_estudiantes > 0 else 0
-        df_display = df_data.copy()
-        df_display['#'] = range(1, len(df_display) + 1)
-        df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
-        df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
-        df_display = df_display[['#', 'grado', 'cantidad', 'porcentaje']]
-        df_display.columns = ['#', 'Grado', 'Estudiantes', 'Porcentaje']
-        st.dataframe(df_display, use_container_width=True, hide_index=True)
-
-    with col2:
-        st.subheader("Visualización de Porcentajes")
-        fig, ax = plt.subplots(figsize=(8, 6))
-        
-        labels = df_data['grado']
-        sizes = df_data['cantidad']
-        colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(labels)))
-        
-        wedges, texts, autotexts = ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90,
-                                          colors=colors, pctdistance=0.85,
-                                          wedgeprops=dict(width=0.4, edgecolor='w'))
-        
-        plt.setp(autotexts, size=10, weight="bold", color="white")
-        ax.set_title("Distribución de Estudiantes por Grado", pad=20)
-        
-        centre_circle = plt.Circle((0,0),0.60,fc='white')
-        fig.gca().add_artist(centre_circle)
-        
-        ax.axis('equal')
-        plt.tight_layout()
-        st.pyplot(fig)
+    # Tabla de resumen
+    st.subheader("📋 Resumen por Grado")
+    df_data['porcentaje'] = (df_data['cantidad'] / float(total_estudiantes) * 100) if total_estudiantes > 0 else 0
+    df_display = df_data.copy()
+    df_display['#'] = range(1, len(df_display) + 1)
+    df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
+    df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
+    df_display = df_display[['#', 'grado', 'cantidad', 'porcentaje']]
+    df_display.columns = ['#', 'Grado', 'Estudiantes', 'Porcentaje']
+    st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 @st.cache_data
 def load_data_by_grade(_engine, year):
@@ -169,19 +167,21 @@ try:
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
 
-    # Layout en dos columnas: Gráfico y tabla a la izquierda, filtro de año a la derecha
-    with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
+    # Layout en dos columnas: Gráfico a la izquierda, filtro de año a la derecha
+    col1, col2 = st.columns([3, 1])
+
+    with col1:
+        # Mostrar el gráfico de estudiantes por grado
+        create_grade_donut_chart(df_grados, total_estudiantes, "Distribución de Estudiantes por Grado")
+
+    with col2:
         st.write("📅 **Seleccionar Año**")
         def set_year(year):
             st.session_state.selected_year = year
-        cols_buttons = st.columns(len(available_years))
+
         for year in available_years:
             button_type = "primary" if year == selected_year else "secondary"
             st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
-    
-    st.divider()
-    # Mostrar el nuevo gráfico de estudiantes por grado
-    create_grade_donut_chart(df_grados, total_estudiantes, "Distribución de Estudiantes por Grado")
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
