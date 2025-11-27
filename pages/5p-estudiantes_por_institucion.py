@@ -181,8 +181,8 @@ try:
     )
     st.sidebar.divider()
 
-    if selected_population != "Estudiantes Comfenalco":
-        st.info(f"Este dashboard es para 'Estudiantes Comfenalco'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
+    if selected_population != "Formación a estudiantes Comfenalco Antioquia":
+        st.info(f"Este dashboard es para 'Formación a estudiantes Comfenalco Antioquia'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
         st.stop()
 
     available_years = get_available_years(engine)

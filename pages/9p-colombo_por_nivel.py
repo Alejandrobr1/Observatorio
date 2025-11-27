@@ -195,13 +195,13 @@ try:
     )
     st.sidebar.divider()
 
-    if selected_population != "Estudiantes Colombo":
-        st.info(f"Este dashboard es para 'Estudiantes Colombo'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
+    if selected_population != "Formación a estudiantes Centro Colombo Americano de Medellín":
+        st.info(f"Este dashboard es para 'Formación a estudiantes Centro Colombo Americano de Medellín'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
         st.stop()
 
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning("⚠️ No se encontraron datos para 'Estudiantes Colombo'.")
+        st.warning("⚠️ No se encontraron datos para 'Formación a estudiantes Centro Colombo Americano de Medellín'.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:

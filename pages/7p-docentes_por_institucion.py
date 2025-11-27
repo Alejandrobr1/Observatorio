@@ -192,13 +192,13 @@ try:
     )
     st.sidebar.divider()
 
-    if selected_population != "Docentes":
-        st.info(f"Este dashboard es para 'Docentes'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
+    if selected_population != "Formación a docentes":
+        st.info(f"Este dashboard es para 'Formación a docentes'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
         st.stop()
 
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning("⚠️ No se encontraron datos para 'Docentes'.")
+        st.warning("⚠️ No se encontraron datos para 'Formación a docentes'.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
