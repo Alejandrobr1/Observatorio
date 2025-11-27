@@ -60,12 +60,11 @@ def update_filter_by_page(current_page_file):
     pass
 
 def create_nav_buttons(selected_pop):
-    # Cambiar proporción de 3:1 a 4:1 o 5:1
-    col1, col2 = st.columns([5, 1])
-    
-    with col2:
+    # Filtro de población en la parte superior
+    col_selector = st.columns([2, 5])
+    with col_selector[0]:
         new_pop = st.selectbox(
-            "Cambiar a:",
+            "Población:",
             options=list(DASHBOARD_CATEGORIES.keys()),
             index=list(DASHBOARD_CATEGORIES.keys()).index(selected_pop),
             key="population_selector"
@@ -74,14 +73,17 @@ def create_nav_buttons(selected_pop):
             st.session_state.population_filter = new_pop
             st.rerun()
     
-    with col1:
-        # Reducir número de columnas para botones más anchos
-        nav_cols = st.columns(6)  # En lugar de 8
+    # Botones de navegación justo debajo, ocupando todo el ancho
+    if selected_pop in DASHBOARD_CATEGORIES:
+        pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
+        num_buttons = len(pages) + 1  # +1 para Inicio
+        nav_cols = st.columns(num_buttons)
+        
         with nav_cols[0]:
             st.page_link("app.py", label="Inicio", icon="🏠")
         
-        if selected_pop in DASHBOARD_CATEGORIES:
-            pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
-            for i, (page_file, label, icon) in enumerate(pages):
-                with nav_cols[i + 1]:
-                    st.page_link(f"pages/{page_file}", label=label, icon=icon)
+        for i, (page_file, label, icon) in enumerate(pages):
+            with nav_cols[i + 1]:
+                st.page_link(f"pages/{page_file}", label=label, icon=icon)
+
+
