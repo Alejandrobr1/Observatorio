@@ -14,16 +14,21 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes Comfenalco por Sede Nodal")
 st.title("📊 Estudiantes Matriculados por Sede Nodal (Comfenalco)")
 
+# Definir las etiquetas para los filtros de población
+COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
+DOCENTES_LABEL = "Formación a docentes"
+COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
+
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
-    st.session_state.population_filter = "Estudiantes Comfenalco"
+    st.session_state.population_filter = COMFENALCO_LABEL
 
 def create_nav_buttons(selected_pop):
     nav_cols = st.columns(8)
     with nav_cols[0]:
         st.page_link("app.py", label="Inicio", icon="🏠")
 
-    if selected_pop == "Estudiantes Comfenalco":
+    if selected_pop == COMFENALCO_LABEL:
         links = {
             "Sede Nodal": "pages/1p-estudiantes_matriculados_por_sede_nodal.py",
             "Jornada/Día": "pages/2p-estudiantes_por_jornada_dia.py",
@@ -41,11 +46,11 @@ def create_nav_buttons(selected_pop):
             with nav_cols[i+1]:
                 st.page_link(page, label=label)
 
-    elif selected_pop == "Docentes":
+    elif selected_pop == DOCENTES_LABEL:
         with nav_cols[1]:
             st.page_link("pages/8p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
 
-    elif selected_pop == "Estudiantes Colombo":
+    elif selected_pop == COLOMBO_LABEL:
         with nav_cols[1]:
             st.page_link("pages/10p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
         with nav_cols[2]:
@@ -112,15 +117,15 @@ def get_available_years(_engine, prefix):
 st.sidebar.header("Filtros")
 selected_population = st.sidebar.selectbox(
     "Filtrar por tipo de población",
-    ["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"],
-    index=["Estudiantes Comfenalco", "Estudiantes Colombo", "Docentes"].index(st.session_state.population_filter),
+    [COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL],
+    index=[COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL].index(st.session_state.population_filter),
     key="population_filter",
     help="Selecciona el grupo de datos a visualizar."
 )
 st.sidebar.divider()
 
-if selected_population != "Estudiantes Comfenalco":
-    st.info(f"Este dashboard es para 'Estudiantes Comfenalco'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
+if selected_population != COMFENALCO_LABEL:
+    st.info(f"Este dashboard es para '{COMFENALCO_LABEL}'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
     st.stop()
 
 population_prefix = "Estudiantes"
