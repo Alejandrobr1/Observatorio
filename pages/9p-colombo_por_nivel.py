@@ -61,8 +61,13 @@ st.markdown("""
         border-radius: 5px;
         padding: 8px;
         text-align: center;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-decoration: none;
+        height: 4.5em; /* Altura fija para todos los botones */
+        line-height: 1.2; /* Espaciado para texto en varias líneas */
+        word-wrap: break-word;
     }
 </style>
 """, unsafe_allow_html=True)

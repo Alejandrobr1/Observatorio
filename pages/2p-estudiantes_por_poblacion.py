@@ -50,7 +50,7 @@ def create_nav_buttons(selected_pop):
             st.page_link("pages/8p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
         with nav_cols[2]:
             st.page_link("pages/9p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
-            
+
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
 st.markdown("""
@@ -61,8 +61,13 @@ st.markdown("""
         border-radius: 5px;
         padding: 8px;
         text-align: center;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-decoration: none;
+        height: 4.5em; /* Altura fija para todos los botones */
+        line-height: 1.2; /* Espaciado para texto en varias líneas */
+        word-wrap: break-word;
     }
 </style>
 """, unsafe_allow_html=True)
