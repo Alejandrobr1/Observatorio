@@ -1,0 +1,51 @@
+# Configuración compartida para navegación de dashboards
+# Este archivo define las constantes y funciones utilizadas en toda la aplicación
+import streamlit as st
+
+COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
+DOCENTES_LABEL = "Formación a docentes"
+COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
+
+# Mapeo de categorías a páginas
+DASHBOARD_CATEGORIES = {
+    COMFENALCO_LABEL: {
+        "pages": [
+            ("1p-estudiantes_por_jornada_dia.py", "Matriculados por Jornada y Día", "📅"),
+            ("2p-estudiantes_por_poblacion.py", "Matriculados por Tipo de Población", "👥"),
+            ("3p-estudiantes_por_sede_nodal_etapa1_2.py", "Comparativa Etapas por Sede (Pastel)", "⚖️"),
+            ("4p-estudiantes_por_sede_nodal_barras_etp1_2.py", "Comparativa Etapas por Sede (Barras)", "📊"),
+            ("5p-estudiantes_por_institucion.py", "Estudiantes por Institución (Escuela Nueva)", "🏛️"),
+        ],
+        "first_page": "1p-estudiantes_por_jornada_dia.py"
+    },
+    DOCENTES_LABEL: {
+        "pages": [
+            ("6p-docentes_por_nivel.py", "Docentes por Nivel MCER", "🎓"),
+            ("7p-docentes_por_institucion.py", "Docentes por Institución", "🏫"),
+        ],
+        "first_page": "6p-docentes_por_nivel.py"
+    },
+    COLOMBO_LABEL: {
+        "pages": [
+            ("8p-colombo_por_institucion.py", "Colombo - Estudiantes por Institución", "🏫"),
+            ("9p-colombo_por_nivel.py", "Colombo - Estudiantes por Nivel", "📈"),
+        ],
+        "first_page": "8p-colombo_por_institucion.py"
+    }
+}
+
+def create_nav_buttons(selected_pop):
+    """
+    Create navigation buttons for the selected population category.
+    Only displays pages belonging to the selected population.
+    """
+    nav_cols = st.columns(8)
+    with nav_cols[0]:
+        st.page_link("app.py", label="Inicio", icon="🏠")
+    
+    # Get pages for the selected population category
+    if selected_pop in DASHBOARD_CATEGORIES:
+        pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
+        for i, (page_file, label, icon) in enumerate(pages):
+            with nav_cols[i + 1]:
+                st.page_link(f"pages/{page_file}", label=label, icon=icon)

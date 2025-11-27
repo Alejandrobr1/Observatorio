@@ -4,11 +4,9 @@ import pandas as pd
 import numpy as np
 import traceback
 from sqlalchemy import create_engine, text
-import sys
+import sys 
 import os
-from app import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL
-
-# Añadir el directorio raíz del proyecto a sys.path
+from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL, create_nav_buttons# Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
@@ -18,39 +16,6 @@ st.title("📊 Estudiantes por Institución Educativa Escuela Nueva")
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
     st.session_state.population_filter = "Estudiantes Comfenalco"
-
-def create_nav_buttons(selected_pop):
-    nav_cols = st.columns(8)
-    with nav_cols[0]:
-        st.page_link("app.py", label="Inicio", icon="🏠")
-
-    if selected_pop != COMFENALCO_LABEL:
-        links = {
-            "Jornada/Día": "pages/1p-estudiantes_por_jornada_dia.py",
-            "Población": "pages/2p-estudiantes_por_poblacion.py",
-            "Participación % por sede nodal": "pages/3p-estudiantes_por_sede_nodal_etapa1_2.py",
-            "Matriculados por sede nodal": "pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py",
-            "Estudiantes por institución\n(Escuela nueva)": "pages/5p-estudiantes_por_institucion.py"
-        }
-        # Re-ajustar columnas para acomodar todos los botones
-        nav_cols = st.columns(len(links) + 1)
-        with nav_cols[0]:
-            st.page_link("app.py", label="Inicio", icon="🏠")
-        for i, (label, page) in enumerate(links.items()):
-            with nav_cols[i+1]:
-                st.page_link(page, label=label)
-
-    elif selected_pop == DOCENTES_LABEL:
-        with nav_cols[1]:
-            st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
-        with nav_cols[2]:
-            st.page_link("pages/7p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
-
-    elif selected_pop == COLOMBO_LABEL:
-        with nav_cols[1]:
-            st.page_link("pages/8p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
-        with nav_cols[2]:
-            st.page_link("pages/9p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
