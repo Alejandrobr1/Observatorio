@@ -11,12 +11,12 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Estudiantes Colombo")
-st.title("📊 Estudiantes Colombo por Institución Educativa")
+st.set_page_config(layout="wide", page_title="Docentes por Institución")
+st.title("📊 Docentes por Institución Educativa")
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
-    st.session_state.population_filter = "Estudiantes Colombo"
+    st.session_state.population_filter = "Docentes"
 
 def create_nav_buttons(selected_pop):
     nav_cols = st.columns(8)
@@ -43,15 +43,15 @@ def create_nav_buttons(selected_pop):
 
     elif selected_pop == "Docentes":
         with nav_cols[1]:
-            st.page_link("pages/9p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
+            st.page_link("pages/8p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓") # Mantener
         with nav_cols[2]:
-            st.page_link("pages/10p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
+            st.page_link("pages/9p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫") # Renombrado
 
     elif selected_pop == "Estudiantes Colombo":
         with nav_cols[1]:
-            st.page_link("pages/11p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
+            st.page_link("pages/10p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
         with nav_cols[2]:
-            st.page_link("pages/12p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
+            st.page_link("pages/11p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
@@ -71,7 +71,7 @@ st.markdown("""
 
 @st.cache_resource
 def get_engine():
-    # En producción (Streamlit Cloud), lee desde st.secrets
+    # Lee desde st.secrets
     db_user = st.secrets["DB_USER"]
     db_pass = st.secrets["DB_PASS"]
     db_host = st.secrets["DB_HOST"]
@@ -88,9 +88,10 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
+# Función para generar gráfico de barras y tabla
 @st.cache_data
 def get_available_years(_engine):
-    table_name = "Estudiantes_Colombo"
+    table_name = "Docentes"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             st.warning(f"La tabla '{table_name}' no existe. No se pueden cargar los años.")
@@ -102,12 +103,11 @@ def get_available_years(_engine):
     st.warning(f"No se encontraron años en la tabla '{table_name}'.")
     return []
 
-# Función para generar gráfico de barras y tabla
-def create_bar_chart_and_table(df_data, total_estudiantes, title):
+def create_bar_chart_and_table(df_data, total_docentes, title):
     st.header(f"📊 {title} - Año {st.session_state.selected_year}")
     
     if df_data.empty:
-        st.warning("No hay datos de estudiantes para el año seleccionado.")
+        st.warning("No hay datos de docentes para el año seleccionado.")
         return
 
     df_data['cantidad'] = pd.to_numeric(df_data['cantidad'])
@@ -128,8 +128,8 @@ def create_bar_chart_and_table(df_data, total_estudiantes, title):
         
         ax.set_yticks(y_pos)
         ax.set_yticklabels(df_sorted['institucion'])
-        ax.set_xlabel('Cantidad de Estudiantes')
-        ax.set_title('Estudiantes Colombo por Institución Educativa')
+        ax.set_xlabel('Cantidad de Docentes')
+        ax.set_title('Docentes por Institución Educativa')
         
         # Añadir etiquetas de valor en las barras
         for bar in bars:
@@ -143,18 +143,18 @@ def create_bar_chart_and_table(df_data, total_estudiantes, title):
 
     with col2:
         st.subheader("📋 Resumen")
-        df_data['porcentaje'] = (df_data['cantidad'] / float(total_estudiantes) * 100) if total_estudiantes > 0 else 0
+        df_data['porcentaje'] = (df_data['cantidad'] / float(total_docentes) * 100) if total_docentes > 0 else 0
         df_display = df_data.copy()
         df_display['#'] = range(1, len(df_display) + 1)
         df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
         df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
         df_display = df_display[['#', 'institucion', 'cantidad', 'porcentaje']]
-        df_display.columns = ['#', 'Institución', 'Estudiantes', 'Porcentaje']
+        df_display.columns = ['#', 'Institución', 'Docentes', 'Porcentaje']
         st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 @st.cache_data
 def load_data(_engine, year):
-    table_name = "Estudiantes_Colombo"
+    table_name = "Docentes"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(), 0, 0
@@ -174,12 +174,12 @@ def load_data(_engine, year):
         df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["institucion", "cantidad"])
         
         query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
-        total_estudiantes = connection.execute(query_total, params).scalar() or 0
+        total_docentes = connection.execute(query_total, params).scalar() or 0
         
         query_instituciones = text(f"SELECT COUNT(DISTINCT INSTITUCION_EDUCATIVA) FROM {table_name} WHERE FECHA = :year")
         total_instituciones = connection.execute(query_instituciones, params).scalar() or 0
         
-        return df, total_estudiantes, total_instituciones
+        return df, total_docentes, total_instituciones
 
 try:
     st.sidebar.header("Filtros")
@@ -192,43 +192,44 @@ try:
     )
     st.sidebar.divider()
 
-    if selected_population != "Estudiantes Colombo":
-        st.info(f"Este dashboard es para 'Estudiantes Colombo'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
+    if selected_population != "Docentes":
+        st.info(f"Este dashboard es para 'Docentes'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
         st.stop()
 
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning("⚠️ No se encontraron datos para 'Estudiantes Colombo'.")
+        st.warning("⚠️ No se encontraron datos para 'Docentes'.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
         st.session_state.selected_year = available_years[0]
     selected_year = st.session_state.selected_year
 
-    df_estudiantes, total_estudiantes, total_instituciones = load_data(engine, selected_year)
+    df_docentes, total_docentes, total_instituciones = load_data(engine, selected_year)
 
     st.sidebar.info(f"**Año:** {selected_year}")
     st.sidebar.divider()
     st.sidebar.header("📈 Estadísticas Generales")
-    st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{int(total_estudiantes):,}")
-    st.sidebar.metric(f"Instituciones ({selected_year})", f"{int(total_instituciones):,}")
+    st.sidebar.metric(f"Total Docentes ({selected_year})", f"{int(total_docentes):,}")
+    st.sidebar.metric(f"Instituciones con Docentes ({selected_year})", f"{int(total_instituciones):,}")
     st.sidebar.divider()
     # Añadir el logo al final del sidebar
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
 
-    create_bar_chart_and_table(df_estudiantes, total_estudiantes, "Distribución de Estudiantes Colombo por Institución")
-    
-    st.divider()
-    with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
-        st.write("Haz clic en un botón para cambiar el año de los datos mostrados.")
-        cols = st.columns(len(available_years))
+    # Layout en dos columnas: Gráfico y tabla a la izquierda, filtro de año a la derecha
+    col1, col2 = st.columns([3, 1])
+
+    with col1:
+        create_bar_chart_and_table(df_docentes, total_docentes, "Distribución de Docentes por Institución")
+
+    with col2:
+        st.write("📅 **Seleccionar Año**")
         def set_year(year):
             st.session_state.selected_year = year
-        for i, year in enumerate(available_years):
-            with cols[i]:
-                button_type = "primary" if year == selected_year else "secondary"
-                st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+        for year in available_years:
+            button_type = "primary" if year == selected_year else "secondary"
+            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")

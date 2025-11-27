@@ -43,15 +43,15 @@ def create_nav_buttons(selected_pop):
 
     elif selected_pop == "Docentes":
         with nav_cols[1]:
-            st.page_link("pages/9p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
-        with nav_cols[2]:
-            st.page_link("pages/10p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
+            st.page_link("pages/8p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
 
     elif selected_pop == "Estudiantes Colombo":
         with nav_cols[1]:
-            st.page_link("pages/11p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
+            st.page_link("pages/10p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
         with nav_cols[2]:
-            st.page_link("pages/12p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
+            st.page_link("pages/11p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
+        with nav_cols[3]:
+            st.page_link("pages/9p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
@@ -234,23 +234,18 @@ try:
     with col2:
         create_pie_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
     
-    # --- Selección de Año con Botones ---
+    # Layout para el filtro de año
     st.divider()
-    with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
-        st.write("Haz clic en un botón para cambiar el año de los datos mostrados en los gráficos.")
-        
-        cols_buttons = st.columns(len(available_years))
-        
+    col_filter, _ = st.columns([1, 3]) # Columna para el filtro a la izquierda
+    with col_filter:
+        st.write("📅 **Seleccionar Año**")
         def set_year(year):
             st.session_state.selected_year = year
 
-        for i, year in enumerate(available_years):
-            with cols_buttons[i]:
-                button_type = "primary" if year == selected_year else "secondary"
-                st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+        for year in available_years:
+            button_type = "primary" if year == selected_year else "secondary"
+            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
     st.exception(e)
-    with st.expander("Ver detalles técnicos del error"):
-        st.code(traceback.format_exc())
