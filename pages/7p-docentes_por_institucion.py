@@ -116,44 +116,41 @@ def create_bar_chart_and_table(df_data, total_docentes, title):
     df_data['cantidad'] = pd.to_numeric(df_data['cantidad'])
     df_data = df_data[df_data['cantidad'] > 0]
 
-    col1, col2 = st.columns([2, 1])
+    # Gráfico de barras
+    st.subheader("Visualización por Institución")
+    df_sorted = df_data.sort_values('cantidad', ascending=True)
+    
+    fig, ax = plt.subplots(figsize=(12, max(6, len(df_sorted) * 0.3)))
+    y_pos = np.arange(len(df_sorted))
+    colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_sorted)))
+    
+    bars = ax.barh(y_pos, df_sorted['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
+    
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(df_sorted['institucion'])
+    ax.set_xlabel('Cantidad de Docentes')
+    ax.set_title('Docentes por Institución Educativa')
+    
+    # Añadir etiquetas de valor en las barras
+    for bar in bars:
+        width = bar.get_width()
+        ax.text(width + (df_sorted['cantidad'].max() * 0.01), bar.get_y() + bar.get_height()/2,
+                f'{int(width):,}', ha='left', va='center', fontsize=9)
+    
+    ax.grid(axis='x', linestyle='--', alpha=0.6)
+    plt.tight_layout()
+    st.pyplot(fig)
 
-    with col1:
-        st.subheader("Visualización por Institución")
-        # Ordenar datos para gráfico horizontal
-        df_sorted = df_data.sort_values('cantidad', ascending=True)
-        
-        fig, ax = plt.subplots(figsize=(12, max(6, len(df_sorted) * 0.3)))
-        y_pos = np.arange(len(df_sorted))
-        colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_sorted)))
-        
-        bars = ax.barh(y_pos, df_sorted['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
-        
-        ax.set_yticks(y_pos)
-        ax.set_yticklabels(df_sorted['institucion'])
-        ax.set_xlabel('Cantidad de Docentes')
-        ax.set_title('Docentes por Institución Educativa')
-        
-        # Añadir etiquetas de valor en las barras
-        for bar in bars:
-            width = bar.get_width()
-            ax.text(width + (df_sorted['cantidad'].max() * 0.01), bar.get_y() + bar.get_height()/2,
-                    f'{int(width):,}', ha='left', va='center', fontsize=9)
-        
-        ax.grid(axis='x', linestyle='--', alpha=0.6)
-        plt.tight_layout()
-        st.pyplot(fig)
-
-    with col2:
-        st.subheader("📋 Resumen")
-        df_data['porcentaje'] = (df_data['cantidad'] / float(total_docentes) * 100) if total_docentes > 0 else 0
-        df_display = df_data.copy()
-        df_display['#'] = range(1, len(df_display) + 1)
-        df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
-        df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
-        df_display = df_display[['#', 'institucion', 'cantidad', 'porcentaje']]
-        df_display.columns = ['#', 'Institución', 'Docentes', 'Porcentaje']
-        st.dataframe(df_display, use_container_width=True, hide_index=True)
+    # Tabla de resumen
+    st.subheader("📋 Resumen")
+    df_data['porcentaje'] = (df_data['cantidad'] / float(total_docentes) * 100) if total_docentes > 0 else 0
+    df_display = df_data.copy()
+    df_display['#'] = range(1, len(df_display) + 1)
+    df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
+    df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
+    df_display = df_display[['#', 'institucion', 'cantidad', 'porcentaje']]
+    df_display.columns = ['#', 'Institución', 'Docentes', 'Porcentaje']
+    st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 @st.cache_data
 def load_data(_engine, year):
