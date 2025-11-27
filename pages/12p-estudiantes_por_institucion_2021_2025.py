@@ -5,7 +5,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 import sys
 import os
-from dashboard_config import create_nav_buttons, ESTUDIANTES_2021_2025_LABEL
+from dashboard_config import create_nav_buttons, COMFENALCO_LABEL
 
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -16,7 +16,7 @@ st.title("📊 Estudiantes por Institución Educativa (2021-2025)")
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
-    st.session_state.population_filter = ESTUDIANTES_2021_2025_LABEL
+    st.session_state.population_filter = COMFENALCO_LABEL
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
@@ -154,7 +154,7 @@ def load_data(_engine, year):
 try:
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning(f"⚠️ No se encontraron datos para {ESTUDIANTES_2021_2025_LABEL}.")
+        st.warning(f"⚠️ No se encontraron datos para la población seleccionada.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:

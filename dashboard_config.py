@@ -5,7 +5,6 @@ import streamlit as st
 COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
 DOCENTES_LABEL = "Formación a docentes"
 COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
-ESTUDIANTES_2021_2025_LABEL = "Formación a estudiantes 2021-2025"
 
 # Mapeo de categorías a páginas
 DASHBOARD_CATEGORIES = {
@@ -16,6 +15,7 @@ DASHBOARD_CATEGORIES = {
             ("3p-estudiantes_por_sede_nodal_etapa1_2.py", "“Participación % por sede nodal", "⚖️"),
             ("4p-estudiantes_por_sede_nodal_barras_etp1_2.py", "Matriculados por sede nodal", "📊"),
             ("5p-estudiantes_por_institucion.py", "Estudiantes por Institución (Escuela Nueva)", "🏛️"),
+            ("12p-estudiantes_por_institucion_2021_2025.py", "Estudiantes por Institución (2021-2025)", "🏫"),
         ],
         "first_page": "1p-estudiantes_por_jornada_dia.py"
     },
@@ -34,12 +34,6 @@ DASHBOARD_CATEGORIES = {
         ],
         "first_page": "8p-colombo_por_institucion.py",
         
-    },
-    ESTUDIANTES_2021_2025_LABEL: {
-        "pages": [
-            ("12p-estudiantes_por_institucion_2021_2025.py", "Estudiantes por Institución", "🏫"),
-        ],
-        "first_page": "12p-estudiantes_por_institucion_2021_2025.py",
     }
 }
 

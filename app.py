@@ -145,7 +145,6 @@ with tab2:
     COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
     DOCENTES_LABEL = "Formación a docentes"
     COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
-    ESTUDIANTES_2021_2025_LABEL = "Formación a estudiantes 2021-2025"
 
     # Inicializar el estado de la sesión para el filtro de población
     if 'population_filter' not in st.session_state:
@@ -155,7 +154,7 @@ with tab2:
         st.session_state.population_filter = pop_type
 
     # Crear botones para seleccionar la población
-    pop_options = [COMFENALCO_LABEL, DOCENTES_LABEL, COLOMBO_LABEL, ESTUDIANTES_2021_2025_LABEL]
+    pop_options = [COMFENALCO_LABEL, DOCENTES_LABEL, COLOMBO_LABEL]
     cols = st.columns(len(pop_options))
     for i, pop in enumerate(pop_options):
         with cols[i]:
@@ -174,6 +173,7 @@ with tab2:
         with col2:
             st.page_link("pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Comparativa Etapas por Sede (Barras)", icon="📊")
             st.page_link("pages/5p-estudiantes_por_institucion.py", label="Estudiantes por Institución\n(Escuela Nueva)", icon="🏛️")
+            st.page_link("pages/12p-estudiantes_por_institucion_2021_2025.py", label="Estudiantes por Institución (2021-2025)", icon="🏫")
     
     elif st.session_state.population_filter == DOCENTES_LABEL:
         st.markdown("#### 👨‍🏫 Análisis de Docentes")
@@ -184,10 +184,6 @@ with tab2:
         st.markdown("#### Análisis Colombo Americano")
         st.page_link("pages/8p-colombo_por_institucion.py", label="Colombo - Estudiantes por Institución", icon="🏫")
         st.page_link("pages/9p-colombo_por_nivel.py", label="Colombo - Estudiantes por Nivel", icon="📈")
-
-    elif st.session_state.population_filter == ESTUDIANTES_2021_2025_LABEL:
-        st.markdown("#### 📈 Análisis de Estudiantes (2021-2025)")
-        st.page_link("pages/12p-estudiantes_por_institucion_2021_2025.py", label="Estudiantes por Institución", icon="🏫")
 
 
 with tab3:
