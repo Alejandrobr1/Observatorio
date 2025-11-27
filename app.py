@@ -169,8 +169,8 @@ with tab2:
         with col1:
             st.page_link("pages/1p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día", icon="📅")
             st.page_link("pages/2p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población", icon="👥")
-            st.page_link("pages/3p-estudiantes_por_sede_nodal_etapa1_2.py", label="Comparativa Etapas por Sede (Pastel)", icon="⚖️")
-            st.page_link("pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Comparativa Etapas por Sede (Barras)", icon="📊")
+            st.page_link("pages/3p-estudiantes_por_sede_nodal_etapa1_2.py", label="Participación % por sede nodal", icon="⚖️")
+            st.page_link("pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Matriculados por sede nodal", icon="📊")
         with col2:
             st.page_link("pages/5p-estudiantes_por_institucion.py", label="Estudiantes por Institución\n(Escuela Nueva)", icon="🏛️")
             st.page_link("pages/10p-estudiantes_por_institucion_2021_2025.py", label="Estudiantes por Institución (2021-2025)", icon="🏫")
