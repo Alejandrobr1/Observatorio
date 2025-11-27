@@ -13,7 +13,6 @@ import sys
 # Añadir el directorio raíz del proyecto a sys.path para encontrar 'Base_datos'
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
 from Base_datos.conexion import get_engine
-from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL
 
 
 # Configuración de la página
@@ -94,10 +93,6 @@ def export_all_tables_to_zip(engine):
     return mem_zip.read()
 
 
-# Inicializar el filtro de población en session_state
-if 'population_filter' not in st.session_state:
-    st.session_state.population_filter = COMFENALCO_LABEL
-
 # Contenido principal
 tab1, tab2, tab3 = st.tabs(["🏠 Inicio", "📈 Dashboards", "📥 Descargas"])
 
@@ -136,7 +131,7 @@ with tab1:
                 
             col2.metric("👥 Total de Personas", personas_count)
             col2.metric("🏫 Instituciones", inst_count)
-        except Exception:
+        except Exception as e:
             # Si hay un error de conexión, no se muestran las métricas,
             # pero se evita mostrar un mensaje de error al usuario en esta sección.
             pass
@@ -144,7 +139,27 @@ with tab1:
 
 with tab2:
     st.markdown("### 📈 Dashboards Disponibles")
-    st.markdown("Selecciona el tipo de población desde el selector en la barra de navegación superior.")
+    st.markdown("Selecciona el tipo de población para ver los dashboards correspondientes.")
+
+    # Definir las etiquetas para los filtros de población
+    COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
+    DOCENTES_LABEL = "Formación a docentes"
+    COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
+
+    # Inicializar el estado de la sesión para el filtro de población
+    if 'population_filter' not in st.session_state:
+        st.session_state.population_filter = COMFENALCO_LABEL
+
+    def set_population(pop_type):
+        st.session_state.population_filter = pop_type
+
+    # Crear botones para seleccionar la población
+    pop_options = [COMFENALCO_LABEL, DOCENTES_LABEL, COLOMBO_LABEL]
+    cols = st.columns(len(pop_options))
+    for i, pop in enumerate(pop_options):
+        with cols[i]:
+            st.button(pop, key=f"pop_btn_{pop}", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if st.session_state.population_filter == pop else "secondary")
+
     st.markdown("---")
     
     # Mostrar enlaces de dashboards según la población seleccionada
