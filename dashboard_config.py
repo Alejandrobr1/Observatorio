@@ -16,6 +16,7 @@ DASHBOARD_CATEGORIES = {
             ("4p-estudiantes_por_sede_nodal_barras_etp1_2.py", "Matriculados por sede nodal", "📊"),
             ("5p-estudiantes_por_institucion.py", "Estudiantes por Institución (Escuela Nueva)", "🏛️"),
             ("10p-estudiantes_por_institucion_2021_2025.py", "Estudiantes por Institución (2021-2025)", "🏫"),
+            ("11p-estudiantes_por_grado_2021_2025.py", "Estudiantes por Grado (2021-2025)", "🏫"),
         ],
         "first_page": "1p-estudiantes_por_jornada_dia.py"
     },
