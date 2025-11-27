@@ -155,15 +155,7 @@ def load_data(_engine, year):
 
 try:
     st.sidebar.header("Filtros")
-    selected_pop = st.sidebar.selectbox(
-        "Filtrar por tipo de población",
-        [COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL],
-        index=[COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL].index(st.session_state.population_filter),
-        key="population_filter",
-        help="Selecciona el grupo de datos a visualizar."
-    )
-    st.sidebar.divider()
-
+    
     available_years = get_available_years(engine)
     if not available_years:
         st.warning(f"⚠️ No se encontraron datos para {DOCENTES_LABEL}.")
