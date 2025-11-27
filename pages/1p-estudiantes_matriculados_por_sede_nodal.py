@@ -182,46 +182,44 @@ try:
         if os.path.exists("assets/Logo_rionegro.png"):
             st.sidebar.image("assets/Logo_rionegro.png")
 
-        # Crear gráfico de barras horizontales
-        st.header(f"📊 Matriculados por Sede Nodal (Etapa 1) - Año {selected_year}")
+        # Layout en dos columnas: Gráfico a la izquierda, filtro de año a la derecha
+        col1, col2 = st.columns([3, 1])
 
-        df['cantidad'] = pd.to_numeric(df['cantidad'])
-        df_sorted = df.sort_values('cantidad', ascending=True)
+        with col1:
+            # Crear gráfico de barras horizontales
+            st.header(f"📊 Matriculados por Sede Nodal (Etapa 1) - Año {selected_year}")
 
-        fig, ax = plt.subplots(figsize=(12, max(8, len(df_sorted) * 0.5)))
-        y_pos = range(len(df_sorted))
-        colors_gradient = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_sorted)))
-        bars = ax.barh(y_pos, df_sorted['cantidad'], color=colors_gradient, edgecolor='black', linewidth=1.2)
-        
-        for i, (bar, valor) in enumerate(zip(bars, df_sorted['cantidad'])):
-            ax.text(valor, i, f'  {int(valor):,}', ha='left', va='center', color='black', fontsize=10, fontweight='bold')
-        
-        ax.set_yticks(y_pos, labels=df_sorted['SEDE_NODAL'])
-        ax.set_yticklabels(df_sorted['SEDE_NODAL'], fontsize=10)
-        ax.set_xlabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Sede Nodal', fontsize=13, fontweight='bold')
-        ax.set_title(f'Estudiantes Matriculados por Sede Nodal\nAño {selected_year}', fontsize=16, fontweight='bold', pad=20)
-        
-        max_val = df_sorted['cantidad'].max() if not df_sorted.empty else 1
-        ax.set_xlim(right=float(max_val) * 1.15)
-        ax.grid(axis='x', alpha=0.3, linestyle='--')
-        plt.tight_layout()
-        st.pyplot(fig)
+            df['cantidad'] = pd.to_numeric(df['cantidad'])
+            df_sorted = df.sort_values('cantidad', ascending=True)
 
-        # --- Selección de Año con Botones ---
-        st.divider()
-        with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
-            st.write("Haz clic en un botón para cambiar el año de los datos mostrados en los gráficos.")
+            fig, ax = plt.subplots(figsize=(12, max(8, len(df_sorted) * 0.5)))
+            y_pos = range(len(df_sorted))
+            colors_gradient = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_sorted)))
+            bars = ax.barh(y_pos, df_sorted['cantidad'], color=colors_gradient, edgecolor='black', linewidth=1.2)
+            
+            for i, (bar, valor) in enumerate(zip(bars, df_sorted['cantidad'])):
+                ax.text(valor, i, f'  {int(valor):,}', ha='left', va='center', color='black', fontsize=10, fontweight='bold')
+            
+            ax.set_yticks(y_pos, labels=df_sorted['SEDE_NODAL'])
+            ax.set_yticklabels(df_sorted['SEDE_NODAL'], fontsize=10)
+            ax.set_xlabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Sede Nodal', fontsize=13, fontweight='bold')
+            ax.set_title(f'Estudiantes Matriculados por Sede Nodal\nAño {selected_year}', fontsize=16, fontweight='bold', pad=20)
+            
+            max_val = df_sorted['cantidad'].max() if not df_sorted.empty else 1
+            ax.set_xlim(right=float(max_val) * 1.15)
+            ax.grid(axis='x', alpha=0.3, linestyle='--')
+            plt.tight_layout()
+            st.pyplot(fig)
 
-            cols = st.columns(len(available_years))
-
+        with col2:
+            st.write("📅 **Seleccionar Año**")
             def set_year(year):
                 st.session_state.selected_year = year
 
-            for i, year in enumerate(available_years):
-                with cols[i]:
-                    button_type = "primary" if year == selected_year else "secondary"
-                    st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), use_container_width=True, type=button_type)
+            for year in available_years:
+                button_type = "primary" if year == selected_year else "secondary"
+                st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), use_container_width=True, type=button_type)
 
         # Tabla resumen
         df['porcentaje'] = (df['cantidad'] / float(total_matriculados) * 100) if total_matriculados > 0 else 0
