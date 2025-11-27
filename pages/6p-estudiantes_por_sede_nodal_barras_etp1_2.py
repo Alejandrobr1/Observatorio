@@ -227,23 +227,23 @@ try:
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
 
+    # --- Selección de Año con Botones Horizontales ---
+    st.write("📅 **Seleccionar Año para Visualizar**")
+    cols_buttons = st.columns(len(available_years))
+    def set_year(year):
+        st.session_state.selected_year = year
+
+    for i, year in enumerate(available_years):
+        with cols_buttons[i]:
+            button_type = "primary" if year == selected_year else "secondary"
+            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+    st.divider()
+
     col1, col2 = st.columns(2)
     with col1:
         create_bar_chart_and_table(df_etapa1, total_etapa1, f"📊 Etapa 1 - Año {selected_year}")
     with col2:
         create_bar_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
-
-    # Layout para el filtro de año
-    st.divider()
-    col_filter, _ = st.columns([1, 3]) # Columna para el filtro a la izquierda
-    with col_filter:
-        st.write("📅 **Seleccionar Año**")
-        def set_year(year):
-            st.session_state.selected_year = year
-
-        for year in available_years:
-            button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
