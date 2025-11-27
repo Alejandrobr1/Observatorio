@@ -24,7 +24,7 @@ def create_nav_buttons(selected_pop):
     with nav_cols[0]:
         st.page_link("app.py", label="Inicio", icon="🏠")
 
-    if selected_population != COMFENALCO_LABEL:
+    if selected_pop != COMFENALCO_LABEL:
         links = {
             "Jornada/Día": "pages/1p-estudiantes_por_jornada_dia.py",
             "Población": "pages/2p-estudiantes_por_poblacion.py",
@@ -173,7 +173,7 @@ def load_data(_engine, year):
 # --- Consultas y Visualización Principal ---
 try:
     st.sidebar.header("Filtros")
-    selected_population = st.sidebar.selectbox(
+    selected_pop = st.sidebar.selectbox(
         "Filtrar por tipo de población",
         [COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL],
         index=[COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL].index(st.session_state.population_filter),
@@ -182,7 +182,7 @@ try:
     )
     st.sidebar.divider()
 
-    if selected_population != COMFENALCO_LABEL:
+    if selected_pop != COMFENALCO_LABEL:
         st.info(f"Este dashboard es para {COMFENALCO_LABEL}. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
         st.stop()
 

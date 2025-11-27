@@ -24,7 +24,7 @@ def create_nav_buttons(selected_pop):
     with nav_cols[0]:
         st.page_link("app.py", label="Inicio", icon="🏠")
 
-    if selected_population != COMFENALCO_LABEL:
+    if selected_pop != COMFENALCO_LABEL:
         links = {
             "Jornada/Día": "pages/1p-estudiantes_por_jornada_dia.py",
             "Población": "pages/2p-estudiantes_por_poblacion.py",
@@ -120,7 +120,7 @@ def get_available_years(_engine, prefix):
     return []
 
 st.sidebar.header("Filtros")
-selected_population = st.sidebar.selectbox(
+selected_pop = st.sidebar.selectbox(
     "Filtrar por tipo de población",
     [COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL],
     index=[COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL].index(st.session_state.population_filter),
@@ -129,7 +129,7 @@ selected_population = st.sidebar.selectbox(
 )
 st.sidebar.divider()
 
-if selected_population != COMFENALCO_LABEL:
+if selected_pop != COMFENALCO_LABEL:
     st.info(f"Este dashboard es para {COMFENALCO_LABEL}. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
     st.stop()
 
@@ -137,7 +137,7 @@ population_prefix = "Estudiantes"
 available_years = get_available_years(engine, population_prefix)
 
 if not available_years:
-    st.warning(f"⚠️ No se encontraron datos para '{selected_population}'.")
+    st.warning(f"⚠️ No se encontraron datos para '{selected_pop}'.")
     st.stop()
 
 # FORZAR REINICIO DEL AÑO: Si el año guardado en la sesión no es válido para
@@ -147,7 +147,7 @@ if 'selected_year' not in st.session_state or st.session_state.selected_year not
 
 selected_year = st.session_state.selected_year
 
-st.sidebar.info(f"**Población:** {selected_population}")
+st.sidebar.info(f"**Población:** {selected_pop}")
 st.sidebar.info(f"**Año:** {selected_year}")
 st.sidebar.divider()
 
