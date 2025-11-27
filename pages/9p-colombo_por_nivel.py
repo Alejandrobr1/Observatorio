@@ -33,7 +33,8 @@ def create_nav_buttons(selected_pop):
         }
         # Re-ajustar columnas para acomodar todos los botones
         nav_cols = st.columns(len(links) + 1)
-        
+        with nav_cols[0]:
+            st.page_link("app.py", label="Inicio", icon="🏠")
         for i, (label, page) in enumerate(links.items()):
             with nav_cols[i+1]:
                 st.page_link(page, label=label)
