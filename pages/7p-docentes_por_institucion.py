@@ -11,8 +11,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Docentes por Nivel")
-st.title("📊 Docentes por Nivel")
+st.set_page_config(layout="wide", page_title="Docentes por Institución")
+st.title("📊 Docentes por Institución Educativa")
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
@@ -43,15 +43,15 @@ def create_nav_buttons(selected_pop):
 
     elif selected_pop == "Docentes":
         with nav_cols[1]:
-            st.page_link("pages/8p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
+            st.page_link("pages/8p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓") # Mantener
+        with nav_cols[2]:
+            st.page_link("pages/9p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫") # Renombrado
 
     elif selected_pop == "Estudiantes Colombo":
         with nav_cols[1]:
             st.page_link("pages/10p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
         with nav_cols[2]:
             st.page_link("pages/11p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
-        with nav_cols[3]:
-            st.page_link("pages/9p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
@@ -88,6 +88,7 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
+# Función para generar gráfico de barras y tabla
 @st.cache_data
 def get_available_years(_engine):
     table_name = "Docentes"
@@ -102,8 +103,7 @@ def get_available_years(_engine):
     st.warning(f"No se encontraron años en la tabla '{table_name}'.")
     return []
 
-# Función para generar gráfico de dona y tabla
-def create_donut_chart_and_table(df_data, total_docentes, title):
+def create_bar_chart_and_table(df_data, total_docentes, title):
     st.header(f"📊 {title} - Año {st.session_state.selected_year}")
     
     if df_data.empty:
@@ -113,43 +113,45 @@ def create_donut_chart_and_table(df_data, total_docentes, title):
     df_data['cantidad'] = pd.to_numeric(df_data['cantidad'])
     df_data = df_data[df_data['cantidad'] > 0]
 
-    col1, col2 = st.columns([1, 2])
+    col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.subheader("📋 Resumen por Nivel")
+        st.subheader("Visualización por Institución")
+        # Ordenar datos para gráfico horizontal
+        df_sorted = df_data.sort_values('cantidad', ascending=True)
+        
+        fig, ax = plt.subplots(figsize=(12, max(6, len(df_sorted) * 0.3)))
+        y_pos = np.arange(len(df_sorted))
+        colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_sorted)))
+        
+        bars = ax.barh(y_pos, df_sorted['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
+        
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(df_sorted['institucion'])
+        ax.set_xlabel('Cantidad de Docentes')
+        ax.set_title('Docentes por Institución Educativa')
+        
+        # Añadir etiquetas de valor en las barras
+        for bar in bars:
+            width = bar.get_width()
+            ax.text(width + (df_sorted['cantidad'].max() * 0.01), bar.get_y() + bar.get_height()/2,
+                    f'{int(width):,}', ha='left', va='center', fontsize=9)
+        
+        ax.grid(axis='x', linestyle='--', alpha=0.6)
+        plt.tight_layout()
+        st.pyplot(fig)
+
+    with col2:
+        st.subheader("📋 Resumen")
         df_data['porcentaje'] = (df_data['cantidad'] / float(total_docentes) * 100) if total_docentes > 0 else 0
         df_display = df_data.copy()
         df_display['#'] = range(1, len(df_display) + 1)
         df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
         df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
-        df_display = df_display[['#', 'NIVEL', 'cantidad', 'porcentaje']]
-        df_display.columns = ['#', 'Nivel', 'Docentes', 'Porcentaje']
+        df_display = df_display[['#', 'institucion', 'cantidad', 'porcentaje']]
+        df_display.columns = ['#', 'Institución', 'Docentes', 'Porcentaje']
         st.dataframe(df_display, use_container_width=True, hide_index=True)
 
-    with col2:
-        st.subheader("Visualización")
-        fig, ax = plt.subplots(figsize=(8, 6))
-        
-        # Gráfico de Dona
-        labels = df_data['NIVEL']
-        sizes = df_data['cantidad']
-        colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(labels)))
-        
-        wedges, texts, autotexts = ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90,
-                                          colors=colors, pctdistance=0.85,
-                                          wedgeprops=dict(width=0.4, edgecolor='w'))
-        
-        plt.setp(autotexts, size=10, weight="bold", color="white")
-        ax.set_title("Distribución de Docentes por Nivel", pad=20)
-        
-        # Círculo central para hacer la dona
-        centre_circle = plt.Circle((0,0),0.60,fc='white')
-        fig.gca().add_artist(centre_circle)
-        
-        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-        plt.tight_layout()
-        st.pyplot(fig)
-        
 @st.cache_data
 def load_data(_engine, year):
     table_name = "Docentes"
@@ -160,16 +162,16 @@ def load_data(_engine, year):
         params = {'year': year}
         query_data = text(f"""
             SELECT 
-                NIVEL, COUNT(ID) as cantidad
+                INSTITUCION_EDUCATIVA as institucion, COUNT(ID) as cantidad
             FROM {table_name}
             WHERE FECHA = :year
-              AND NIVEL IS NOT NULL 
-              AND NIVEL != '' 
-              AND NIVEL != 'SIN INFORMACION'
-            GROUP BY NIVEL
+              AND INSTITUCION_EDUCATIVA IS NOT NULL 
+              AND INSTITUCION_EDUCATIVA != '' 
+              AND INSTITUCION_EDUCATIVA != 'SIN INFORMACION'
+            GROUP BY institucion
             ORDER BY cantidad DESC
         """)
-        df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["NIVEL", "cantidad"])
+        df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["institucion", "cantidad"])
         
         query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
         total_docentes = connection.execute(query_total, params).scalar() or 0
@@ -219,7 +221,7 @@ try:
     col1, col2 = st.columns([3, 1])
 
     with col1:
-        create_donut_chart_and_table(df_docentes, total_docentes, "Distribución de Docentes por Nivel")
+        create_bar_chart_and_table(df_docentes, total_docentes, "Distribución de Docentes por Institución")
 
     with col2:
         st.write("📅 **Seleccionar Año**")
@@ -237,8 +239,8 @@ def add_interest_links():
     st.markdown("---")
     st.markdown("### 🔗 Enlaces de Interés")
     st.markdown("""
-    - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx)
-    - [Agencia Pública de Empleo Municipio de Rionegro](https://rionegro.gov.co/publicaciones/508/agencia-publica-de-empleo-de-rionegro/)
     - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
+    - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx) 
     """)
 add_interest_links()

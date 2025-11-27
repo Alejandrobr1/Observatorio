@@ -164,7 +164,7 @@ with tab2:
     
     # Mostrar enlaces de dashboards según la población seleccionada
     if st.session_state.population_filter == COMFENALCO_LABEL:
-        st.markdown("#### 📊 Análisis de Matrículas (Comfenalco y Escuela Nueva)")
+        st.markdown("#### 📊 Análisis de Matrículas")
         col1, col2 = st.columns(2)
         with col1:
             st.page_link("pages/1p-estudiantes_matriculados_por_sede_nodal.py", label="Matriculados por Sede Nodal", icon="🏫")
