@@ -186,47 +186,44 @@ try:
     if df.empty:
         st.warning(f"⚠️ No hay datos de matriculados por población para el año {selected_year}.")
     else:
-        # Crear gráfico de barras verticales
-        st.header(f"📊 Matriculados por Tipo de Población - Año {selected_year}")
-        fig, ax = plt.subplots(figsize=(12, 7))
-        colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df)))
-        bars = ax.bar(df['POBLACION'], df['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
-        
-        for bar in bars:
-            height = bar.get_height()
-            if height > 0:
-                ax.annotate(f'{int(height):,}',
-                            xy=(bar.get_x() + bar.get_width() / 2, height),
-                            xytext=(0, 3),
-                            textcoords="offset points",
-                            ha='center', va='bottom', fontsize=10, fontweight='bold')
-        
-        ax.set_xlabel('Tipo de Población', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-        ax.set_title(f'Estudiantes Matriculados por Tipo de Población\nAño {selected_year}',
-                     fontsize=16, fontweight='bold', pad=20)
-        plt.xticks(rotation=45, ha="right")
-        
-        max_val = df['cantidad'].max() if not df.empty else 1
-        ax.set_ylim(0, float(max_val) * 1.2)
-        ax.grid(axis='y', alpha=0.3, linestyle='--')
-        plt.tight_layout()
-        st.pyplot(fig)
+        # Layout en dos columnas: Gráfico a la izquierda, filtro de año a la derecha
+        col1, col2 = st.columns([3, 1])
 
-        # --- Selección de Año con Botones ---
-        st.divider()
-        with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
-            st.write("Haz clic en un botón para cambiar el año de los datos mostrados en los gráficos.")
+        with col1:
+            # Crear gráfico de barras verticales
+            st.header(f"📊 Matriculados por Tipo de Población - Año {selected_year}")
+            fig, ax = plt.subplots(figsize=(12, 7))
+            colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df)))
+            bars = ax.bar(df['POBLACION'], df['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
             
-            cols = st.columns(len(available_years))
+            for bar in bars:
+                height = bar.get_height()
+                if height > 0:
+                    ax.annotate(f'{int(height):,}',
+                                xy=(bar.get_x() + bar.get_width() / 2, height),
+                                xytext=(0, 3),
+                                textcoords="offset points",
+                                ha='center', va='bottom', fontsize=10, fontweight='bold')
             
+            ax.set_xlabel('Tipo de Población', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
+            ax.set_title(f'Estudiantes Matriculados por Tipo de Población\nAño {selected_year}', fontsize=16, fontweight='bold', pad=20)
+            plt.xticks(rotation=45, ha="right")
+            
+            max_val = df['cantidad'].max() if not df.empty else 1
+            ax.set_ylim(0, float(max_val) * 1.2)
+            ax.grid(axis='y', alpha=0.3, linestyle='--')
+            plt.tight_layout()
+            st.pyplot(fig)
+
+        with col2:
+            st.write("📅 **Seleccionar Año**")
             def set_year(year):
                 st.session_state.selected_year = year
 
-            for i, year in enumerate(available_years):
-                with cols[i]:
-                    button_type = "primary" if year == selected_year else "secondary"
-                    st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+            for year in available_years:
+                button_type = "primary" if year == selected_year else "secondary"
+                st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), use_container_width=True, type=button_type)
 
         # Tabla de datos detallada
         df['porcentaje'] = (pd.to_numeric(df['cantidad']) / float(total_matriculados) * 100) if total_matriculados > 0 else 0

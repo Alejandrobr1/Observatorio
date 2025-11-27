@@ -206,20 +206,20 @@ try:
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
 
-    create_bar_chart_and_table(df_total, total_matriculados, f"Total Matriculados por Institución - Año {selected_year}")
-    
-    st.divider()
-    with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
-        st.write("Haz clic en un botón para cambiar el año de los datos mostrados.")
-        
-        cols = st.columns(len(available_years))
+    # Layout en dos columnas: Gráfico y tabla a la izquierda, filtro de año a la derecha
+    col1, col2 = st.columns([3, 1])
+
+    with col1:
+        create_bar_chart_and_table(df_total, total_matriculados, f"Total Matriculados por Institución - Año {selected_year}")
+
+    with col2:
+        st.write("📅 **Seleccionar Año**")
         def set_year(year):
             st.session_state.selected_year = year
 
-        for i, year in enumerate(available_years):
-            with cols[i]:
-                button_type = "primary" if year == selected_year else "secondary"
-                st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+        for year in available_years:
+            button_type = "primary" if year == selected_year else "secondary"
+            st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), use_container_width=True, type=button_type)
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")

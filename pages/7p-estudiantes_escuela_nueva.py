@@ -218,28 +218,23 @@ try:
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
     
-    # Layout de tres columnas
-    col1, col2, col3 = st.columns(3)
+    # Layout de cuatro columnas: 3 para gráficos, 1 para filtro de año
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 0.5])
     with col1:
         create_bar_chart_and_table(df_grupo1, total_grupo1, f"📊 Grupo 1 - Año {selected_year}")
     with col2:
         create_bar_chart_and_table(df_grupo2, total_grupo2, f"📊 Grupo 2 - Año {selected_year}")
     with col3:
         create_bar_chart_and_table(df_grupo3, total_grupo3, f"📊 Grupo 3 - Año {selected_year}")
-    
-    # --- Selección de Año con Botones ---
-    st.divider()
-    with st.expander("📅 **Seleccionar Año para Visualizar**", expanded=True):
-        st.write("Haz clic en un botón para cambiar el año de los datos mostrados.")
-        
-        cols = st.columns(len(available_years))
+    with col4:
+        st.write("📅 **Seleccionar Año**")
         def set_year(year):
             st.session_state.selected_year = year
 
-        for i, year in enumerate(available_years):
-            with cols[i]:
-                button_type = "primary" if year == selected_year else "secondary"
-                st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+        for year in available_years:
+            button_type = "primary" if year == selected_year else "secondary"
+            st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), use_container_width=True, type=button_type)
+
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
