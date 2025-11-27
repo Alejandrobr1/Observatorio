@@ -11,8 +11,13 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Participación por Etapa y Sede Nodal")
-st.title("📊 Participación por Etapa y Sede Nodal (Comfenalco)")
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Etapa")
+st.title("📊 Comparativa de Estudiantes por Etapa y Sede (Comfenalco)")
+
+# Definir las etiquetas para los filtros de población
+COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
+DOCENTES_LABEL = "Formación a docentes"
+COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
@@ -23,13 +28,15 @@ def create_nav_buttons(selected_pop):
     with nav_cols[0]:
         st.page_link("app.py", label="Inicio", icon="🏠")
 
-    if selected_pop == "Estudiantes Comfenalco":
+    if selected_pop == COMFENALCO_LABEL:
         links = {
-            "Jornada/Día": "pages/1p-estudiantes_por_jornada_dia.py",
-            "Población": "pages/2p-estudiantes_por_poblacion.py",
-            "Participación % por sede nodal": "pages/3p-estudiantes_por_sede_nodal_etapa1_2.py",
-            "Matriculados por sede nodal": "pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py",
-            "Estudiantes por institución\n(Escuela nueva)": "pages/5p-estudiantes_por_institucion.py"
+            "Sede Nodal": "pages/1p-estudiantes_matriculados_por_sede_nodal.py",
+            "Jornada/Día": "pages/2p-estudiantes_por_jornada_dia.py",
+            "Población": "pages/3p-estudiantes_por_poblacion.py",
+            "Participación %": "pages/4p-estudiantes_matriculados_sede_porcentaje.py",
+            "Etapas (Pastel)": "pages/5p-estudiantes_por_sede_nodal_etapa1_2.py",
+            "Etapas (Barras)": "pages/6p-estudiantes_por_sede_nodal_barras_etp1_2.py",
+            "Escuela Nueva (IE)": "pages/7p-estudiantes_escuela_nueva_por_ie.py"
         }
         # Re-ajustar columnas para acomodar todos los botones
         nav_cols = st.columns(len(links) + 1)
@@ -39,17 +46,17 @@ def create_nav_buttons(selected_pop):
             with nav_cols[i+1]:
                 st.page_link(page, label=label)
 
-    elif selected_pop == "Docentes":
+    elif selected_pop == DOCENTES_LABEL:
         with nav_cols[1]:
-            st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
+            st.page_link("pages/8p-docentes_por_nivel.py", label="Docentes por Nivel", icon="🎓")
         with nav_cols[2]:
-            st.page_link("pages/7p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
+            st.page_link("pages/9p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
 
-    elif selected_pop == "Estudiantes Colombo":
+    elif selected_pop == COLOMBO_LABEL:
         with nav_cols[1]:
-            st.page_link("pages/8p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
+            st.page_link("pages/10p-colombo_por_institucion.py", label="Colombo por Institución", icon="🏫")
         with nav_cols[2]:
-            st.page_link("pages/9p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
+            st.page_link("pages/11p-colombo_por_nivel.py", label="Colombo por Nivel", icon="📈")
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
@@ -71,7 +78,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
 @st.cache_resource
 def get_engine():
     # En producción (Streamlit Cloud), lee desde st.secrets
@@ -103,8 +109,11 @@ def get_available_years(_engine, prefix):
                 years = [row[0] for row in connection.execute(query_years).fetchall()]
                 if years:
                     return years
-                st.warning(f"La tabla '{table_name}' no contiene años en la columna 'FECHA'. Usando año por defecto.")
-                return [pd.Timestamp.now().year] # Devuelve el año actual si no hay datos
+            else:
+                st.warning(f"La tabla '{table_name}' no existe. Usando año por defecto.")
+                return [pd.Timestamp.now().year]
+            st.warning(f"La tabla '{table_name}' no contiene años en la columna 'FECHA'. Usando año por defecto.")
+            return [pd.Timestamp.now().year]
     else: # Para Docentes
         with _engine.connect() as connection:
             query_tables = text(f"SHOW TABLES LIKE '{prefix}_%'")
@@ -116,18 +125,18 @@ def get_available_years(_engine, prefix):
 st.sidebar.header("Filtros")
 selected_population = st.sidebar.selectbox(
     "Filtrar por tipo de población",
-    ["Formación a estudiantes Comfenalco Antioquia", "Formación a estudiantes Centro Colombo Americano de Medellín", "Formación a docentes"],
-    index=["Formación a estudiantes Comfenalco Antioquia", "Formación a estudiantes Centro Colombo Americano de Medellín", "Formación a docentes"].index(st.session_state.population_filter),
+    [COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL],
+    index=[COMFENALCO_LABEL, COLOMBO_LABEL, DOCENTES_LABEL].index(st.session_state.population_filter),
     key="population_filter",
     help="Selecciona el grupo de datos a visualizar."
 )
 st.sidebar.divider()
 
-if selected_population != "Formación a estudiantes Comfenalco Antioquia":
-    st.info(f"Este dashboard es para 'Formación a estudiantes Comfenalco Antioquia'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
+if selected_population != COMFENALCO_LABEL:
+    st.info(f"Este dashboard es para '{COMFENALCO_LABEL}'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
     st.stop()
 
-population_prefix = "Estudiantes"
+population_prefix = "Estudiantes" # Usar el prefijo correcto para la consulta
 available_years = get_available_years(engine, population_prefix)
 
 if not available_years:
@@ -145,8 +154,8 @@ st.sidebar.info(f"**Población:** {selected_population}")
 st.sidebar.info(f"**Año:** {selected_year}")
 st.sidebar.divider()
 
-# Función para generar gráfico de pastel y tabla
-def create_pie_chart_and_table(df_data, total_etapa, title):
+# Función para generar gráfico de barras y tabla
+def create_bar_chart_and_table(df_data, total_etapa, title):
     st.header(title)
     
     if df_data.empty:
@@ -155,31 +164,27 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
 
     df_data['cantidad'] = pd.to_numeric(df_data['cantidad'])
 
-    df_pie = df_data.copy()
-    if len(df_pie) > 10:
-        pie_top = df_pie.nlargest(10, 'cantidad')
-        otras_sum = df_pie.nsmallest(len(df_pie) - 10, 'cantidad')['cantidad'].sum()
-        pie_top.loc[len(pie_top)] = {'SEDE_NODAL': 'Otras Sedes', 'cantidad': otras_sum}
-        df_pie = pie_top
+    # Crear el gráfico de barras verticales
+    fig, ax = plt.subplots(figsize=(10, 6))
+    colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_data)))
+    bars = ax.bar(df_data['SEDE_NODAL'], df_data['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
 
-    fig, ax = plt.subplots(figsize=(8, 6))
-    colors = plt.cm.viridis(np.linspace(0, 1, len(df_pie)))
-    explode = [0.05 if i == 0 else 0 for i in range(len(df_pie))]
-    wedges, texts, autotexts = ax.pie(
-        df_pie['cantidad'], 
-        labels=df_pie['SEDE_NODAL'],
-        autopct='%1.1f%%',
-        colors=colors,
-        startangle=90,
-        explode=explode,
-        textprops={'fontsize': 9, 'fontweight': 'bold'},
-        shadow=True
-    )
-    
-    for autotext in autotexts:
-        autotext.set_color('white')
-    
-    ax.set_title('Distribución por Sede Nodal', fontsize=14, fontweight='bold', pad=20)
+    for bar in bars:
+        height = bar.get_height()
+        if height > 0:
+            ax.annotate(f'{int(height):,}',
+                        xy=(bar.get_x() + bar.get_width() / 2, height),
+                        xytext=(0, 3),
+                        textcoords="offset points",
+                        ha='center', va='bottom', fontsize=9, fontweight='bold')
+
+    ax.set_xlabel('Sede Nodal', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Cantidad de Matriculados', fontsize=12, fontweight='bold')
+    ax.set_title('Matriculados por Sede Nodal', fontsize=14, fontweight='bold', pad=20)
+    plt.xticks(rotation=45, ha="right")
+    max_val = df_data['cantidad'].max() if not df_data.empty else 1
+    ax.set_ylim(0, float(max_val) * 1.2)
+    ax.grid(axis='y', alpha=0.3, linestyle='--')
     plt.tight_layout()
     st.pyplot(fig)
 
@@ -195,7 +200,7 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
 
 # --- Carga de Datos ---
 @st.cache_data
-def load_data_by_stage(_engine, prefix, year, stage):
+def load_data_by_stage(_engine, year, prefix, stage):
     # Si son estudiantes, usar la tabla consolidada. Si no, mantener la lógica anterior.
     table_name = "Estudiantes_2016_2019" if prefix == "Estudiantes" else f"{prefix}_{year}"
     with _engine.connect() as connection:
@@ -218,8 +223,8 @@ def load_data_by_stage(_engine, prefix, year, stage):
         return df, total_matriculados_stage
 
 try:
-    df_etapa1, total_etapa1 = load_data_by_stage(engine, population_prefix, selected_year, '1')
-    df_etapa2, total_etapa2 = load_data_by_stage(engine, population_prefix, selected_year, '2')
+    df_etapa1, total_etapa1 = load_data_by_stage(engine, selected_year, population_prefix, '1')
+    df_etapa2, total_etapa2 = load_data_by_stage(engine, selected_year, population_prefix, '2')
     total_matriculados = total_etapa1 + total_etapa2
 
     # --- Visualización ---
@@ -246,20 +251,10 @@ try:
 
     col1, col2 = st.columns(2)
     with col1:
-        create_pie_chart_and_table(df_etapa1, total_etapa1, f"📊 Etapa 1 - Año {selected_year}")
+        create_bar_chart_and_table(df_etapa1, total_etapa1, f"📊 Etapa 1 - Año {selected_year}")
     with col2:
-        create_pie_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
+        create_bar_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
     st.exception(e)
-
-def add_interest_links():
-    st.markdown("---")
-    st.markdown("### 🔗 Enlaces de Interés")
-    st.markdown("""
-    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
-    - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
-    - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx)   
-    """)
-add_interest_links()

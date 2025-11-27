@@ -127,7 +127,7 @@ if selected_population != "Formación a estudiantes Comfenalco Antioquia":
     st.info(f"Este dashboard es para 'Formación a estudiantes Comfenalco Antioquia'. Por favor, selecciona esa opción en el filtro de población para ver los datos.")
     st.stop()
 
-population_prefix = "Formación a estudiantes Comfenalco Antioquia"
+population_prefix = "Estudiantes"
 available_years = get_available_years(engine, population_prefix)
 
 if not available_years:
