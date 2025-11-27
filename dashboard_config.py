@@ -5,6 +5,7 @@ import streamlit as st
 COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
 DOCENTES_LABEL = "Formación a docentes"
 COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
+ESTUDIANTES_2021_2025_LABEL = "Formación a estudiantes 2021-2025"
 
 # Mapeo de categorías a páginas
 DASHBOARD_CATEGORIES = {
@@ -33,6 +34,12 @@ DASHBOARD_CATEGORIES = {
         ],
         "first_page": "8p-colombo_por_institucion.py",
         
+    },
+    ESTUDIANTES_2021_2025_LABEL: {
+        "pages": [
+            ("12p-estudiantes_por_institucion_2021_2025.py", "Estudiantes por Institución", "🏫"),
+        ],
+        "first_page": "12p-estudiantes_por_institucion_2021_2025.py",
     }
 }
 
@@ -92,7 +99,3 @@ def create_nav_buttons(selected_pop):
             for i, (page_path, label, icon) in enumerate(second_row):
                 with nav_cols_2[i]:
                     st.page_link(page_path, label=label, icon=icon)
-
-
-
-
