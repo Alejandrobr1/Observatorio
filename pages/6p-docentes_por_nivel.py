@@ -6,7 +6,7 @@ import traceback
 from sqlalchemy import create_engine, text
 import sys
 import os
-from dashboard_config import COMFENALCO_LABEL, DOCENTES_LABEL, COLOMBO_LABEL, create_nav_buttons
+from dashboard_config import COMFENALCO_LABEL, DOCENTES_LABEL, COLOMBO_LABEL, create_nav_buttons, DASHBOARD_CATEGORIES
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -16,7 +16,12 @@ st.title("📊 Docentes por Nivel MCER")
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
-    st.session_state.population_filter = "Docentes"
+    st.session_state.population_filter = DOCENTES_LABEL
+
+# Determinar categoría de esta página
+page_category = DOCENTES_LABEL
+if st.session_state.population_filter not in DASHBOARD_CATEGORIES:
+    st.session_state.population_filter = page_category
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
