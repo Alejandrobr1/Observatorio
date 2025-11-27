@@ -31,8 +31,7 @@ def create_nav_buttons(selected_pop):
             "Participación %": "pages/4p-estudiantes_matriculados_sede_porcentaje.py",
             "Etapas (Pastel)": "pages/5p-estudiantes_por_sede_nodal_etapa1_2.py",
             "Etapas (Barras)": "pages/6p-estudiantes_por_sede_nodal_barras_etp1_2.py",
-            "Escuela Nueva (Sede)": "pages/7p-estudiantes_escuela_nueva.py",
-            "Escuela Nueva (IE)": "pages/8p-estudiantes_por_institucion.py"
+            "Escuela Nueva (IE)": "pages/7p-estudiantes_por_institucion.py"
         }
         # Re-ajustar columnas para acomodar todos los botones
         nav_cols = st.columns(len(links) + 1)

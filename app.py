@@ -160,8 +160,7 @@ with tab2:
         with col2:
             st.page_link("pages/5p-estudiantes_por_sede_nodal_etapa1_2.py", label="Comparativa Etapas por Sede (Pastel)", icon="⚖️")
             st.page_link("pages/6p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Comparativa Etapas por Sede (Barras)", icon="📊")
-            st.page_link("pages/7p-estudiantes_escuela_nueva.py", label="Estudiantes por Grupo y Sede (Escuela Nueva)", icon="🏫")
-            st.page_link("pages/8p-estudiantes_por_institucion.py", label="Estudiantes por Institución (Escuela Nueva)", icon="🏛️")
+            st.page_link("pages/7p-estudiantes_por_institucion.py", label="Estudiantes por Institución (Escuela Nueva)", icon="🏛️")
 
     elif st.session_state.population_filter == "Docentes":
         st.markdown("#### 👨‍🏫 Análisis de Docentes")
