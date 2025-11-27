@@ -49,6 +49,15 @@ st.markdown("""
         margin-top: 20px;
         margin-bottom: 10px;
     }
+    /* Estilo para los botones de filtro de población para que tengan la misma altura */
+    div[data-testid="stHorizontalBlock"] button {
+        height: 4.5em; /* Ajusta esta altura según sea necesario */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1.2; /* Mejora el espaciado del texto en varias líneas */
+    }
     </style>
     """, unsafe_allow_html=True)
 
