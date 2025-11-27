@@ -10,8 +10,8 @@ COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
 DASHBOARD_CATEGORIES = {
     COMFENALCO_LABEL: {
         "pages": [
-            ("1p-estudiantes_por_jornada_dia.py", "Jornada y Día", "📅"),
-            ("2p-estudiantes_por_poblacion.py", "Población", "👥"),
+            ("1p-estudiantes_por_jornada_dia.py", "Matriculados por Jornada y Día", "📅"),
+            ("2p-estudiantes_por_poblacion.py", "Matriculados por Población", "👥"),
             ("3p-estudiantes_por_sede_nodal_etapa1_2.py", "“Participación % por sede nodal", "⚖️"),
             ("4p-estudiantes_por_sede_nodal_barras_etp1_2.py", "Matriculados por sede nodal", "📊"),
             ("5p-estudiantes_por_institucion.py", "Estudiantes por Institución (Escuela Nueva)", "🏛️"),
@@ -24,7 +24,7 @@ DASHBOARD_CATEGORIES = {
             ("7p-docentes_por_institucion.py", "Docentes por Institución", "🏫"),
         ],
         "first_page": "6p-docentes_por_nivel.py",
-        "second_page": "7p-docentes_por_institucion.py"
+        
     },
     COLOMBO_LABEL: {
         "pages": [
@@ -32,7 +32,7 @@ DASHBOARD_CATEGORIES = {
             ("9p-colombo_por_nivel.py", "Colombo - Estudiantes por Nivel", "📈"),
         ],
         "first_page": "8p-colombo_por_institucion.py",
-        "second_page": "9p-colombo_por_nivel.py"
+        
     }
 }
 
@@ -73,25 +73,26 @@ def create_nav_buttons(selected_pop):
             st.session_state.population_filter = new_pop
             st.rerun()
     
-    # Botones de navegación con máximo 4 por fila
+    # Botones de navegación con máximo 3 por fila
     if selected_pop in DASHBOARD_CATEGORIES:
         pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
         all_buttons = [("app.py", "Inicio", "🏠")] + [(f"pages/{pf}", label, icon) for pf, label, icon in pages]
         
-        # Primera fila: máximo 4 botones
-        first_row = all_buttons[:4]
+        # Primera fila: máximo 3 botones
+        first_row = all_buttons[:3]
         nav_cols_1 = st.columns(len(first_row))
         for i, (page_path, label, icon) in enumerate(first_row):
             with nav_cols_1[i]:
                 st.page_link(page_path, label=label, icon=icon)
         
-        # Segunda fila: botones restantes (si hay más de 4)
-        if len(all_buttons) > 4:
-            second_row = all_buttons[4:]
+        # Segunda fila: botones restantes (a partir del cuarto)
+        if len(all_buttons) > 3:
+            second_row = all_buttons[3:]
             nav_cols_2 = st.columns(len(second_row))
             for i, (page_path, label, icon) in enumerate(second_row):
                 with nav_cols_2[i]:
                     st.page_link(page_path, label=label, icon=icon)
+
 
 
 
