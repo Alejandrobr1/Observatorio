@@ -122,40 +122,48 @@ def create_bar_chart_and_table(df_data, total_estudiantes, title):
     df_display.columns = ['#', 'Institución', 'Estudiantes', 'Porcentaje']
     st.dataframe(df_display, use_container_width=True, hide_index=True)
 
-def create_grade_bar_chart(df_data, total_estudiantes, title):
-    """Función para crear un gráfico de barras verticales para estudiantes por grado."""
+def create_grade_donut_chart(df_data, total_estudiantes, title):
+    """Función para crear un gráfico de dona y una tabla para estudiantes por grado."""
     st.header(f"📊 {title} - Año {st.session_state.selected_year}")
 
     if df_data.empty:
         st.warning("No hay datos de estudiantes por grado para el año seleccionado.")
         return
 
-    df_data['cantidad'] = pd.to_numeric(df_data['cantidad'])
-    df_data = df_data[df_data['cantidad'] > 0]
+    col1, col2 = st.columns([1, 2])
 
-    # Gráfico de barras verticales
-    st.subheader("Visualización por Grado")
-    fig, ax = plt.subplots(figsize=(12, 7))
-    colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_data)))
-    bars = ax.bar(df_data['grado'], df_data['cantidad'], color=colors, edgecolor='black', linewidth=1.2)
+    with col1:
+        st.subheader("📋 Resumen por Grado")
+        df_data['porcentaje'] = (df_data['cantidad'] / float(total_estudiantes) * 100) if total_estudiantes > 0 else 0
+        df_display = df_data.copy()
+        df_display['#'] = range(1, len(df_display) + 1)
+        df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
+        df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
+        df_display = df_display[['#', 'grado', 'cantidad', 'porcentaje']]
+        df_display.columns = ['#', 'Grado', 'Estudiantes', 'Porcentaje']
+        st.dataframe(df_display, use_container_width=True, hide_index=True)
 
-    for bar in bars:
-        height = bar.get_height()
-        if height > 0:
-            ax.annotate(f'{int(height):,}',
-                        xy=(bar.get_x() + bar.get_width() / 2, height),
-                        xytext=(0, 3), textcoords="offset points",
-                        ha='center', va='bottom', fontsize=10, fontweight='bold')
-
-    ax.set_xlabel('Grado', fontsize=13, fontweight='bold')
-    ax.set_ylabel('Cantidad de Estudiantes', fontsize=13, fontweight='bold')
-    ax.set_title('Estudiantes por Grado', fontsize=16, fontweight='bold', pad=20)
-    plt.xticks(rotation=45, ha="right")
-    max_val = df_data['cantidad'].max() if not df_data.empty else 1
-    ax.set_ylim(0, float(max_val) * 1.2)
-    ax.grid(axis='y', alpha=0.3, linestyle='--')
-    plt.tight_layout()
-    st.pyplot(fig)
+    with col2:
+        st.subheader("Visualización de Porcentajes")
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        labels = df_data['grado']
+        sizes = df_data['cantidad']
+        colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(labels)))
+        
+        wedges, texts, autotexts = ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90,
+                                          colors=colors, pctdistance=0.85,
+                                          wedgeprops=dict(width=0.4, edgecolor='w'))
+        
+        plt.setp(autotexts, size=10, weight="bold", color="white")
+        ax.set_title("Distribución de Estudiantes por Grado", pad=20)
+        
+        centre_circle = plt.Circle((0,0),0.60,fc='white')
+        fig.gca().add_artist(centre_circle)
+        
+        ax.axis('equal')
+        plt.tight_layout()
+        st.pyplot(fig)
 
 @st.cache_data
 def load_data(_engine, year):
@@ -191,7 +199,7 @@ def load_data_by_grade(_engine, year):
     table_name = "Estudiantes_2021_2025"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
-            return pd.DataFrame()
+            return pd.DataFrame(), 0
         
         params = {'year': year}
         query_data = text(f"""
@@ -206,7 +214,10 @@ def load_data_by_grade(_engine, year):
             ORDER BY grado ASC
         """)
         df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["grado", "cantidad"])
-        return df
+        
+        total_grados = df['grado'].nunique()
+        
+        return df, total_grados
 
 try:
     available_years = get_available_years(engine)
@@ -219,13 +230,14 @@ try:
     selected_year = st.session_state.selected_year
 
     df_estudiantes, total_estudiantes, total_instituciones = load_data(engine, selected_year)
-    df_grados = load_data_by_grade(engine, selected_year)
+    df_grados, total_grados = load_data_by_grade(engine, selected_year)
 
     st.sidebar.info(f"**Año:** {selected_year}")
     st.sidebar.divider()
     st.sidebar.header("📈 Estadísticas Generales")
     st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{int(total_estudiantes):,}")
     st.sidebar.metric(f"Instituciones ({selected_year})", f"{int(total_instituciones):,}")
+    st.sidebar.metric(f"Grados ({selected_year})", f"{int(total_grados):,}")
     st.sidebar.divider()
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
@@ -246,7 +258,7 @@ try:
     
     st.divider()
     # Mostrar el nuevo gráfico de estudiantes por grado
-    create_grade_bar_chart(df_grados, total_estudiantes, "Distribución de Estudiantes por Grado")
+    create_grade_donut_chart(df_grados, total_estudiantes, "Distribución de Estudiantes por Grado")
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
