@@ -1,0 +1,26 @@
+[theme]
+primaryColor = "#667eea"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
+
+[client]
+showErrorDetails = false
+toolbarMode = "minimal"
+showSidebarNavigation = false
+
+[logger]
+level = "info"
+
+[server]
+maxUploadSize = 200
+enableXsrfProtection = true
+headless = true
+# Punto de entrada principal
+runOnSave = true
+runOnOpen = true
+
+[runner]
+# Asegurar que se ejecuta desde la raíz
+magicEnabled = true

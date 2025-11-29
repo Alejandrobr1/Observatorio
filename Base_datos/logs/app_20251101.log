@@ -1,7 +1,0 @@
-2025-11-01 11:16:36,312 - conexion - INFO - Conexión exitosa a MySQL en puerto 3308
-2025-11-01 11:16:36,357 - conexion - INFO - Conexión a base de datos cerrada
-2025-11-01 11:16:36,470 - __main__ - INFO - Eliminando tablas existentes (si las hay)...
-2025-11-01 11:16:36,489 - __main__ - INFO - Tablas eliminadas.
-2025-11-01 11:16:36,490 - __main__ - INFO - Iniciando creación de tablas en la base de datos
-2025-11-01 11:16:36,754 - __main__ - INFO - Tablas creadas exitosamente en observatorio_bilinguismo
-2025-11-01 11:16:36,754 - __main__ - INFO - Proceso de creación de tablas finalizado
