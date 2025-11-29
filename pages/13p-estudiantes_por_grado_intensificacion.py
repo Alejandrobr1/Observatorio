@@ -219,7 +219,7 @@ try:
     # Columna de contenido (muestra advertencia o gráfico)
     with col1:
         if df_mcer.empty:
-            st.warning(f"⚠️ No se encontraron datos de Nivel MCER para el año {selected_year}.")
+            st.warning(f"⚠️ No se encontraron datos para el año {selected_year}.")
         else:
             create_mcer_donut_chart(df_mcer, total_estudiantes, "Distribución de Estudiantes por Nivel MCER")
 
