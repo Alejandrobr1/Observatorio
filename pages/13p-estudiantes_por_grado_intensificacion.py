@@ -11,8 +11,8 @@ from dashboard_config import create_nav_buttons, COMFENALCO_LABEL
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Estudiantes por Grado Intensificación")
-st.title("📊 Estudiantes por Grado Intensificación")
+st.set_page_config(layout="wide", page_title="Estudiantes por Nivel MCER")
+st.title("📊 Estudiantes por Nivel MCER")
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
@@ -77,19 +77,30 @@ def get_available_years(_engine):
     st.warning(f"No se encontraron años en la tabla '{table_name}'.")
     return []
 
-def create_grade_donut_chart(df_data, total_estudiantes, title):
-    """Función para crear un gráfico de dona y una tabla para estudiantes por grado."""
+@st.cache_data
+def get_available_institutions(_engine, year):
+    table_name = "Estudiantes_intensificacion"
+    with _engine.connect() as connection:
+        if not _engine.dialect.has_table(connection, table_name):
+            return []
+        query = text(f"SELECT DISTINCT INSTITUCION_EDUCATIVA FROM {table_name} WHERE FECHA = :year AND INSTITUCION_EDUCATIVA IS NOT NULL ORDER BY INSTITUCION_EDUCATIVA")
+        params = {'year': year}
+        institutions = [row[0] for row in connection.execute(query, params).fetchall()]
+        return institutions
+
+def create_mcer_donut_chart(df_data, total_estudiantes, title):
+    """Función para crear un gráfico de dona y una tabla para estudiantes por Nivel MCER."""
     st.header(f"📊 {title} - Año {st.session_state.selected_year}")
 
     if df_data.empty:
-        st.warning("No hay datos de estudiantes por grado para el año seleccionado.")
+        st.warning("No hay datos de estudiantes por Nivel MCER para la selección actual.")
         return
 
     # Gráfico de dona
     st.subheader("Visualización de Porcentajes")
     fig, ax = plt.subplots(figsize=(8, 6))
     
-    labels = df_data['grado']
+    labels = df_data['nivel_mcer']
     sizes = df_data['cantidad']
     colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(labels)))
     
@@ -98,7 +109,7 @@ def create_grade_donut_chart(df_data, total_estudiantes, title):
                                       wedgeprops=dict(width=0.4, edgecolor='w'))
     
     plt.setp(autotexts, size=10, weight="bold", color="white")
-    ax.set_title("Distribución de Estudiantes por Grado", pad=20)
+    ax.set_title("Distribución de Estudiantes por Nivel MCER", pad=20)
     
     centre_circle = plt.Circle((0,0),0.60,fc='white')
     fig.gca().add_artist(centre_circle)
@@ -108,41 +119,42 @@ def create_grade_donut_chart(df_data, total_estudiantes, title):
     st.pyplot(fig)
 
     # Tabla de resumen
-    st.subheader("📋 Resumen por Grado")
+    st.subheader("📋 Resumen por Nivel MCER")
     df_data['porcentaje'] = (df_data['cantidad'] / float(total_estudiantes) * 100) if total_estudiantes > 0 else 0
     df_display = df_data.copy()
     df_display['#'] = range(1, len(df_display) + 1)
     df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
     df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
-    df_display = df_display[['#', 'grado', 'cantidad', 'porcentaje']]
-    df_display.columns = ['#', 'Grado', 'Estudiantes', 'Porcentaje']
+    df_display = df_display[['#', 'nivel_mcer', 'cantidad', 'porcentaje']]
+    df_display.columns = ['#', 'Nivel MCER', 'Estudiantes', 'Porcentaje']
     st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 @st.cache_data
-def load_data_by_grade(_engine, year):
+def load_data_by_mcer(_engine, year, institution):
     table_name = "Estudiantes_intensificacion"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(), 0, 0
         
-        params = {'year': year}
+        params = {'year': year, 'institution': institution}
         query_data = text(f"""
             SELECT 
-                GRADO as grado, COUNT(ID) as cantidad
+                NIVEL_MCER as nivel_mcer, COUNT(ID) as cantidad
             FROM {table_name}
             WHERE FECHA = :year
-              AND GRADO IS NOT NULL 
-              AND GRADO != '' 
-              AND GRADO != 'SIN INFORMACION'
-            GROUP BY grado
-            ORDER BY grado ASC
+              AND INSTITUCION_EDUCATIVA = :institution
+              AND NIVEL_MCER IS NOT NULL 
+              AND NIVEL_MCER != '' 
+              AND NIVEL_MCER != 'SIN INFORMACION'
+            GROUP BY nivel_mcer
+            ORDER BY nivel_mcer ASC
         """)
-        df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["grado", "cantidad"]) # type: ignore
+        df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["nivel_mcer", "cantidad"]) # type: ignore
         
-        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
+        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year AND INSTITUCION_EDUCATIVA = :institution")
         total_estudiantes = connection.execute(query_total, params).scalar() or 0
         
-        total_grados = df['grado'].nunique()
+        total_grados = df['nivel_mcer'].nunique()
         
         return df, total_estudiantes, total_grados
 
@@ -156,22 +168,35 @@ try:
         st.session_state.selected_year = available_years[0]
     selected_year = st.session_state.selected_year
 
-    df_grados, total_estudiantes, total_grados = load_data_by_grade(engine, selected_year)
+    available_institutions = get_available_institutions(engine, selected_year)
+    if not available_institutions:
+        st.warning(f"⚠️ No se encontraron instituciones con datos para el año {selected_year}.")
+        st.stop()
+
+    if 'selected_institution' not in st.session_state or st.session_state.selected_institution not in available_institutions:
+        st.session_state.selected_institution = available_institutions[0]
+    
+    selected_institution = st.sidebar.selectbox(
+        "🏫 Seleccionar Institución",
+        options=available_institutions,
+        index=available_institutions.index(st.session_state.selected_institution)
+    )
+    st.session_state.selected_institution = selected_institution
+
+    df_mcer, total_estudiantes, total_niveles = load_data_by_mcer(engine, selected_year, selected_institution)
     st.sidebar.info(f"**Año:** {selected_year}")
     st.sidebar.divider()
     st.sidebar.header("📈 Estadísticas Generales")
     st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{int(total_estudiantes):,}")
-    st.sidebar.metric(f"Grados ({selected_year})", f"{int(total_grados):,}")
+    st.sidebar.metric(f"Niveles MCER ({selected_year})", f"{int(total_niveles):,}")
     st.sidebar.divider()
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
 
-    # Layout en dos columnas: Gráfico a la izquierda, filtro de año a la derecha
     col1, col2 = st.columns([3, 1])
 
     with col1:
-        # Mostrar el gráfico de estudiantes por grado
-        create_grade_donut_chart(df_grados, total_estudiantes, "Distribución de Estudiantes por Grado")
+        create_mcer_donut_chart(df_mcer, total_estudiantes, f"Institución: {selected_institution}")
 
     with col2:
         st.write("📅 **Seleccionar Año**")
