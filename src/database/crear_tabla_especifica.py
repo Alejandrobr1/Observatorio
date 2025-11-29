@@ -3,8 +3,9 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from .conexion import engine
-from .models import Estudiantes_intensificacion
+# Cambiamos las importaciones relativas por absolutas desde la raíz 'src'
+from src.database.conexion import engine
+from src.database.models import Estudiantes_intensificacion
 from src.config.logger_config import get_logger
 
 logger = get_logger(__name__)

@@ -7,16 +7,21 @@ import os
 import sys
 from sqlalchemy import text
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
+# Añadir el directorio raíz del proyecto ('Observatorio') al path de Python
+# Se suben dos niveles desde 'data/imports' para llegar a la raíz.
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from src.database.conexion import engine
 from src.config.logger_config import get_logger
 
 logger = get_logger(__name__)
 
-# Definir la ruta del archivo CSV
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-ruta_archivo = os.path.join(project_root, "CSVs", "Tabla_datos_intensificacion.csv")
+# Definir la ruta del archivo CSV de forma robusta desde la raíz del proyecto
+# El script está en 'data/imports', así que subimos dos niveles para llegar a 'Observatorio'
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+ruta_archivo = os.path.join(project_root, "data", "csv", "Tabla_intensificacion.csv")
 
 print("\n" + "="*70)
 print("INSERCIÓN DE DATOS - TABLA ESTUDIANTES_INTENSIFICACION")

@@ -8,7 +8,7 @@ import os
 import sys
 from sqlalchemy import text
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from src.database.conexion import engine
 from src.config.logger_config import get_logger
@@ -16,8 +16,8 @@ from src.config.logger_config import get_logger
 logger = get_logger(__name__)
 
 # Definir la ruta del archivo CSV
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-ruta_archivo = os.path.join(project_root, "CSVs", "Tabla_2016_2019.csv")
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+ruta_archivo = os.path.join(project_root, "data", "csv", "Tabla_2016_2019.csv")
 
 print("\n" + "="*70)
 print("INSERCIÓN DE DATOS - TABLA ESTUDIANTES_2016_2019")
