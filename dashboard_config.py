@@ -19,6 +19,7 @@ DASHBOARD_CATEGORIES = {
             ("11p-estudiantes_por_grado_2021_2025.py", "Estudiantes por Grado (2021-2025)", "🏫"),
             ("12p-estudiantes_por_institucion_intensificacion.py", "Estudiantes por Institución Intensificación", "🏫"),
             ("13p-estudiantes_por_grado_intensificacion.py", "Estudiantes por Grado Intensificación", "🎓"),
+            ("14p-estudiantes_por_nivel_mcer_intensificacion.py", "Estudiantes por idioma Intensificación", "📈")
         ],
         "first_page": "1p-estudiantes_por_jornada_dia.py"
     },

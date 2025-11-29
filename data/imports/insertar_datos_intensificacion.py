@@ -115,6 +115,19 @@ try:
     # Insertar en la base de datos
     print(f"\n💾 Insertando {len(registros)} registros en la base de datos...")
     
+    # --- INICIO: Eliminar datos existentes ---
+    with engine.connect() as connection:
+        transaction = connection.begin()
+        try:
+            print(f"   • Limpiando datos antiguos de la tabla 'Estudiantes_intensificacion'...")
+            connection.execute(text("DELETE FROM Estudiantes_intensificacion"))
+            transaction.commit()
+            print(f"   ✓ Datos antiguos eliminados.")
+        except Exception as e:
+            transaction.rollback()
+            raise e  # Re-lanzar la excepción para detener el script si la limpieza falla
+    # --- FIN: Eliminar datos existentes ---
+
     with engine.connect() as connection:
         inseridos = 0
         

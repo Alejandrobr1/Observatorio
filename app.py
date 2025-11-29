@@ -179,6 +179,7 @@ with tab2:
             st.page_link("pages/11p-estudiantes_por_grado_2021_2025.py", label="Estudiantes por Grado (2021-2025)", icon="🎓")
             st.page_link("pages/12p-estudiantes_por_institucion_intensificacion.py", label="Estudiantes por Institución Intensificación", icon="🏫")
             st.page_link("pages/13p-estudiantes_por_grado_intensificacion.py", label="Estudiantes por Grado Intensificación", icon="🎓")
+            st.page_link("pages/14p-estudiantes_por_nivel_mcer_intensificacion.py", label="Estudiantes por idioma Intensificación", icon="📈")
             
     elif st.session_state.population_filter == DOCENTES_LABEL:
         st.markdown("#### 👨‍🏫 Análisis de Docentes")
