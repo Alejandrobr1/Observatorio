@@ -52,3 +52,14 @@ class Estudiantes_2021_2025(Base):
     GRADO = Column(String(100))
     JORNADA = Column(String(100))
     NIVEL_MCER = Column(String(150))
+
+class Estudiantes_intensificacion(Base):
+    __tablename__ = 'Estudiantes_intensificacion'
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    FECHA = Column(Integer)
+    INSTITUCION_EDUCATIVA = Column(String(255))
+    POBLACION = Column(String(150))
+    GRADO = Column(String(100))
+    JORNADA = Column(String(100))
+    NIVEL_MCER = Column(String(150))
+    IDIOMA = Column(String(255))

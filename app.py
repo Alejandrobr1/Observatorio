@@ -173,10 +173,12 @@ with tab2:
             st.page_link("pages/2p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población", icon="👥")
             st.page_link("pages/3p-estudiantes_por_sede_nodal_etapa1_2.py", label="Participación % por sede nodal", icon="⚖️")
             st.page_link("pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Matriculados por sede nodal", icon="📊")
+            st.page_link("pages/5p-estudiantes_por_institucion.py", label="Estudiantes por Institución", icon="🏫")
         with col2:
-            st.page_link("pages/5p-estudiantes_por_institucion.py", label="Estudiantes por Institución\n(Escuela Nueva)", icon="🏛️")
             st.page_link("pages/10p-estudiantes_por_institucion_2021_2025.py", label="Estudiantes por Institución (2021-2025)", icon="🏫")
             st.page_link("pages/11p-estudiantes_por_grado_2021_2025.py", label="Estudiantes por Grado (2021-2025)", icon="🎓")
+            st.page_link("pages/12p-estudiantes_por_institucion_intensificacion.py", label="Estudiantes por Institución Intensificación", icon="🏫")
+            st.page_link("pages/13p-estudiantes_por_grado_intensificacion.py", label="Estudiantes por Grado Intensificación", icon="🎓")
             
     elif st.session_state.population_filter == DOCENTES_LABEL:
         st.markdown("#### 👨‍🏫 Análisis de Docentes")
