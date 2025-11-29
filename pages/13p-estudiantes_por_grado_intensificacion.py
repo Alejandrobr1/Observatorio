@@ -180,13 +180,26 @@ try:
         st.session_state.selected_year = available_years[0]
     selected_year = st.session_state.selected_year
 
+    # --- RENDERIZACIÓN DEL LAYOUT ---
+    # Se define el layout principal ANTES de cargar los datos para que los filtros siempre estén visibles.
+    col1, col2 = st.columns([3, 1])
+
+    # Columna de filtros (siempre visible)
+    with col2:
+        st.write("📅 **Seleccionar Año**")
+        def set_year(year):
+            st.session_state.selected_year = year
+
+        for year in available_years:
+            button_type = "primary" if year == selected_year else "secondary"
+            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+
+    # --- CARGA DE DATOS Y RENDERIZACIÓN CONDICIONAL ---
+    # Cargar los datos para el año seleccionado
     df_mcer, total_estudiantes, total_niveles = load_data_by_mcer(engine, selected_year)
     df_institutions = get_institutions_by_mcer(engine, selected_year)
 
-    if df_mcer.empty:
-        st.warning(f"⚠️ No se encontraron datos para el año {selected_year}.")
-        st.stop()
-
+    # Actualizar la barra lateral con las estadísticas
     st.sidebar.info(f"**Año:** {selected_year}")
     st.sidebar.divider()
     st.sidebar.header("📈 Estadísticas Generales")
@@ -194,7 +207,6 @@ try:
     st.sidebar.metric(f"Niveles MCER ({selected_year})", f"{int(total_niveles):,}")
     st.sidebar.divider()
     
-    # Mostrar cantidad de instituciones por Nivel MCER
     if not df_institutions.empty:
         st.sidebar.subheader("🏫 Instituciones por Nivel")
         for _, row in df_institutions.iterrows():
@@ -204,20 +216,12 @@ try:
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
 
-    # Layout en dos columnas: Gráfico a la izquierda, filtro de año a la derecha
-    col1, col2 = st.columns([3, 1])
-
+    # Columna de contenido (muestra advertencia o gráfico)
     with col1:
-        create_mcer_donut_chart(df_mcer, total_estudiantes, "Distribución de Estudiantes por Nivel MCER")
-
-    with col2:
-        st.write("📅 **Seleccionar Año**")
-        def set_year(year):
-            st.session_state.selected_year = year
-
-        for year in available_years:
-            button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+        if df_mcer.empty:
+            st.warning(f"⚠️ No se encontraron datos de Nivel MCER para el año {selected_year}.")
+        else:
+            create_mcer_donut_chart(df_mcer, total_estudiantes, "Distribución de Estudiantes por Nivel MCER")
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")
