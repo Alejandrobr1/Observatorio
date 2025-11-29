@@ -64,15 +64,14 @@ except Exception as e:
     st.stop()
 
 @st.cache_data
-def get_available_years(_engine, population):
+def get_available_years(_engine):
     table_name = "Estudiantes_intensificacion"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             st.warning(f"La tabla '{table_name}' no existe. No se pueden cargar los años.")
             return []
-        query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} WHERE POBLACION = :population ORDER BY FECHA DESC")
-        params = {'population': population}
-        years = [row[0] for row in connection.execute(query_years, params).fetchall()]
+        query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
+        years = [row[0] for row in connection.execute(query_years).fetchall()]
         if years:
             return years
     st.warning(f"No se encontraron años en la tabla '{table_name}'.")
@@ -120,19 +119,18 @@ def create_grade_donut_chart(df_data, total_estudiantes, title):
     st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 @st.cache_data
-def load_data_by_grade(_engine, year, population):
+def load_data_by_grade(_engine, year):
     table_name = "Estudiantes_intensificacion"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
-            return pd.DataFrame(), 0
+            return pd.DataFrame(), 0, 0
         
-        params = {'year': year, 'population': population}
+        params = {'year': year}
         query_data = text(f"""
             SELECT 
                 GRADO as grado, COUNT(ID) as cantidad
             FROM {table_name}
             WHERE FECHA = :year
-              AND POBLACION = :population
               AND GRADO IS NOT NULL 
               AND GRADO != '' 
               AND GRADO != 'SIN INFORMACION'
@@ -141,7 +139,7 @@ def load_data_by_grade(_engine, year, population):
         """)
         df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["grado", "cantidad"]) # type: ignore
         
-        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year AND POBLACION = :population")
+        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
         total_estudiantes = connection.execute(query_total, params).scalar() or 0
         
         total_grados = df['grado'].nunique()
@@ -149,17 +147,16 @@ def load_data_by_grade(_engine, year, population):
         return df, total_estudiantes, total_grados
 
 try:
-    available_years = get_available_years(engine, st.session_state.population_filter)
+    available_years = get_available_years(engine)
     if not available_years:
-        st.warning(f"⚠️ No se encontraron datos para la población seleccionada en la tabla Estudiantes_intensificacion.")
+        st.warning(f"⚠️ No se encontraron datos en la tabla Estudiantes_intensificacion.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
         st.session_state.selected_year = available_years[0]
     selected_year = st.session_state.selected_year
 
-    df_grados, total_estudiantes, total_grados = load_data_by_grade(engine, selected_year, st.session_state.population_filter)
-
+    df_grados, total_estudiantes, total_grados = load_data_by_grade(engine, selected_year)
     st.sidebar.info(f"**Año:** {selected_year}")
     st.sidebar.divider()
     st.sidebar.header("📈 Estadísticas Generales")
