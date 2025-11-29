@@ -11,8 +11,8 @@ from dashboard_config import create_nav_buttons, COMFENALCO_LABEL
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Estudiantes por Nivel MCER")
-st.title("📊 Estudiantes por Nivel MCER")
+st.set_page_config(layout="wide", page_title="Estudiantes por Nivel MCER Intensificación")
+st.title("📊 Estudiantes por Nivel MCER Intensificación")
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
@@ -68,32 +68,17 @@ def get_available_years(_engine):
     table_name = "Estudiantes_intensificacion"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
-            st.warning(f"La tabla '{table_name}' no existe. No se pueden cargar los años.")
             return []
         query_years = text(f"SELECT DISTINCT FECHA FROM {table_name} ORDER BY FECHA DESC")
         years = [row[0] for row in connection.execute(query_years).fetchall()]
-        if years:
-            return years
-    st.warning(f"No se encontraron años en la tabla '{table_name}'.")
-    return []
-
-@st.cache_data
-def get_available_institutions(_engine, year):
-    table_name = "Estudiantes_intensificacion"
-    with _engine.connect() as connection:
-        if not _engine.dialect.has_table(connection, table_name):
-            return []
-        query = text(f"SELECT DISTINCT INSTITUCION_EDUCATIVA FROM {table_name} WHERE FECHA = :year AND INSTITUCION_EDUCATIVA IS NOT NULL ORDER BY INSTITUCION_EDUCATIVA")
-        params = {'year': year}
-        institutions = [row[0] for row in connection.execute(query, params).fetchall()]
-        return institutions
+        return years
 
 def create_mcer_donut_chart(df_data, total_estudiantes, title):
     """Función para crear un gráfico de dona y una tabla para estudiantes por Nivel MCER."""
     st.header(f"📊 {title} - Año {st.session_state.selected_year}")
 
     if df_data.empty:
-        st.warning("No hay datos de estudiantes por Nivel MCER para la selección actual.")
+        st.warning("No hay datos de estudiantes por Nivel MCER para el año seleccionado.")
         return
 
     # Gráfico de dona
@@ -130,33 +115,60 @@ def create_mcer_donut_chart(df_data, total_estudiantes, title):
     st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 @st.cache_data
-def load_data_by_mcer(_engine, year, institution):
+def load_data_by_mcer(_engine, year):
+    """Cargar cantidad de estudiantes agrupados por Nivel MCER."""
     table_name = "Estudiantes_intensificacion"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(), 0, 0
         
-        params = {'year': year, 'institution': institution}
+        params = {'year': year}
         query_data = text(f"""
             SELECT 
                 NIVEL_MCER as nivel_mcer, COUNT(ID) as cantidad
             FROM {table_name}
             WHERE FECHA = :year
-              AND INSTITUCION_EDUCATIVA = :institution
               AND NIVEL_MCER IS NOT NULL 
               AND NIVEL_MCER != '' 
               AND NIVEL_MCER != 'SIN INFORMACION'
             GROUP BY nivel_mcer
-            ORDER BY nivel_mcer ASC
+            ORDER BY cantidad DESC
         """)
         df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["nivel_mcer", "cantidad"]) # type: ignore
         
-        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year AND INSTITUCION_EDUCATIVA = :institution")
+        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
         total_estudiantes = connection.execute(query_total, params).scalar() or 0
         
-        total_grados = df['nivel_mcer'].nunique()
+        total_niveles = df['nivel_mcer'].nunique() if not df.empty else 0
         
-        return df, total_estudiantes, total_grados
+        return df, total_estudiantes, total_niveles
+
+@st.cache_data
+def get_institutions_by_mcer(_engine, year):
+    """Obtener cantidad de instituciones por Nivel MCER."""
+    table_name = "Estudiantes_intensificacion"
+    with _engine.connect() as connection:
+        if not _engine.dialect.has_table(connection, table_name):
+            return pd.DataFrame()
+        
+        params = {'year': year}
+        query_data = text(f"""
+            SELECT 
+                NIVEL_MCER as nivel_mcer, 
+                COUNT(DISTINCT INSTITUCION_EDUCATIVA) as instituciones
+            FROM {table_name}
+            WHERE FECHA = :year
+              AND NIVEL_MCER IS NOT NULL 
+              AND NIVEL_MCER != '' 
+              AND NIVEL_MCER != 'SIN INFORMACION'
+              AND INSTITUCION_EDUCATIVA IS NOT NULL 
+              AND INSTITUCION_EDUCATIVA != '' 
+              AND INSTITUCION_EDUCATIVA != 'SIN INFORMACION'
+            GROUP BY nivel_mcer
+            ORDER BY instituciones DESC
+        """)
+        df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["nivel_mcer", "instituciones"]) # type: ignore
+        return df
 
 try:
     available_years = get_available_years(engine)
@@ -168,35 +180,35 @@ try:
         st.session_state.selected_year = available_years[0]
     selected_year = st.session_state.selected_year
 
-    available_institutions = get_available_institutions(engine, selected_year)
-    if not available_institutions:
-        st.warning(f"⚠️ No se encontraron instituciones con datos para el año {selected_year}.")
+    df_mcer, total_estudiantes, total_niveles = load_data_by_mcer(engine, selected_year)
+    df_institutions = get_institutions_by_mcer(engine, selected_year)
+
+    if df_mcer.empty:
+        st.warning(f"⚠️ No se encontraron datos para el año {selected_year}.")
         st.stop()
 
-    if 'selected_institution' not in st.session_state or st.session_state.selected_institution not in available_institutions:
-        st.session_state.selected_institution = available_institutions[0]
-    
-    selected_institution = st.sidebar.selectbox(
-        "🏫 Seleccionar Institución",
-        options=available_institutions,
-        index=available_institutions.index(st.session_state.selected_institution)
-    )
-    st.session_state.selected_institution = selected_institution
-
-    df_mcer, total_estudiantes, total_niveles = load_data_by_mcer(engine, selected_year, selected_institution)
     st.sidebar.info(f"**Año:** {selected_year}")
     st.sidebar.divider()
     st.sidebar.header("📈 Estadísticas Generales")
     st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{int(total_estudiantes):,}")
     st.sidebar.metric(f"Niveles MCER ({selected_year})", f"{int(total_niveles):,}")
     st.sidebar.divider()
+    
+    # Mostrar cantidad de instituciones por Nivel MCER
+    if not df_institutions.empty:
+        st.sidebar.subheader("🏫 Instituciones por Nivel")
+        for _, row in df_institutions.iterrows():
+            st.sidebar.write(f"**{row['nivel_mcer']}**: {int(row['instituciones'])} instituciones")
+        st.sidebar.divider()
+    
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
 
+    # Layout en dos columnas: Gráfico a la izquierda, filtro de año a la derecha
     col1, col2 = st.columns([3, 1])
 
     with col1:
-        create_mcer_donut_chart(df_mcer, total_estudiantes, f"Institución: {selected_institution}")
+        create_mcer_donut_chart(df_mcer, total_estudiantes, "Distribución de Estudiantes por Nivel MCER")
 
     with col2:
         st.write("📅 **Seleccionar Año**")
