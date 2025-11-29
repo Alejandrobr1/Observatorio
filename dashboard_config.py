@@ -77,31 +77,16 @@ def create_nav_buttons(selected_pop):
             st.session_state.population_filter = new_pop
             st.rerun()
     
-    # Botones de navegación con máximo 3 por fila
+    # Botones de navegación con 3 botones por fila
     if selected_pop in DASHBOARD_CATEGORIES:
         pages = DASHBOARD_CATEGORIES[selected_pop]["pages"]
         all_buttons = [("app.py", "Inicio", "🏠")] + [(f"pages/{pf}", label, icon) for pf, label, icon in pages]
         
-        # Primera fila: botones 1-3
-        first_row = all_buttons[:3]
-        nav_cols_1 = st.columns(len(first_row))
-        for i, (page_path, label, icon) in enumerate(first_row):
-            with nav_cols_1[i]:
-                st.page_link(page_path, label=label, icon=icon)
-        
-        # Segunda fila: botones 4-6
-        if len(all_buttons) > 3:
-            second_row = all_buttons[3:6]
-            nav_cols_2 = st.columns(len(second_row))
-            for i, (page_path, label, icon) in enumerate(second_row):
-                with nav_cols_2[i]:
+        # Dividir botones en grupos de 3
+        for i in range(0, len(all_buttons), 3):
+            row_buttons = all_buttons[i:i+3]
+            nav_cols = st.columns(3)
+            
+            for j, (page_path, label, icon) in enumerate(row_buttons):
+                with nav_cols[j]:
                     st.page_link(page_path, label=label, icon=icon)
-        
-        # Tercera fila: botones 7 en adelante
-        if len(all_buttons) > 6:
-            third_row = all_buttons[6:]
-            nav_cols_3 = st.columns(len(third_row))
-            for i, (page_path, label, icon) in enumerate(third_row):
-                with nav_cols_3[i]:
-                    st.page_link(page_path, label=label, icon=icon)
-

@@ -141,7 +141,7 @@ def load_data_by_grade(_engine, year, population):
         """)
         df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["grado", "cantidad"]) # type: ignore
         
-        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
+        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year AND POBLACION = :population")
         total_estudiantes = connection.execute(query_total, params).scalar() or 0
         
         total_grados = df['grado'].nunique()

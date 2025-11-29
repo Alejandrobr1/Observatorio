@@ -75,7 +75,7 @@ def get_available_years(_engine, population):
         years = [row[0] for row in connection.execute(query_years, params).fetchall()]
         if years:
             return years
-    st.warning(f"No se encontraron años en la tabla '{table_name}'.")
+    # No se emite una advertencia aquí; se maneja en el bloque principal para evitar duplicados.
     return []
 
 def create_bar_chart_and_table(df_data, total_estudiantes, title):
