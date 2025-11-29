@@ -10,10 +10,12 @@ from sqlalchemy import text, inspect
 import os
 import sys
 
-# Añadir el directorio raíz del proyecto a sys.path para encontrar 'Base_datos'
+# Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
-from Base_datos.conexion import get_engine
 
+# Importar desde la nueva estructura src/
+from src.database.conexion import get_engine
+from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL
 
 # Configuración de la página
 st.set_page_config(
