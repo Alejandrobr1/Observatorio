@@ -5,7 +5,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 import sys
 import os
-from dashboard_config import create_nav_buttons, get_current_page_category
+from dashboard_config import create_nav_buttons, get_current_page_category, COLOMBO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -20,7 +20,7 @@ if 'population_filter' not in st.session_state or st.session_state.population_fi
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
-    st.session_state.population_filter = DOCENTES_LABEL
+    st.session_state.population_filter = COLOMBO_LABEL
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
@@ -163,7 +163,7 @@ try:
     
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning(f"⚠️ No se encontraron datos para {DOCENTES_LABEL}.")
+        st.warning(f"⚠️ No se encontraron datos para docentes.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:

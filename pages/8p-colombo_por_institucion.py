@@ -6,6 +6,7 @@ from sqlalchemy import create_engine, text
 import sys
 import os
 from dashboard_config import create_nav_buttons, get_current_page_category
+from dashboard_config import COLOMBO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
