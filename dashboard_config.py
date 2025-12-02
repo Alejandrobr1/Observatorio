@@ -49,9 +49,11 @@ def get_current_page_category(current_page_file):
     or None if not found.
     """
     for category, config in DASHBOARD_CATEGORIES.items():
-        for page_file, _, _ in config["pages"]:
-            if current_page_file in page_file or page_file in current_page_file:
-                return category
+        if "subcategories" in config:
+            for sub_pages in config["subcategories"].values():
+                for page_file, _, _ in sub_pages:
+                    if current_page_file in page_file or page_file in current_page_file:
+                        return category
     return None
 
 
