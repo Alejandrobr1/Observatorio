@@ -82,6 +82,7 @@ def create_nav_buttons(selected_pop):
         
         def set_population(pop_type):
             st.session_state.population_filter = pop_type
+            st.rerun()
 
         for i, pop in enumerate(pop_options):
             with cols_pop[i]:
