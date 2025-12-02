@@ -3,7 +3,6 @@
 import streamlit as st
 
 COMFENALCO_LABEL = "Comfenalco Antioquia"
-DOCENTES_LABEL = "Formación a docentes"
 COLOMBO_LABEL = "Centro Colombo Americano Medellín"
 
 # Mapeo de categorías a páginas
