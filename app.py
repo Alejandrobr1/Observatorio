@@ -52,13 +52,21 @@ st.markdown("""
         margin-bottom: 10px;
     }
     /* Estilo para los botones de filtro de población para que tengan la misma altura */
-    div[data-testid="stHorizontalBlock"] button {
+    .main-category-btns div[data-testid="stHorizontalBlock"] button {
         height: 4.5em; /* Ajusta esta altura según sea necesario */
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
         line-height: 1.2; /* Mejora el espaciado del texto en varias líneas */
+    }
+    /* Estilo para los botones de subcategoría más pequeños */
+    .subcategory-btns div[data-testid="stHorizontalBlock"] button {
+        height: 3.5em; /* Altura más pequeña para subcategorías */
+        font-size: 0.9em; /* Texto ligeramente más pequeño */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -161,11 +169,14 @@ with tab2:
         st.session_state.population_filter = pop_type
 
     # Crear botones para seleccionar la población
-    pop_options = [COMFENALCO_LABEL, COLOMBO_LABEL]
-    cols_pop = st.columns(len(pop_options))
-    for i, pop in enumerate(pop_options):
-        with cols_pop[i]:
-            st.button(pop, key=f"pop_btn_{pop}", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if st.session_state.population_filter == pop else "secondary")
+    with st.container(border=False):
+        st.markdown('<div class="main-category-btns">', unsafe_allow_html=True)
+        pop_options = [COMFENALCO_LABEL, COLOMBO_LABEL]
+        cols_pop = st.columns(len(pop_options))
+        for i, pop in enumerate(pop_options):
+            with cols_pop[i]:
+                st.button(pop, key=f"pop_btn_{pop}", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if st.session_state.population_filter == pop else "secondary")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("---")
     
@@ -174,12 +185,14 @@ with tab2:
         def set_comfenalco_sub(sub_category):
             st.session_state.comfenalco_subcategory = sub_category
 
-        sub_categories = ["Años 2016 al 2019", "Años 2021 al 2025", "Intensificación lingüística"]
-        cols_sub = st.columns(len(sub_categories))
-        for i, sub in enumerate(sub_categories):
-            with cols_sub[i]:
-                st.button(sub, key=f"comfenalco_sub_{i}", on_click=set_comfenalco_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.comfenalco_subcategory == sub else "secondary")
-
+        with st.container(border=False):
+            st.markdown('<div class="subcategory-btns">', unsafe_allow_html=True)
+            sub_categories = ["Años 2016 al 2019", "Años 2021 al 2025", "Intensificación lingüística"]
+            cols_sub = st.columns(len(sub_categories))
+            for i, sub in enumerate(sub_categories):
+                with cols_sub[i]:
+                    st.button(sub, key=f"comfenalco_sub_{i}", on_click=set_comfenalco_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.comfenalco_subcategory == sub else "secondary")
+            st.markdown('</div>', unsafe_allow_html=True)
         st.markdown("---")
         
         if st.session_state.comfenalco_subcategory == "Años 2016 al 2019":
@@ -214,12 +227,14 @@ with tab2:
         def set_colombo_sub(sub_category):
             st.session_state.colombo_subcategory = sub_category
 
-        sub_categories = ["Formación a estudiantes", "Formación a docentes"]
-        cols_sub = st.columns(len(sub_categories))
-        for i, sub in enumerate(sub_categories):
-            with cols_sub[i]:
-                st.button(sub, key=f"colombo_sub_{i}", on_click=set_colombo_sub, args=(sub,), use_container_width=True, type="secondary" if st.session_state.colombo_subcategory == sub else "secondary")
-
+        with st.container(border=False):
+            st.markdown('<div class="subcategory-btns">', unsafe_allow_html=True)
+            sub_categories = ["Formación a estudiantes", "Formación a docentes"]
+            cols_sub = st.columns(len(sub_categories))
+            for i, sub in enumerate(sub_categories):
+                with cols_sub[i]:
+                    st.button(sub, key=f"colombo_sub_{i}", on_click=set_colombo_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.colombo_subcategory == sub else "secondary")
+            st.markdown('</div>', unsafe_allow_html=True)
         st.markdown("---")
 
         if st.session_state.colombo_subcategory == "Formación a estudiantes":
