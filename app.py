@@ -68,6 +68,10 @@ st.markdown("""
         align-items: center;
         justify-content: center;
     }
+    hr.compact {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -178,7 +182,7 @@ with tab2:
                 st.button(pop, key=f"pop_btn_{pop}", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if st.session_state.population_filter == pop else "secondary")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
+    st.markdown('<hr class="compact">', unsafe_allow_html=True)
     
     # Mostrar enlaces de dashboards según la población seleccionada
     if st.session_state.population_filter == COMFENALCO_LABEL:
@@ -193,7 +197,7 @@ with tab2:
                 with cols_sub[i]:
                     st.button(sub, key=f"comfenalco_sub_{i}", on_click=set_comfenalco_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.comfenalco_subcategory == sub else "secondary")
             st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown("---")
+        st.markdown('<hr class="compact">', unsafe_allow_html=True)
         
         if st.session_state.comfenalco_subcategory == "Años 2016 al 2019":
             st.markdown("#### 📊 Dashboards del periodo 2016-2019")
@@ -235,7 +239,7 @@ with tab2:
                 with cols_sub[i]:
                     st.button(sub, key=f"colombo_sub_{i}", on_click=set_colombo_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.colombo_subcategory == sub else "secondary")
             st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown("---")
+        st.markdown('<hr class="compact">', unsafe_allow_html=True)
 
         if st.session_state.colombo_subcategory == "Formación a estudiantes":
             st.markdown("#### 📈 Dashboards de Formación a Estudiantes")

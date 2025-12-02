@@ -88,7 +88,7 @@ def create_nav_buttons(selected_pop):
                 st.button(pop, key=f"pop_btn_{pop}_nav", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if selected_pop == pop else "secondary")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
+    st.markdown('<hr class="compact">', unsafe_allow_html=True)
 
     # Botones de subcategoría y enlaces
     if selected_pop in DASHBOARD_CATEGORIES:
@@ -114,7 +114,7 @@ def create_nav_buttons(selected_pop):
                     st.button(sub, key=f"sub_btn_{sub}_nav", on_click=set_sub, args=(sub,), use_container_width=True, type="primary" if active_subcategory == sub else "secondary")
             st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown("---")
+        st.markdown('<hr class="compact">', unsafe_allow_html=True)
 
         # Mostrar enlaces de la subcategoría activa
         pages = category_config["subcategories"].get(active_subcategory, [])

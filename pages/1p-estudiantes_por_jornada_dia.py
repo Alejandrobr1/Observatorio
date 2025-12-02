@@ -20,7 +20,7 @@ if 'population_filter' not in st.session_state:
     st.session_state.population_filter = COMFENALCO_LABEL
 
 create_nav_buttons(st.session_state.population_filter)
-st.markdown("---")
+st.markdown('<hr class="compact">', unsafe_allow_html=True)
 st.markdown("""
 <style>
     /* Style for page links with flexible height and text wrapping */
@@ -217,8 +217,8 @@ try:
     for i, year in enumerate(available_years):
         with cols_buttons[i]:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
-    st.divider()
+            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,)) # type: ignore
+    st.markdown('<hr class="compact">', unsafe_allow_html=True)
 
     # Layout en dos columnas para los gráficos
     col1, col2 = st.columns(2)
