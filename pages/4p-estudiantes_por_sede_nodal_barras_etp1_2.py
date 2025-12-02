@@ -134,7 +134,7 @@ def create_bar_chart_and_table(df_data, total_etapa, title):
 
     ax.set_xlabel('Sede Nodal', fontsize=12, fontweight='bold')
     ax.set_ylabel('Cantidad de Matriculados', fontsize=12, fontweight='bold')
-    ax.set_title('Matriculados por Sede Nodal', fontsize=14, fontweight='bold', pad=20)
+    ax.set_title('Estudiantes por Sede nodal', fontsize=14, fontweight='bold', pad=20)
     plt.xticks(rotation=45, ha="right")
     max_val = df_data['cantidad'].max() if not df_data.empty else 1
     ax.set_ylim(0, float(max_val) * 1.2)
@@ -215,9 +215,9 @@ except Exception as e:
 
 def add_interest_links():
     st.markdown("---")
-    st.markdown("### 🔗 Enlaces de Interés")
+    st.markdown("### 🔗 Oportunidades laborales")
     st.markdown("""
-    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    - [Agencia pública de empleo – Comfenalco Antioquia](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
     - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
     - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx) 
     """)

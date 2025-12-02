@@ -118,7 +118,7 @@ def create_bar_chart_and_table(df_data, total_etapa, title):
 
     ax.set_xlabel('Sede Nodal', fontsize=12, fontweight='bold')
     ax.set_ylabel('Cantidad de Matriculados', fontsize=12, fontweight='bold')
-    ax.set_title('Matriculados por Sede Nodal', fontsize=14, fontweight='bold', pad=20)
+    ax.set_title('Estudiantes por Sede nodal', fontsize=14, fontweight='bold', pad=20)
     plt.xticks(rotation=45, ha="right")
     max_val = df_data['cantidad'].max() if not df_data.empty else 1
     ax.set_ylim(0, float(max_val) * 1.2)

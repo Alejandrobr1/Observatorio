@@ -13,7 +13,7 @@ from Base_datos.conexion import get_engine
 
 # Configurar streamlit
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Jornada y Día")
-st.title("📊 Estudiantes Matriculados por Jornada y Día")
+st.title("📊 Estudiantes Estudiantes por Jornada y día")
 
 # Inicializar conexióne
 try:
@@ -93,14 +93,14 @@ try:
         df = pd.DataFrame(result.fetchall(), columns=["DIA", "JORNADA", "cantidad"])
 
         if df.empty:
-            st.warning(f"⚠️ No hay datos de matriculados por jornada y día para el año {selected_year}.")
+            st.warning(f"⚠️ No hay datos de Estudiantes por Jornada y día para el año {selected_year}.")
             st.stop()
 
         # Pivotear los datos para tener días como índice y jornadas como columnas
         df_pivot = df.pivot(index='DIA', columns='JORNADA', values='cantidad').fillna(0)
 
         # Crear gráfico de barras verticales agrupadas
-        st.header(f"📊 Matriculados por Jornada y Día - Año {selected_year}")
+        st.header(f"📊 Estudiantes por Jornada y día - Año {selected_year}")
         
         fig, ax = plt.subplots(figsize=(14, 8))
         
@@ -134,7 +134,7 @@ try:
         # Configuración del gráfico
         ax.set_xlabel('Día de la Semana', fontsize=13, fontweight='bold')
         ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-        ax.set_title(f'Estudiantes Matriculados por Jornada y Día\nAño {selected_year}',
+        ax.set_title(f'Estudiantes Estudiantes por Jornada y día\nAño {selected_year}',
                      fontsize=16, fontweight='bold', pad=20)
         ax.set_xticks(x)
         ax.set_xticklabels(dias, rotation=45, ha='right', fontsize=11)

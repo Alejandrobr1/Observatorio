@@ -12,8 +12,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Base_datos.conexion import get_engine
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Dashboard Estudiantes por Institución")
-st.title("📊 Estudiantes por Institución Educativa")
+st.set_page_config(layout="wide", page_title="Dashboard Estudiantes Escuela Nueva")
+st.title("📊 Estudiantes Escuela Nueva Educativa")
 
 # Inicializar el estado de la sesión para el año si no existe
 if 'selected_year' not in st.session_state:
@@ -33,7 +33,7 @@ with col_selector2:
     if dashboard_choice == "Estudiantes":
         report_choice = st.selectbox(
             "Seleccionar Reporte",
-            ["Estudiantes por Institución", "Otro Reporte de Estudiantes"],
+            ["Estudiantes Escuela Nueva", "Otro Reporte de Estudiantes"],
             help="Elige el reporte específico de estudiantes."
         )
     else: # Docentes

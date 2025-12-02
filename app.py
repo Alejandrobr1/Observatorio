@@ -144,9 +144,9 @@ with tab2:
     st.markdown("Selecciona el tipo de población para ver los dashboards correspondientes.")
 
     # Definir las etiquetas para los filtros de población
-    COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
+    COMFENALCO_LABEL = "Comfenalco Antioquia"
     DOCENTES_LABEL = "Formación a docentes"
-    COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
+    COLOMBO_LABEL = "Centro Colombo Americano Medellín"
 
     # Inicializar el estado de la sesión para el filtro de población
     if 'population_filter' not in st.session_state:
@@ -156,7 +156,7 @@ with tab2:
         st.session_state.population_filter = pop_type
 
     # Crear botones para seleccionar la población
-    pop_options = [COMFENALCO_LABEL, DOCENTES_LABEL, COLOMBO_LABEL]
+    pop_options = [COMFENALCO_LABEL, COLOMBO_LABEL]
     cols = st.columns(len(pop_options))
     for i, pop in enumerate(pop_options):
         with cols[i]:
@@ -166,31 +166,29 @@ with tab2:
     
     # Mostrar enlaces de dashboards según la población seleccionada
     if st.session_state.population_filter == COMFENALCO_LABEL:
-        st.markdown("#### 📊 Análisis de Matrículas")
+        st.markdown("#### 📊 Años 2016 al 2019")
         col1, col2 = st.columns(2)
         with col1:
-            st.page_link("pages/1p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día", icon="📅")
-            st.page_link("pages/2p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población", icon="👥")
-            st.page_link("pages/3p-estudiantes_por_sede_nodal_etapa1_2.py", label="Participación % por sede nodal", icon="⚖️")
-            st.page_link("pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Matriculados por sede nodal", icon="📊")
-            st.page_link("pages/5p-estudiantes_por_institucion.py", label="Estudiantes por Institución", icon="🏫")
+            st.page_link("pages/1p-estudiantes_por_jornada_dia.py", label="Estudiantes por Jornada y día", icon="📅")
+            st.page_link("pages/2p-estudiantes_por_poblacion.py", label="Estudiantes por Población", icon="👥")
+            st.page_link("pages/3p-estudiantes_por_sede_nodal_etapa1_2.py", label="Participación % por Sede nodal", icon="⚖️")
+            st.page_link("pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Estudiantes por Sede nodal", icon="📊")
+            st.page_link("pages/5p-estudiantes_por_institucion.py", label="Estudiantes Escuela Nueva", icon="🏫")
         with col2:
-            st.page_link("pages/10p-estudiantes_por_institucion_2021_2025.py", label="Estudiantes por Institución (2021-2025)", icon="🏫")
-            st.page_link("pages/11p-estudiantes_por_grado_2021_2025.py", label="Estudiantes por Grado (2021-2025)", icon="🎓")
+            st.page_link("pages/10p-estudiantes_por_institucion_2021_2025.py", label="Estudiantes por Institución Educativa", icon="🏫")
+            st.page_link("pages/11p-estudiantes_por_grado_2021_2025.py", label="Estudiantes por Grado", icon="🎓")
             st.page_link("pages/12p-estudiantes_por_institucion_intensificacion.py", label="Estudiantes por Institución Intensificación", icon="🏫")
             st.page_link("pages/13p-estudiantes_por_grado_intensificacion.py", label="Estudiantes por Grado Intensificación", icon="🎓")
             st.page_link("pages/14p-estudiantes_por_idioma_intensificacion.py", label="Estudiantes por idioma Intensificación", icon="📈")
             
-    elif st.session_state.population_filter == DOCENTES_LABEL:
-        st.markdown("#### 👨‍🏫 Análisis de Docentes")
-        st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por Nivel MCER", icon="🎓")
-        st.page_link("pages/7p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
 
     elif st.session_state.population_filter == COLOMBO_LABEL:
         st.markdown("#### Análisis Colombo Americano")
         st.page_link("pages/8p-colombo_por_institucion.py", label="Colombo - Estudiantes por Institución", icon="🏫")
         st.page_link("pages/9p-colombo_por_nivel.py", label="Colombo - Estudiantes por Nivel", icon="📈")
-
+        st.markdown("#### 👨‍🏫 Análisis de Docentes")
+        st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por Nivel MCER", icon="🎓")
+        st.page_link("pages/7p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
 
 with tab3:
     st.markdown("### 📥 Centro de Descargas")
@@ -228,9 +226,9 @@ st.sidebar.markdown("""
 
 def add_interest_links():
     st.markdown("---")
-    st.markdown("### 🔗 Enlaces de Interés")
+    st.markdown("### 🔗 Oportunidades laborales")
     st.markdown("""
-    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    - [Agencia pública de empleo – Comfenalco Antioquia](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
     - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
     - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx) 
     """)

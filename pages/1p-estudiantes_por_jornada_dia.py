@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes Comfenalco por Jornada y Día")
-st.title("📊 Estudiantes Matriculados por Jornada y Día (Comfenalco)")
+st.title("📊 Estudiantes por Jornada y día (Comfenalco)")
  
 
 # --- State and Navigation ---
@@ -146,7 +146,7 @@ def create_day_journey_chart(df, title):
     """Función para crear un gráfico de barras agrupadas para una etapa específica."""
     st.header(title)
     if df.empty:
-        st.warning("No hay datos de matriculados por jornada y día para esta etapa.")
+        st.warning("No hay datos de Estudiantes por Jornada y día para esta etapa.")
         return
 
     # Pivotear los datos para tener días como índice y jornadas como columnas
@@ -178,7 +178,7 @@ def create_day_journey_chart(df, title):
 
     ax.set_xlabel('Día de la Semana', fontsize=13, fontweight='bold')
     ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-    ax.set_title(f'Estudiantes Matriculados por Jornada y Día', fontsize=16, fontweight='bold', pad=20)
+    ax.set_title('Estudiantes por Jornada y día', fontsize=16, fontweight='bold', pad=20)
     ax.set_xticks(x)
     ax.set_xticklabels(dias, rotation=45, ha='right', fontsize=11)
     ax.legend(title='Jornada', fontsize=10)
@@ -237,9 +237,9 @@ except Exception as e:
 
 def add_interest_links():
     st.markdown("---")
-    st.markdown("### 🔗 Enlaces de Interés")
+    st.markdown("### 🔗 Oportunidades laborales")
     st.markdown("""
-    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    - [Agencia pública de empleo – Comfenalco Antioquia](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
     - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
     - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx)    
     """)

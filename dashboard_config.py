@@ -2,39 +2,34 @@
 # Este archivo define las constantes y funciones utilizadas en toda la aplicación
 import streamlit as st
 
-COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
+COMFENALCO_LABEL = "Comfenalco Antioquia"
 DOCENTES_LABEL = "Formación a docentes"
-COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
+COLOMBO_LABEL = "Centro Colombo Americano Medellín"
 
 # Mapeo de categorías a páginas
 DASHBOARD_CATEGORIES = {
     COMFENALCO_LABEL: {
         "pages": [
-            ("1p-estudiantes_por_jornada_dia.py", "Matriculados por Jornada y Día", "📅"),
-            ("2p-estudiantes_por_poblacion.py", "Matriculados por Población", "👥"),
-            ("3p-estudiantes_por_sede_nodal_etapa1_2.py", "“Participación % por sede nodal", "⚖️"),
-            ("4p-estudiantes_por_sede_nodal_barras_etp1_2.py", "Matriculados por sede nodal", "📊"),
-            ("5p-estudiantes_por_institucion.py", "Estudiantes por Institución (Escuela Nueva)", "🏛️"),
-            ("10p-estudiantes_por_institucion_2021_2025.py", "Estudiantes por Institución (2021-2025)", "🏫"),
-            ("11p-estudiantes_por_grado_2021_2025.py", "Estudiantes por Grado (2021-2025)", "🏫"),
+            ("1p-estudiantes_por_jornada_dia.py", "Estudiantes por Jornada y día", "📅"),
+            ("2p-estudiantes_por_poblacion.py", "Estudiantes por Población", "👥"),
+            ("3p-estudiantes_por_sede_nodal_etapa1_2.py", "“Participación % por Sede nodal", "⚖️"),
+            ("4p-estudiantes_por_sede_nodal_barras_etp1_2.py", "Estudiantes por Sede nodal", "📊"),
+            ("5p-estudiantes_por_institucion.py", "Estudiantes Escuela Nueva", "🏛️"),
+            ("10p-estudiantes_por_institucion_2021_2025.py", "Estudiantes por Institución Educativa", "🏫"),
+            ("11p-estudiantes_por_grado_2021_2025.py", "Estudiantes por Grado", "🏫"),
             ("12p-estudiantes_por_institucion_intensificacion.py", "Estudiantes por Institución Intensificación", "🏫"),
             ("13p-estudiantes_por_grado_intensificacion.py", "Estudiantes por Grado Intensificación", "🎓"),
             ("14p-estudiantes_por_idioma_intensificacion.py", "Estudiantes por idioma Intensificación", "📈")
         ],
         "first_page": "1p-estudiantes_por_jornada_dia.py"
     },
-    DOCENTES_LABEL: {
-        "pages": [
-            ("6p-docentes_por_nivel.py", "Docentes por Nivel MCER", "🎓"),
-            ("7p-docentes_por_institucion.py", "Docentes por Institución", "🏫"),
-        ],
-        "first_page": "6p-docentes_por_nivel.py",
-        
-    },
+   
     COLOMBO_LABEL: {
         "pages": [
             ("8p-colombo_por_institucion.py", "Colombo - Estudiantes por Institución", "🏫"),
             ("9p-colombo_por_nivel.py", "Colombo - Estudiantes por Nivel", "📈"),
+            ("6p-docentes_por_nivel.py", "Docentes por Nivel MCER", "🎓"),
+            ("7p-docentes_por_institucion.py", "Docentes por Institución", "🏫"),
         ],
         "first_page": "8p-colombo_por_institucion.py",
         

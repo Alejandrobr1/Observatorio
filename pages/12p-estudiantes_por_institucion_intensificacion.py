@@ -192,9 +192,9 @@ except Exception as e:
 
 def add_interest_links():
     st.markdown("---")
-    st.markdown("### 🔗 Enlaces de Interés")
+    st.markdown("### 🔗 Oportunidades laborales")
     st.markdown("""
-    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    - [Agencia pública de empleo – Comfenalco Antioquia](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
     - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
     - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx) 
     """)
