@@ -218,7 +218,7 @@ with tab2:
         cols_sub = st.columns(len(sub_categories))
         for i, sub in enumerate(sub_categories):
             with cols_sub[i]:
-                st.button(sub, key=f"colombo_sub_{i}", on_click=set_colombo_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.colombo_subcategory == sub else "secondary")
+                st.button(sub, key=f"colombo_sub_{i}", on_click=set_colombo_sub, args=(sub,), use_container_width=True, type="secondary" if st.session_state.colombo_subcategory == sub else "secondary")
 
         st.markdown("---")
 
