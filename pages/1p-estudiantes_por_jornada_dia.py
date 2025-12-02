@@ -15,11 +15,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 st.set_page_config(layout="wide", page_title="Dashboard Estudiantes Comfenalco por Jornada y Día")
 st.title("📊 Estudiantes por Jornada y día (Comfenalco)")
 
-# --- Set Category State ---
-current_page_category = get_current_page_category(os.path.basename(__file__))
-if 'population_filter' not in st.session_state or st.session_state.population_filter != current_page_category:
-    st.session_state.population_filter = current_page_category
-
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
     st.session_state.population_filter = COMFENALCO_LABEL
