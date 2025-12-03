@@ -75,22 +75,24 @@ try:
     for idx, row in df.iterrows():
         try:
             # Extraer y convertir valores según la estructura de la tabla
-            fecha = int(row['FECHA']) if pd.notna(row['FECHA']) else None
-            institucion_educativa = str(row['Institución Educativa']).strip() if pd.notna(row['Institución Educativa']) else None
+            fecha = int(row['Año']) if pd.notna(row['Año']) else None
+            sede_nodal = str(row['Sede Nodal']).strip() if pd.notna(row['Sede Nodal']) else None
             poblacion = str(row['Población']).strip() if pd.notna(row['Población']) else None
-            grado = str(row['Grado']).strip() if pd.notna(row['Grado']) else None
+            nivel = str(row['Nivel']).strip() if pd.notna(row['Nivel']) else None
+            dia = str(row['Día']).strip() if pd.notna(row['Día']) else None
             jornada = str(row['Jornada']).strip() if pd.notna(row['Jornada']) else None
-            nivel_mcer = str(row['NIVEL_MCER']).strip() if pd.notna(row['NIVEL_MCER']) else None
-            idioma = str(row['IDIOMA']).strip() if pd.notna(row['IDIOMA']) else None
+            matriculados = int(row['Matriculados']) if pd.notna(row['Matriculados']) else None
+            etapa = int(row['Etapa']) if pd.notna(row['Etapa']) else None
             
             registros.append({
                 'FECHA': fecha,
-                'INSTITUCION_EDUCATIVA': institucion_educativa,
+                'SEDE_NODAL': sede_nodal,
                 'POBLACION': poblacion,
-                'GRADO': grado,
+                'NIVEL': nivel,
+                'DIA': dia,
                 'JORNADA': jornada,
-                'NIVEL_MCER': nivel_mcer,
-                'IDIOMA': idioma
+                'MATRICULADOS': matriculados,
+                'ETAPA': etapa
             })
         
         except Exception as e:
@@ -136,17 +138,18 @@ try:
                 # Insertar registro sin verificar duplicados
                 # Se permiten valores duplicados tal como vienen en el Excel
                 connection.execute(text(
-                    """INSERT INTO Estudiantes_intensificacion 
-                       (FECHA, INSTITUCION_EDUCATIVA, POBLACION, GRADO, JORNADA, NIVEL_MCER, IDIOMA)
-                       VALUES (:fecha, :institucion_educativa, :poblacion, :grado, :jornada, :nivel_mcer, :idioma)"""
+                    """INSERT INTO Estudiantes_intensificacion
+                       (FECHA, SEDE_NODAL, POBLACION, NIVEL, DIA, JORNADA, MATRICULADOS, ETAPA)
+                       VALUES (:fecha, :sede_nodal, :poblacion, :nivel, :dia, :jornada, :matriculados, :etapa)"""
                 ), {
                     'fecha': reg['FECHA'],
-                    'institucion_educativa': reg['INSTITUCION_EDUCATIVA'],
+                    'sede_nodal': reg['SEDE_NODAL'],
                     'poblacion': reg['POBLACION'],
-                    'grado': reg['GRADO'],
+                    'nivel': reg['NIVEL'],
+                    'dia': reg['DIA'],
                     'jornada': reg['JORNADA'],
-                    'nivel_mcer': reg['NIVEL_MCER'],
-                    'idioma': reg['IDIOMA']
+                    'matriculados': reg['MATRICULADOS'],
+                    'etapa': reg['ETAPA']
                 })
                 
                 inseridos += 1
@@ -195,13 +198,13 @@ try:
         for i, row in enumerate(pob_query):
             print(f"      • {row[0]}: {row[1]}")
         
-        # Distribución por grado
-        grado_query = connection.execute(text(
-            "SELECT GRADO, COUNT(*) as cantidad FROM Estudiantes_intensificacion GROUP BY GRADO ORDER BY GRADO"
+        # Distribución por nivel
+        nivel_query = connection.execute(text(
+            "SELECT NIVEL, COUNT(*) as cantidad FROM Estudiantes_intensificacion GROUP BY NIVEL ORDER BY NIVEL"
         ))
-        print(f"\n   Grados:")
-        for row in grado_query:
-            print(f"      • Grado {row[0]}: {row[1]} registros")
+        print(f"\n   Niveles:")
+        for row in nivel_query:
+            print(f"      • Nivel {row[0]}: {row[1]} registros")
         
         # Distribución por jornada
         jornada_query = connection.execute(text(

@@ -47,19 +47,69 @@ class Estudiantes_2021_2025(Base):
     __tablename__ = 'Estudiantes_2021_2025'
     ID = Column(Integer, primary_key=True, autoincrement=True)
     FECHA = Column(Integer)
-    INSTITUCION_EDUCATIVA = Column(String(255))
+    SEDE_NODAL = Column(String(255))
     POBLACION = Column(String(150))
-    GRADO = Column(String(100))
+    NIVEL = Column(String(100))
+    DIA = Column(String(255))
     JORNADA = Column(String(100))
-    NIVEL_MCER = Column(String(150))
+    MATRICULADOS = Column(Integer)
+    ETAPA = Column(Integer)
+
+class Instituciones_2021_2025(Base):
+    __tablename__ = 'Instituciones_2021_2025'
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    FECHA = Column(Integer)
+    ETAPA = Column(Integer)
+    INSTITUCION_EDUCATIVA = Column(String(255))
+    MATRICULADOS = Column(Integer)
+    
+class Grados_2021_2025(Base):
+    __tablename__ = 'Grados_2021_2025'
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    FECHA = Column(Integer)
+    ETAPA = Column(Integer)
+    GRADO = Column(String(255))
+    MATRICULADOS = Column(Integer)
 
 class Estudiantes_intensificacion(Base):
     __tablename__ = 'Estudiantes_intensificacion'
     ID = Column(Integer, primary_key=True, autoincrement=True)
     FECHA = Column(Integer)
-    INSTITUCION_EDUCATIVA = Column(String(255))
+    SEDE_NODAL = Column(String(255))
     POBLACION = Column(String(150))
-    GRADO = Column(String(100))
+    NIVEL = Column(String(100))
+    DIA = Column(String(255))
     JORNADA = Column(String(100))
-    NIVEL_MCER = Column(String(150))
-    IDIOMA = Column(String(255))
+    MATRICULADOS = Column(Integer)
+    ETAPA = Column(Integer)
+  
+class Grados_intensificacion(Base):
+    __tablename__ = 'Grados_intensificacion'
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    FECHA = Column(Integer)
+    SEDE_NODAL = Column(String(255))
+    GRADO = Column(String(150))
+    MATRICULADOS = Column(Integer)
+
+class Frances_intensificacion(Base):
+    __tablename__ = 'Frances_intensificacion'
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    FECHA = Column(Integer)
+    SEDE_NODAL = Column(String(255))
+    SEDE = Column(String(255))
+    GRADO = Column(String(150))
+    IDIOMA = Column(String(100))
+    NIVEL_MCER = Column(String(100))
+    HORAS = Column(Integer)
+    DIA = Column(String(100))
+    JORNADA = Column(String(100))
+    MATRICULADOS = Column(Integer)
+    NIVEL = Column(String(100))
+
+class Grados_intensificacion_Frances(Base):
+    __tablename__ = 'Grados_intensificacion_Frances'
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    FECHA = Column(Integer)
+    SEDE_NODAL = Column(String(255))
+    GRADO = Column(String(150))
+    MATRICULADOS = Column(Integer)
