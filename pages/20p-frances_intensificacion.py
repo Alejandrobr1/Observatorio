@@ -80,6 +80,20 @@ def get_available_years(_engine):
     st.warning(f"No se encontraron años en la tabla '{table_name}'.")
     return []
 
+@st.cache_data
+def get_available_sedes(_engine, year):
+    """Obtiene las sedes nodales disponibles para un año específico."""
+    table_name = "Frances_intensificacion"
+    with _engine.connect() as connection:
+        if not _engine.dialect.has_table(connection, table_name):
+            return []
+        query_sedes = text(f"""
+            SELECT DISTINCT SEDE_NODAL FROM {table_name} 
+            WHERE FECHA = :year AND SEDE_NODAL IS NOT NULL AND SEDE_NODAL != ''
+            ORDER BY SEDE_NODAL ASC
+        """)
+        return [row[0] for row in connection.execute(query_sedes, {'year': year}).fetchall()]
+
 available_years = get_available_years(engine)
 
 if not available_years:
@@ -93,19 +107,30 @@ if 'selected_year' not in st.session_state or st.session_state.selected_year not
 
 selected_year = st.session_state.selected_year
 
+available_sedes = get_available_sedes(engine, selected_year)
+if not available_sedes:
+    st.warning(f"⚠️ No se encontraron sedes para el año {selected_year}.")
+    st.stop()
+
+if 'selected_sede' not in st.session_state or st.session_state.selected_sede not in available_sedes:
+    st.session_state.selected_sede = available_sedes[0]
+
+selected_sede = st.sidebar.selectbox("📍 Seleccionar Sede Nodal", available_sedes, index=available_sedes.index(st.session_state.selected_sede))
+st.session_state.selected_sede = selected_sede
+
 st.sidebar.info(f"**Población:** {st.session_state.population_filter}")
 st.sidebar.info(f"**Año:** {selected_year}")
 st.sidebar.divider()
 
 # --- Carga de Datos ---
 @st.cache_data
-def load_data(_engine, year):
+def load_data(_engine, year, sede_nodal):
     table_name = "Frances_intensificacion"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(columns=["DIA", "JORNADA", "total_matriculados"]), 0
         
-        params = {'year': year}
+        params = {'year': year, 'sede_nodal': sede_nodal}
         query = text(f"""
             SELECT 
                 DIA, JORNADA, COALESCE(SUM(MATRICULADOS), 0) as total_matriculados
@@ -113,6 +138,7 @@ def load_data(_engine, year):
             WHERE DIA IS NOT NULL AND DIA != '' AND DIA != 'SIN INFORMACION'
               AND JORNADA IS NOT NULL AND JORNADA != '' AND JORNADA != 'SIN INFORMACION'
               AND FECHA = :year
+              AND SEDE_NODAL = :sede_nodal
             GROUP BY DIA, JORNADA
             ORDER BY FIELD(DIA, 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'), JORNADA
         """)
@@ -120,11 +146,11 @@ def load_data(_engine, year):
         df = pd.DataFrame(result.fetchall(), columns=["DIA", "JORNADA", "total_matriculados"])
         
         # Métricas
-        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE FECHA = :year"), params).scalar() or 0
+        total_matriculados = connection.execute(text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE FECHA = :year AND SEDE_NODAL = :sede_nodal"), params).scalar() or 0
         
         return df, total_matriculados
 
-def create_day_journey_chart(df, title):
+def create_day_journey_chart(df, title, sede_nodal):
     """Función para crear un gráfico de barras agrupadas de matriculados por jornada y día."""
     st.header(title)
     if df.empty:
@@ -158,7 +184,7 @@ def create_day_journey_chart(df, title):
 
     ax.set_xlabel('Día de la Semana', fontsize=13, fontweight='bold')
     ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-    ax.set_title('Matriculados por Jornada y Día, Sede Nodal I. E. JOSEFINA MUÑOZ GONZÁLEZ', fontsize=16, fontweight='bold', pad=20)
+    ax.set_title(f'Matriculados por Jornada y Día - Sede: {sede_nodal}', fontsize=16, fontweight='bold', pad=20)
     ax.set_xticks(x)
     ax.set_xticklabels(dias, rotation=45, ha='right', fontsize=11)
     ax.legend(title='Jornada', fontsize=10)
@@ -175,7 +201,7 @@ def create_day_journey_chart(df, title):
     st.dataframe(df_display, use_container_width=True)
 
 try:
-    df_data, total_matriculados = load_data(engine, selected_year)
+    df_data, total_matriculados = load_data(engine, selected_year, selected_sede)
 
     # --- Visualización ---
     st.sidebar.header("📈 Estadísticas Generales")
@@ -199,7 +225,7 @@ try:
     st.markdown('<hr class="compact">', unsafe_allow_html=True)
     
     # Mostrar el gráfico
-    create_day_journey_chart(df_data, f"Año {selected_year}")
+    create_day_journey_chart(df_data, f"Año {selected_year}", selected_sede)
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")

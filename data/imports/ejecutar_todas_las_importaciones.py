@@ -30,6 +30,7 @@ def ejecutar_importaciones():
         "insertar_intensificacion_grados.py",
         "insertar_intensificacion_frances.py",
         "insertar_intensificacion_frances_grados.py",
+        "insertar_intensificacion_horas_frances.py",
     ]
 
     print("="*80)

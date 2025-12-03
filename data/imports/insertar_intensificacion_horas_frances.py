@@ -17,10 +17,10 @@ logger = get_logger(__name__)
 
 # Definir la ruta del archivo CSV
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-ruta_archivo = os.path.join(project_root, "data", "csv", "Tabla_intensificacion_frances.csv")
+ruta_archivo = os.path.join(project_root, "data", "csv", "Tabla_intensif_horas_frances.csv")
 
 print("\n" + "="*70)
-print("INSERCIÓN DE DATOS - TABLA FRANCES_INTENSIFICACION")
+print("INSERCIÓN DE DATOS - TABLA FRANCES_INTENSIFICACION_HORAS")
 print("="*70)
 
 try:
@@ -39,7 +39,7 @@ try:
 
     # Rellenar valores NaN para evitar errores de conversión
     # Columnas numéricas
-    numeric_cols = ['Año', 'Matriculados']
+    numeric_cols = ['Año', 'Horas de formación', 'Matriculados']
     for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
     # Columnas de texto
@@ -82,21 +82,25 @@ try:
             fecha = clean_int(row.get('Año', 0))
             sede_nodal = clean_text(row.get('Sede Nodal'))
             sede = clean_text(row.get('Sede'))
+            grado = clean_text(row.get('Grado'))
             idioma = clean_text(row.get('Idioma'))
+            nivel_mcer = clean_text(row.get('Nivel MCER'))
+            horas = clean_int(row.get('Horas de formación', 0))
             dia = clean_text(row.get('Día'))
             jornada = clean_text(row.get('Jornada'))
             matriculados = clean_int(row.get('Matriculados', 0))
-            nivel = clean_text(row.get('Nivel'))
             
             registros.append({
                 'FECHA': fecha,
                 'SEDE_NODAL': sede_nodal,
                 'SEDE': sede,
+                'GRADO': grado,
                 'IDIOMA': idioma,
+                'NIVEL_MCER': nivel_mcer,
+                'HORAS': horas,
                 'DIA': dia,
                 'JORNADA': jornada,
-                'MATRICULADOS': matriculados,
-                'NIVEL': nivel
+                'MATRICULADOS': matriculados
             })
         
         except Exception as e:
@@ -125,8 +129,8 @@ try:
     with engine.connect() as connection:
         transaction = connection.begin()
         try:
-            print(f"   • Limpiando datos antiguos de la tabla 'Frances_intensificacion'...")
-            connection.execute(text("DELETE FROM Frances_intensificacion"))
+            print(f"   • Limpiando datos antiguos de la tabla 'Frances_intensificacion_horas'...")
+            connection.execute(text("DELETE FROM Frances_intensificacion_horas"))
             transaction.commit()
             print(f"   ✓ Datos antiguos eliminados.")
         except Exception as e:
@@ -142,18 +146,20 @@ try:
             try:
                 # Insertar registro
                 connection.execute(text(
-                    """INSERT INTO Frances_intensificacion
-                       (FECHA, SEDE_NODAL, SEDE, IDIOMA, DIA, JORNADA, MATRICULADOS, NIVEL)
-                       VALUES (:fecha, :sede_nodal, :sede, :idioma, :dia, :jornada, :matriculados, :nivel)"""
+                    """INSERT INTO Frances_intensificacion_horas 
+                       (FECHA, SEDE_NODAL, SEDE, GRADO, IDIOMA, NIVEL_MCER, HORAS, DIA, JORNADA, MATRICULADOS)
+                       VALUES (:fecha, :sede_nodal, :sede, :grado, :idioma, :nivel_mcer, :horas, :dia, :jornada, :matriculados)"""
                 ), {
                     'fecha': reg['FECHA'],
                     'sede_nodal': reg['SEDE_NODAL'],
                     'sede': reg['SEDE'],
+                    'grado': reg['GRADO'],
                     'idioma': reg['IDIOMA'],
+                    'nivel_mcer': reg['NIVEL_MCER'],
+                    'horas': reg['HORAS'],
                     'dia': reg['DIA'],
                     'jornada': reg['JORNADA'],
-                    'matriculados': reg['MATRICULADOS'],
-                    'nivel': reg['NIVEL']
+                    'matriculados': reg['MATRICULADOS']
                 })
                 
                 inseridos += 1
@@ -180,20 +186,20 @@ try:
     
     # Mostrar estadísticas de los datos insertados
     with engine.connect() as connection:
-        total_query = connection.execute(text("SELECT COUNT(*) FROM Frances_intensificacion"))
+        total_query = connection.execute(text("SELECT COUNT(*) FROM Frances_intensificacion_horas"))
         total = total_query.scalar()
         
-        print(f"\n📈 Distribución de datos en Frances_intensificacion:")
+        print(f"\n📈 Distribución de datos en Frances_intensificacion_horas:")
         print(f"   • Total de registros: {total}")
         
         año_query = connection.execute(text(
-            "SELECT FECHA, SUM(MATRICULADOS) as total_matriculados FROM Frances_intensificacion GROUP BY FECHA"
+            "SELECT FECHA, SUM(MATRICULADOS) as total_matriculados FROM Frances_intensificacion_horas GROUP BY FECHA"
         ))
         for row in año_query:
             print(f"   • Año {row[0]}: {row[1]:,} matriculados")
         
         idioma_query = connection.execute(text(
-            "SELECT IDIOMA, SUM(MATRICULADOS) as total_matriculados FROM Frances_intensificacion GROUP BY IDIOMA ORDER BY total_matriculados DESC"
+            "SELECT IDIOMA, SUM(MATRICULADOS) as total_matriculados FROM Frances_intensificacion_horas GROUP BY IDIOMA ORDER BY total_matriculados DESC"
         ))
         print(f"\n   Matriculados por Idioma:")
         for row in idioma_query:
@@ -203,7 +209,7 @@ try:
     print("✅ PROCESO COMPLETADO EXITOSAMENTE")
     print("="*70)
     
-    logger.info(f"Successfully inserted {inseridos} records into Frances_intensificacion")
+    logger.info(f"Successfully inserted {inseridos} records into Frances_intensificacion_horas")
 
 except FileNotFoundError:
     print(f"\n❌ Error: Archivo no encontrado")
