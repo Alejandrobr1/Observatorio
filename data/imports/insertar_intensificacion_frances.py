@@ -88,7 +88,7 @@ try:
             sede = clean_text(row.get('Sede'))
             grado = clean_text(row.get('Grado'))
             idioma = clean_text(row.get('Idioma'))
-            nivel_mcer = clean_text(row.get('Nivel MCER'))
+            nivel_mcer = clean_text(row.get('MCER'))
             horas = clean_int(row.get('Horas', 0))
             dia = clean_text(row.get('Día'))
             jornada = clean_text(row.get('Jornada'))

@@ -25,12 +25,14 @@ DASHBOARD_CATEGORIES = {
                 ("15p-estudiantes_por_institucion_2021_2025.py", "Matriculados por Institución", "🏫"),
             ],
             "Intensificación lingüística": [
-                ("12p-estudiantes_por_institucion_intensificacion.py", "Estudiantes por Institución", "🏫"),
-                ("13p-estudiantes_por_grado_intensificacion.py", "Estudiantes por Grado", "🎓"),
-                ("14p-estudiantes_por_idioma_intensificacion.py", "Estudiantes por Idioma", "📈"),
                 ("16p-estudiantes_por_jornada_intensificacion.py", "Estudiantes por Jornada", "📅"),
                 ("17p-estudiantes_por_poblacion_intensificacion.py", "Estudiantes por Población", "👥"),
                 ("18p-estudiantes_por_sede_nodal_intensificacion.py", "Estudiantes por Sede Nodal", "📊"),
+                ("19p-grados_intensificacion.py", "Grados por Sede Nodal", "🎓"),
+                ("20p-frances_intensificacion.py", "Matriculados por Jornada (Francés)", "🕒"),
+                ("21p-frances_intensificacion_grados.py", "Nivel MCER por Grado (Francés)", "📈"),
+                ("22p-horas_frances_intensificacion.py", "Horas de Formación por Sede (Francés)", "🏫"),
+                ("23p-grados_frances_intensificacion.py", "Matriculados por Grado y Sede (Francés)", "🎓"),
             ]
         }
     },
