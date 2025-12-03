@@ -17,13 +17,20 @@ DASHBOARD_CATEGORIES = {
                 ("5p-estudiantes_por_institucion.py", "Estudiantes Escuela Nueva", "🏫"),
             ],
             "Años 2021 al 2025": [
-                ("10p-estudiantes_por_institucion_2021_2025.py", "Estudiantes por Institución Educativa", "🏫"),
-                ("11p-estudiantes_por_grado_2021_2025.py", "Estudiantes por Grado", "🎓"),
+                ("10p-estudiantes_por_jornada_dia_2021_2025.py", "Estudiantes por Jornada y día", "📅"),
+                ("11p-estudiantes_por_poblacion_2021_2025.py", "Estudiantes por Población", "👥"),
+                ("12p-estudiantes_por_sede_nodal_etapa1_2_2021_2025.py", "Participación % por Sede nodal", "⚖️"),
+                ("13p-estudiantes_por_sede_nodal_barras_etp1_2_2021_2025.py", "Estudiantes por Sede nodal", "📊"),
+                ("14p-grados_2021_2025.py", "Estudiantes por Grado y Etapa", "🎓"),
+                ("15p-estudiantes_por_institucion_2021_2025.py", "Matriculados por Institución", "🏫"),
             ],
             "Intensificación lingüística": [
                 ("12p-estudiantes_por_institucion_intensificacion.py", "Estudiantes por Institución", "🏫"),
                 ("13p-estudiantes_por_grado_intensificacion.py", "Estudiantes por Grado", "🎓"),
                 ("14p-estudiantes_por_idioma_intensificacion.py", "Estudiantes por Idioma", "📈"),
+                ("16p-estudiantes_por_jornada_intensificacion.py", "Estudiantes por Jornada", "📅"),
+                ("17p-estudiantes_por_poblacion_intensificacion.py", "Estudiantes por Población", "👥"),
+                ("18p-estudiantes_por_sede_nodal_intensificacion.py", "Estudiantes por Sede Nodal", "📊"),
             ]
         }
     },

@@ -214,9 +214,17 @@ with tab2:
             st.markdown("#### 📊 Dashboards del periodo 2021-2025")
             col1, col2 = st.columns(2)
             with col1:
-                st.page_link("pages/10p-estudiantes_por_institucion_2021_2025.py", label="Estudiantes por Institución Educativa", icon="🏫")
+                st.page_link("pages/10p-estudiantes_por_jornada_dia_2021_2025.py", label="Estudiantes por Jornada y día", icon="📅")
+                st.page_link("pages/11p-estudiantes_por_poblacion_2021_2025.py", label="Estudiantes por Población", icon="👥")
+                st.page_link("pages/12p-estudiantes_por_sede_nodal_etapa1_2021_2025.py", label="Participación % por Sede nodal", icon="⚖️")
+                st.page_link("pages/13p-estudiantes_por_sede_nodal_barras_etp1_2_2021_2025.py", label="Estudiantes por Sede nodal", icon="📊")
+                st.page_link("pages/14p-grados_2021_2025.py", label="Estudiantes por Grado y Etapa", icon="🎓")
             with col2:
-                st.page_link("pages/11p-estudiantes_por_grado_2021_2025.py", label="Estudiantes por Grado", icon="🎓")
+                st.page_link("pages/15p-estudiantes_por_institucion_2021_2025.py", label="Matriculados por Institución", icon="🏫")
+                st.page_link("pages/16p-estudiantes_por_jornada_intensificacion.py", label="Estudiantes por Jornada - Intensificación", icon="📅")
+                st.page_link("pages/17p-estudiantes_por_poblacion_intensificacion.py", label="Estudiantes por Población - Intensificación", icon="👥")
+                st.page_link("pages/18p-estudiantes_por_sede_nodal_barras_etp1_2_intensificacion.py", label="Estudiantes por Sede nodal - Intensificación", icon="📊")
+
 
         elif st.session_state.comfenalco_subcategory == "Intensificación lingüística":
             st.markdown("#### 📊 Dashboards de Intensificación Lingüística")
