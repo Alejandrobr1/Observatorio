@@ -152,7 +152,7 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
     df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.1f}%")
     df_display = df_display[['#', 'SEDE_NODAL', 'cantidad', 'porcentaje']]
     df_display.columns = ['#', 'Sede Nodal', 'Matriculados', 'Porcentaje']
-    st.dataframe(df_display, use_container_width=True, hide_index=True)
+    st.dataframe(df_display, width='stretch', hide_index=True)
 
 # --- Carga de Datos ---
 @st.cache_data
@@ -200,7 +200,7 @@ try:
     for i, year in enumerate(available_years):
         with cols_buttons[i]:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+            st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), type=button_type, width='stretch')
     st.divider()
 
     col1, col2 = st.columns(2)

@@ -5,7 +5,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import create_nav_buttons, get_current_page_category# Añadir el directorio raíz del proyecto a sys.path
+from dashboard_config import create_nav_buttons
 from dashboard_config import COMFENALCO_LABEL
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -121,7 +121,7 @@ def create_bar_chart_and_table(df_data, total_grupo, title):
     df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
     df_display = df_display[['#', 'institucion', 'cantidad', 'porcentaje']]
     df_display.columns = ['#', 'Institución', 'Matriculados', 'Porcentaje']
-    st.dataframe(df_display, use_container_width=True, hide_index=True)
+    st.dataframe(df_display, width='stretch', hide_index=True)
 
 @st.cache_data
 def load_data(_engine, year):
@@ -181,7 +181,7 @@ try:
 
         for year in available_years:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), use_container_width=True, type=button_type)
+            st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), type=button_type, width='stretch')
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")

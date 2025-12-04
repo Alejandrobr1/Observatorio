@@ -6,7 +6,7 @@ import traceback
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import create_nav_buttons, get_current_page_category
+from dashboard_config import create_nav_buttons
 from dashboard_config import COMFENALCO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -197,7 +197,7 @@ def create_day_journey_chart(df, title):
     df_display = df_pivot.copy().astype(int)
     df_display['Total por Día'] = df_pivot.sum(axis=1).astype(int)
     st.markdown("##### 📋 Tabla Detallada")
-    st.dataframe(df_display, use_container_width=True)
+    st.dataframe(df_display, width='stretch')
 
 try:
     # --- Carga de datos para ambas tablas ---

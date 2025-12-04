@@ -6,7 +6,7 @@ import traceback
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import create_nav_buttons, get_current_page_category
+from dashboard_config import create_nav_buttons
 from dashboard_config import COMFENALCO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -190,10 +190,10 @@ def create_day_journey_chart(df, title):
 
     # Tabla de datos detallada
     df_display = df_pivot.copy()
-    df_display = df_display.astype(int).applymap('{:,}'.format)
+    df_display = df_display.astype(int).map('{:,}'.format)
     df_display['Total por Día'] = df_pivot.sum(axis=1).astype(int).apply('{:,}'.format)
     st.header("📋 Tabla Detallada")
-    st.dataframe(df_display, use_container_width=True)
+    st.dataframe(df_display, width='stretch')
 
 try:
     df_etapa1, total_matriculados_etapa1, _, _ = load_data_by_stage(engine, population_prefix, selected_year, '1')
@@ -217,7 +217,7 @@ try:
     for i, year in enumerate(available_years):
         with cols_buttons[i]:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,)) # type: ignore
+            st.button(str(year), key=f"year_{year}", type=button_type, on_click=set_year, args=(year,), width='stretch') # type: ignore
     st.markdown('<hr class="compact">', unsafe_allow_html=True)
 
     # Layout en dos columnas para los gráficos

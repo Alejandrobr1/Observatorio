@@ -95,7 +95,7 @@ def create_nav_buttons(selected_pop):
 
         for i, pop in enumerate(pop_options):
             with cols_pop[i]:
-                st.button(pop, key=f"pop_btn_{pop}_nav", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if selected_pop == pop else "secondary")
+                st.button(pop, key=f"pop_btn_{pop}_nav", on_click=set_population, args=(pop,), width='stretch', type="primary" if selected_pop == pop else "secondary")
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<hr class="compact">', unsafe_allow_html=True)
@@ -121,7 +121,7 @@ def create_nav_buttons(selected_pop):
             cols_sub = st.columns(len(subcategories))
             for i, sub in enumerate(subcategories):
                 with cols_sub[i]:
-                    st.button(sub, key=f"sub_btn_{sub}_nav", on_click=set_sub, args=(sub,), use_container_width=True, type="primary" if active_subcategory == sub else "secondary")
+                    st.button(sub, key=f"sub_btn_{sub}_nav", on_click=set_sub, args=(sub,), width='stretch', type="primary" if active_subcategory == sub else "secondary")
             st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown('<hr class="compact">', unsafe_allow_html=True)
@@ -136,4 +136,4 @@ def create_nav_buttons(selected_pop):
             nav_cols = st.columns(2)
             for j, (page_path, label, icon) in enumerate(row_buttons):
                 with nav_cols[j]:
-                    st.page_link(page_path, label=label, icon=icon, use_container_width=True)
+                    st.page_link(page_path, label=label, icon=icon, width='stretch')

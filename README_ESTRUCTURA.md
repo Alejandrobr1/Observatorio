@@ -2,7 +2,6 @@
 
 ## Estructura Organizacional
 
-```
 Observatorio/
 ├── app.py                          # Punto de entrada principal (Streamlit)
 ├── dashboard_config.py             # Configuración compartida de dashboards
@@ -74,76 +73,3 @@ Observatorio/
 ├── .devcontainer/                  # 🐳 Configuración Docker Dev
 ├── env/                            # 🐍 Entorno Virtual (excluir de git)
 └── .git/                          # 📝 Control de versiones
-```
-
-## 🔄 Cambios Realizados
-
-### 1. **Módulo `src/database/`**
-   - Consolidación de módulos de base de datos
-   - Archivos movidos desde `Base_datos/`:
-     - `conexion.py` - Conexión MySQL
-     - `models.py` - Modelos de datos
-     - `crear_tablas.py` - Creación de esquema
-     - `crear_tabla_especifica.py` - Creación selectiva
-
-### 2. **Módulo `src/config/`**
-   - `logger_config.py` - Sistema de logging centralizado
-
-### 3. **Directorio `data/`**
-   - `data/csv/` - Almacena archivos CSV fuente
-   - `data/imports/` - Scripts para importar datos
-   - `data/exports/` - Exportaciones generadas
-   - `data/verify/` - Validación de datos
-
-### 4. **Dashboards**
-   - `pages/` - Dashboards activos (1p-11p)
-   - `dashboards_archive/` - Versiones antiguas (1-9)
-
-## 🚀 Importaciones Actualizadas
-
-### Antes (Estructura Antigua)
-```python
-from Base_datos.conexion import get_engine
-from logger_config import get_logger
-```
-
-### Después (Nueva Estructura)
-```python
-from src.database.conexion import get_engine
-from src.config.logger_config import get_logger
-```
-
-## 📌 Puntos Importantes
-
-- ✅ Todas las funcionalidades se mantienen intactas
-- ✅ Los dashboards siguen funcionando sin cambios
-- ✅ Sistema modular y escalable
-- ✅ Mejor organización para mantenimiento
-- ✅ Facilita testing y desarrollo futuro
-
-## 🔧 Para Ejecutar
-
-```bash
-# Activar entorno virtual
-.\env\Scripts\Activate.ps1
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Ejecutar Streamlit
-streamlit run app.py
-```
-
-## 📊 Estructura de Datos
-
-### Tablas Principales
-- `Docentes` - Información de docentes
-- `Estudiantes_2016_2019` - Datos históricos
-- `Estudiantes_2021_2025` - Datos recientes
-- `Estudiantes_Colombo` - Centro Colombo Americano
-- `Escuela_nueva` - Programa Escuela Nueva
-
-## 📝 Notas
-- Los archivos antiguos se conservan en `dashboards_archive/` como respaldo
-- Los logs se generan automáticamente en `logs/`
-- Las exportaciones se guardan en `data/exports/`

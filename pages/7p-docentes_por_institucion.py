@@ -5,7 +5,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 import sys
 import os
-from dashboard_config import create_nav_buttons, get_current_page_category, COLOMBO_LABEL
+from dashboard_config import create_nav_buttons, COLOMBO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -121,7 +121,7 @@ def create_bar_chart_and_table(df_data, total_docentes, title):
     df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
     df_display = df_display[['#', 'institucion', 'cantidad', 'porcentaje']]
     df_display.columns = ['#', 'Institución', 'Docentes', 'Porcentaje']
-    st.dataframe(df_display, use_container_width=True, hide_index=True)
+    st.dataframe(df_display, width='stretch', hide_index=True)
 
 @st.cache_data
 def load_data(_engine, year):
@@ -158,7 +158,7 @@ try:
 
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning(f"⚠️ No se encontraron datos para docentes.")
+        st.warning("⚠️ No se encontraron datos para docentes.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
@@ -189,7 +189,7 @@ try:
             st.session_state.selected_year = year
         for year in available_years:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+            st.button(str(year), key=f"year_{year}", type=button_type, on_click=set_year, args=(year,), width='stretch')
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")

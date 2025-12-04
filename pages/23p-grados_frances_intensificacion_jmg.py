@@ -120,7 +120,7 @@ def create_grouped_bar_chart_and_table(df_data, title):
     # Tabla de datos detallada
     st.subheader("📋 Tabla de Datos")
     df_display = df_pivot.copy().astype(int)
-    st.dataframe(df_display.T, use_container_width=True)
+    st.dataframe(df_display.T, width='stretch')
 
 @st.cache_data
 def load_all_data(_engine, year):
@@ -150,7 +150,7 @@ def load_all_data(_engine, year):
 try:
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning(f"⚠️ No se encontraron datos en la tabla Grados_intensificacion_Frances.")
+        st.warning("⚠️ No se encontraron datos en la tabla Grados_intensificacion_Frances.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
@@ -178,7 +178,7 @@ try:
     for i, year in enumerate(available_years):
         with cols_buttons[i]:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+            st.button(str(year), key=f"year_{year}", type=button_type, on_click=set_year, args=(year,), width='stretch')
     st.markdown('<hr class="compact">', unsafe_allow_html=True)
 
     # --- Layout de Gráficos ---
