@@ -116,7 +116,7 @@ try:
         st.warning(f"⚠️ No hay datos de matriculados por población para el año {selected_year}.")
     else:
         # Crear gráfico de barras verticales
-        st.header(f"📊 Matriculados por Tipo de Población - Año {selected_year}")
+        st.header(f"📊 Estudiantes por Población - Año {selected_year}")
         
         fig, ax = plt.subplots(figsize=(12, 7))
         
@@ -138,7 +138,7 @@ try:
         # Configuración del gráfico
         ax.set_xlabel('Tipo de Población', fontsize=13, fontweight='bold')
         ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-        ax.set_title(f'Estudiantes Matriculados por Tipo de Población\nAño {selected_year}',
+        ax.set_title(f'Estudiantes Estudiantes por Población\nAño {selected_year}',
                      fontsize=16, fontweight='bold', pad=20)
         plt.xticks(rotation=45, ha="right")
         

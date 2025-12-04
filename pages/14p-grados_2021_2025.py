@@ -5,21 +5,22 @@ import numpy as np
 from sqlalchemy import create_engine, text
 import sys
 import os
-from dashboard_config import create_nav_buttons, COMFENALCO_LABEL
+from dashboard_config import create_nav_buttons
+from dashboard_config import COMFENALCO_LABEL
 
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Configurar streamlit
-st.set_page_config(layout="wide", page_title="Estudiantes por Grado (2021-2025)")
-st.title("📊 Estudiantes por Grado (2021-2025)")
+st.set_page_config(layout="wide", page_title="Grados por Etapa (2021-2025)")
+st.title("📊 Grados y Matriculados por Etapa (2021-2025)")
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
     st.session_state.population_filter = COMFENALCO_LABEL
 
 create_nav_buttons(st.session_state.population_filter)
-st.markdown("---")
+st.markdown('<hr class="compact">', unsafe_allow_html=True)
 st.markdown("""
 <style>
     /* Style for page links with flexible height and text wrapping */
@@ -65,7 +66,7 @@ except Exception as e:
 
 @st.cache_data
 def get_available_years(_engine):
-    table_name = "Estudiantes_2021_2025"
+    table_name = "Grados_2021_2025"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             st.warning(f"La tabla '{table_name}' no existe. No se pueden cargar los años.")
@@ -77,16 +78,16 @@ def get_available_years(_engine):
     st.warning(f"No se encontraron años en la tabla '{table_name}'.")
     return []
 
-def create_grade_donut_chart(df_data, total_estudiantes, title):
-    """Función para crear un gráfico de dona y una tabla para estudiantes por grado."""
-    st.header(f"📊 {title} - Año {st.session_state.selected_year}")
+def create_donut_chart_and_table(df_data, total_matriculados, title):
+    """Función para crear un gráfico de dona y una tabla para una etapa."""
+    st.header(title)
 
     if df_data.empty:
-        st.warning("No hay datos de estudiantes por grado para el año seleccionado.")
+        st.warning("No hay datos de matriculados para esta etapa.")
         return
 
     # Gráfico de dona
-    st.subheader("Visualización de Porcentajes")
+    st.subheader("Distribución por Grado")
     fig, ax = plt.subplots(figsize=(8, 6))
     
     labels = df_data['grado']
@@ -98,7 +99,7 @@ def create_grade_donut_chart(df_data, total_estudiantes, title):
                                       wedgeprops=dict(width=0.4, edgecolor='w'))
     
     plt.setp(autotexts, size=10, weight="bold", color="white")
-    ax.set_title("Distribución de Estudiantes por Grado", pad=20)
+    ax.set_title(f"Distribución de Matriculados - {title}", pad=20)
     
     centre_circle = plt.Circle((0,0),0.60,fc='white')
     fig.gca().add_artist(centre_circle)
@@ -109,89 +110,95 @@ def create_grade_donut_chart(df_data, total_estudiantes, title):
 
     # Tabla de resumen
     st.subheader("📋 Resumen por Grado")
-    df_data['porcentaje'] = (df_data['cantidad'] / float(total_estudiantes) * 100) if total_estudiantes > 0 else 0
+    df_data['porcentaje'] = (df_data['cantidad'].astype(float) / float(total_matriculados) * 100) if total_matriculados > 0 else 0
     df_display = df_data.copy()
     df_display['#'] = range(1, len(df_display) + 1)
     df_display['cantidad'] = df_display['cantidad'].apply(lambda x: f"{int(x):,}")
     df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
     df_display = df_display[['#', 'grado', 'cantidad', 'porcentaje']]
-    df_display.columns = ['#', 'Grado', 'Estudiantes', 'Porcentaje']
+    df_display.columns = ['#', 'Grado', 'Matriculados', 'Porcentaje']
     st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 @st.cache_data
-def load_data_by_grade(_engine, year):
-    table_name = "Estudiantes_2021_2025"
+def load_data_by_stage(_engine, year, stage):
+    table_name = "Grados_2021_2025"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(), 0
         
-        params = {'year': year}
+        params = {'year': year, 'stage': stage}
         query_data = text(f"""
             SELECT 
-                GRADO as grado, COUNT(ID) as cantidad
+                GRADO as grado, COALESCE(SUM(MATRICULADOS), 0) as cantidad
             FROM {table_name}
             WHERE FECHA = :year
+              AND ETAPA = :stage
               AND GRADO IS NOT NULL 
               AND GRADO != '' 
-              AND GRADO != 'SIN INFORMACION'
             GROUP BY grado
-            ORDER BY grado ASC
+            ORDER BY cantidad DESC
         """)
         df = pd.DataFrame(connection.execute(query_data, params).fetchall(), columns=["grado", "cantidad"])
         
-        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
-        total_estudiantes = connection.execute(query_total, params).scalar() or 0
+        query_total = text(f"SELECT SUM(MATRICULADOS) FROM {table_name} WHERE FECHA = :year AND ETAPA = :stage")
+        total_matriculados = connection.execute(query_total, params).scalar() or 0
         
-        total_grados = df['grado'].nunique()
-        
-        return df, total_estudiantes, total_grados
+        return df, total_matriculados
 
 try:
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning(f"⚠️ No se encontraron datos para la población seleccionada en la tabla Estudiantes_2021_2025.")
+        st.warning(f"⚠️ No se encontraron datos en la tabla Grados_2021_2025.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
         st.session_state.selected_year = available_years[0]
     selected_year = st.session_state.selected_year
 
-    df_grados, total_estudiantes, total_grados = load_data_by_grade(engine, selected_year)
+    # Cargar datos para ambas etapas
+    df_etapa1, total_etapa1 = load_data_by_stage(engine, selected_year, 1)
+    df_etapa2, total_etapa2 = load_data_by_stage(engine, selected_year, 2)
 
+    # --- Barra Lateral ---
     st.sidebar.info(f"**Año:** {selected_year}")
     st.sidebar.divider()
     st.sidebar.header("📈 Estadísticas Generales")
-    st.sidebar.metric(f"Total Estudiantes ({selected_year})", f"{int(total_estudiantes):,}")
-    st.sidebar.metric(f"Grados ({selected_year})", f"{int(total_grados):,}")
+    st.sidebar.metric(f"Matriculados Etapa 1 ({selected_year})", f"{int(total_etapa1):,}")
+    st.sidebar.metric(f"Matriculados Etapa 2 ({selected_year})", f"{int(total_etapa2):,}")
     st.sidebar.divider()
     if os.path.exists("assets/Logo_rionegro.png"):
         st.sidebar.image("assets/Logo_rionegro.png")
 
-    # Layout en dos columnas: Gráfico a la izquierda, filtro de año a la derecha
-    col1, col2 = st.columns([3, 1])
+    # --- Selección de Año con Botones ---
+    st.write("📅 **Seleccionar Año para Visualizar**")
+    cols_buttons = st.columns(len(available_years))
+    def set_year(year):
+        st.session_state.selected_year = year
 
-    with col1:
-        # Mostrar el gráfico de estudiantes por grado
-        create_grade_donut_chart(df_grados, total_estudiantes, "Distribución de Estudiantes por Grado")
-
-    with col2:
-        st.write("📅 **Seleccionar Año**")
-        def set_year(year):
-            st.session_state.selected_year = year
-
-        for year in available_years:
+    for i, year in enumerate(available_years):
+        with cols_buttons[i]:
             button_type = "primary" if year == selected_year else "secondary"
             st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+    st.markdown('<hr class="compact">', unsafe_allow_html=True)
+
+    # --- Layout de Gráficos ---
+    col1, col2 = st.columns(2)
+
+    with col1:
+        create_donut_chart_and_table(df_etapa1, total_etapa1, f"📊 Etapa 1 - Año {selected_year}")
+
+    with col2:
+        create_donut_chart_and_table(df_etapa2, total_etapa2, f"📊 Etapa 2 - Año {selected_year}")
 
 except Exception as e:
-    st.error("❌ Error al cargar los datos")
+    st.error("❌ Error al cargar o procesar los datos")
     st.exception(e)
 
 def add_interest_links():
     st.markdown("---")
-    st.markdown("### 🔗 Enlaces de Interés")
+    st.markdown("### 🔗 Oportunidades laborales")
     st.markdown("""
-    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    - [Agencia pública de empleo – Comfenalco Antioquia](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
     - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
     - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx) 
     """)

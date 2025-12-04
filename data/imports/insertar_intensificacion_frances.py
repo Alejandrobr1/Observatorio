@@ -1,5 +1,5 @@
 """
-Script para insertar datos de Tabla_2021_2025.csv en la tabla Estudiantes_2021_2025
+Script para insertar datos de Tabla_intensificacion_frances.csv en la tabla Frances_intensificacion
 """
 
 import pandas as pd
@@ -7,6 +7,7 @@ import os
 import sys
 from sqlalchemy import text
 
+# Añadir el directorio raíz del proyecto ('Observatorio') al path de Python
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from src.database.conexion import engine
@@ -16,10 +17,10 @@ logger = get_logger(__name__)
 
 # Definir la ruta del archivo CSV
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-ruta_archivo = os.path.join(project_root, "data", "csv", "Tabla_2021_2025.csv")
+ruta_archivo = os.path.join(project_root, "data", "csv", "Tabla_intensificacion_frances.csv")
 
 print("\n" + "="*70)
-print("INSERCIÓN DE DATOS - TABLA ESTUDIANTES_2021_2025")
+print("INSERCIÓN DE DATOS - TABLA FRANCES_INTENSIFICACION")
 print("="*70)
 
 try:
@@ -35,11 +36,18 @@ try:
     # Limpiar filas completamente vacías
     df = df.dropna(how='all')
     print(f"   • Total de filas (después de eliminar filas vacías): {len(df)}")
+
+    # Rellenar valores NaN para evitar errores de conversión
+    # Columnas numéricas
+    numeric_cols = ['Año', 'Matriculados']
+    for col in numeric_cols:
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+    # Columnas de texto
+    df = df.fillna('')
     
     # Validar que el CSV no tenga valores vacíos ni nulos
     print(f"\n🔍 Validando datos...")
     
-    # Verificar valores nulos
     nulls_por_columna = df.isnull().sum()
     if nulls_por_columna.sum() > 0:
         print("  ⚠️ Advertencia: Se encontraron valores nulos:")
@@ -47,15 +55,6 @@ try:
             print(f"     • {col}: {count} valores")
     else:
         print("  ✓ No hay valores nulos")
-    
-    # Verificar valores vacíos (ahora sin usar .astype(str).str que causaba error)
-    vacios_por_columna = df.isnull().sum()
-    if vacios_por_columna.sum() > 0:
-        print("  ⚠️ Advertencia: Se encontraron valores vacíos:")
-        for col, count in vacios_por_columna[vacios_por_columna > 0].items():
-            print(f"     • {col}: {count} valores")
-    else:
-        print("  ✓ No hay valores vacíos")
     
     # Mostrar sample de datos
     print(f"\n📋 Primeras 5 filas del CSV:")
@@ -70,24 +69,34 @@ try:
     for idx, row in df.iterrows():
         try:
             # Extraer y convertir valores según la estructura de la tabla
-            fecha = int(row['Año']) if pd.notna(row['Año']) else None # CSV: Año
-            sede_nodal = str(row['Sede Nodal']).strip() if pd.notna(row['Sede Nodal']) else None # CSV: Sede Nodal
-            poblacion = str(row['Población']).strip() if pd.notna(row['Población']) else None # CSV: Población
-            nivel = str(row['Nivel']).strip() if pd.notna(row['Nivel']) else None # CSV: Nivel
-            dia = str(row['Día']).strip() if pd.notna(row['Día']) else None # CSV: Día
-            jornada = str(row['Jornada']).strip() if pd.notna(row['Jornada']) else None # CSV: Jornada
-            matriculados = int(row['Matriculados']) if pd.notna(row['Matriculados']) else None # CSV: Matriculados
-            etapa = int(row['Etapa']) if pd.notna(row['Etapa']) else None # CSV: Etapa
+            def clean_text(value):
+                if pd.isna(value) or str(value).strip().upper() in ['', 'SIN INFORMACION', 'NAN']:
+                    return None
+                return str(value).strip()
+
+            def clean_int(value):
+                if pd.isna(value):
+                    return 0
+                return int(value)
+
+            fecha = clean_int(row.get('Año', 0))
+            sede_nodal = clean_text(row.get('Sede Nodal'))
+            sede = clean_text(row.get('Sede'))
+            idioma = clean_text(row.get('Idioma'))
+            dia = clean_text(row.get('Día'))
+            jornada = clean_text(row.get('Jornada'))
+            matriculados = clean_int(row.get('Matriculados', 0))
+            nivel = clean_text(row.get('Nivel'))
             
             registros.append({
                 'FECHA': fecha,
                 'SEDE_NODAL': sede_nodal,
-                'POBLACION': poblacion,
-                'NIVEL': nivel,
+                'SEDE': sede,
+                'IDIOMA': idioma,
                 'DIA': dia,
                 'JORNADA': jornada,
                 'MATRICULADOS': matriculados,
-                'ETAPA': etapa
+                'NIVEL': nivel
             })
         
         except Exception as e:
@@ -116,14 +125,14 @@ try:
     with engine.connect() as connection:
         transaction = connection.begin()
         try:
-            print(f"   • Limpiando datos antiguos de la tabla 'Estudiantes_2021_2025'...")
-            connection.execute(text("DELETE FROM Estudiantes_2021_2025"))
+            print(f"   • Limpiando datos antiguos de la tabla 'Frances_intensificacion'...")
+            connection.execute(text("DELETE FROM Frances_intensificacion"))
             transaction.commit()
             print(f"   ✓ Datos antiguos eliminados.")
         except Exception as e:
             transaction.rollback()
             print(f"   ✗ Error al limpiar la tabla: {e}")
-            raise  # Detener el script si la limpieza falla
+            raise
     # --- FIN: Eliminar datos existentes ---
 
     with engine.connect() as connection:
@@ -133,29 +142,30 @@ try:
             try:
                 # Insertar registro
                 connection.execute(text(
-                    """INSERT INTO Estudiantes_2021_2025 
-                       (FECHA, SEDE_NODAL, POBLACION, NIVEL, DIA, JORNADA, MATRICULADOS, ETAPA)
-                       VALUES (:fecha, :sede_nodal, :poblacion, :nivel, :dia, :jornada, :matriculados, :etapa)"""
+                    """INSERT INTO Frances_intensificacion
+                       (FECHA, SEDE_NODAL, SEDE, IDIOMA, DIA, JORNADA, MATRICULADOS, NIVEL)
+                       VALUES (:fecha, :sede_nodal, :sede, :idioma, :dia, :jornada, :matriculados, :nivel)"""
                 ), {
                     'fecha': reg['FECHA'],
                     'sede_nodal': reg['SEDE_NODAL'],
-                    'poblacion': reg['POBLACION'],
-                    'nivel': reg['NIVEL'],
+                    'sede': reg['SEDE'],
+                    'idioma': reg['IDIOMA'],
                     'dia': reg['DIA'],
                     'jornada': reg['JORNADA'],
                     'matriculados': reg['MATRICULADOS'],
-                    'etapa': reg['ETAPA']
+                    'nivel': reg['NIVEL']
                 })
                 
                 inseridos += 1
-                
-                # Commit cada 100 registros
-                if inseridos % 100 == 0:
-                    connection.commit()
-                    print(f"   ✓ {inseridos} registros procesados...")
             
             except Exception as e:
-                print(f"   ✗ Error al insertar: {str(e)[:100]}")
+                # Crear una transacción para poder hacer rollback en caso de error
+                transaction = connection.begin()
+                try:
+                    transaction.rollback()
+                except:
+                    pass # La transacción ya podría estar cerrada
+                print(f"   ✗ Error al insertar fila: {str(e)[:150]}")
                 connection.rollback()
                 logger.error(f"Error inserting record: {e}", exc_info=True)
         
@@ -170,59 +180,35 @@ try:
     
     # Mostrar estadísticas de los datos insertados
     with engine.connect() as connection:
-        # Total de registros
-        total_query = connection.execute(text("SELECT COUNT(*) FROM Estudiantes_2021_2025"))
+        total_query = connection.execute(text("SELECT COUNT(*) FROM Frances_intensificacion"))
         total = total_query.scalar()
         
-        # Distribución por año
-        print(f"\n📈 Distribución de datos en Estudiantes_2021_2025:")
+        print(f"\n📈 Distribución de datos en Frances_intensificacion:")
         print(f"   • Total de registros: {total}")
         
-        # Verificar año
         año_query = connection.execute(text(
-            "SELECT DISTINCT FECHA, COUNT(*) as cantidad FROM Estudiantes_2021_2025 GROUP BY FECHA"
+            "SELECT FECHA, SUM(MATRICULADOS) as total_matriculados FROM Frances_intensificacion GROUP BY FECHA"
         ))
         for row in año_query:
-            print(f"   • Año {row[0]}: {row[1]} registros")
+            print(f"   • Año {row[0]}: {row[1]:,} matriculados")
         
-        # Distribución por población
-        pob_query = connection.execute(text(
-            "SELECT POBLACION, COUNT(*) as cantidad FROM Estudiantes_2021_2025 GROUP BY POBLACION ORDER BY cantidad DESC LIMIT 5"
+        idioma_query = connection.execute(text(
+            "SELECT IDIOMA, SUM(MATRICULADOS) as total_matriculados FROM Frances_intensificacion GROUP BY IDIOMA ORDER BY total_matriculados DESC"
         ))
-        print(f"\n   Población (top 5):")
-        for i, row in enumerate(pob_query):
-            print(f"      • {row[0]}: {row[1]}")
-        
-        # Distribución por nivel
-        nivel_query = connection.execute(text(
-            "SELECT NIVEL, COUNT(*) as cantidad FROM Estudiantes_2021_2025 GROUP BY NIVEL ORDER BY NIVEL"
-        ))
-        print(f"\n   Niveles:")
-        for row in nivel_query:
-            print(f"      • Nivel {row[0]}: {row[1]} registros")
-        
-        # Distribución por jornada
-        jornada_query = connection.execute(text(
-            "SELECT JORNADA, COUNT(*) as cantidad FROM Estudiantes_2021_2025 GROUP BY JORNADA ORDER BY cantidad DESC"
-        ))
-        print(f"\n   Jornadas:")
-        for row in jornada_query:
-            print(f"      • {row[0]}: {row[1]}")
+        print(f"\n   Matriculados por Idioma:")
+        for row in idioma_query:
+            print(f"      • {row[0]}: {row[1]:,} matriculados")
     
     print("\n" + "="*70)
     print("✅ PROCESO COMPLETADO EXITOSAMENTE")
     print("="*70)
     
-    logger.info(f"Successfully inserted {inseridos} records into Estudiantes_2021_2025")
+    logger.info(f"Successfully inserted {inseridos} records into Frances_intensificacion")
 
 except FileNotFoundError:
     print(f"\n❌ Error: Archivo no encontrado")
     print(f"   Ruta esperada: {ruta_archivo}")
     logger.error(f"File not found: {ruta_archivo}", exc_info=True)
-    
-except pd.errors.EmptyDataError:
-    print(f"\n❌ Error: El archivo CSV está vacío")
-    logger.error("Empty CSV file", exc_info=True)
     
 except Exception as e:
     print(f"\n❌ Error inesperado: {str(e)}")

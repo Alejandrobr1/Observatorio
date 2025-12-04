@@ -15,7 +15,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
 
 # Importar desde la nueva estructura src/
 from src.database.conexion import get_engine
-from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL
+from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL
 
 # Configuración de la página
 st.set_page_config(
@@ -52,13 +52,25 @@ st.markdown("""
         margin-bottom: 10px;
     }
     /* Estilo para los botones de filtro de población para que tengan la misma altura */
-    div[data-testid="stHorizontalBlock"] button {
+    .main-category-btns div[data-testid="stHorizontalBlock"] button {
         height: 4.5em; /* Ajusta esta altura según sea necesario */
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
         line-height: 1.2; /* Mejora el espaciado del texto en varias líneas */
+    }
+    /* Estilo para los botones de subcategoría más pequeños */
+    .subcategory-btns div[data-testid="stHorizontalBlock"] button {
+        height: 3.5em; /* Altura más pequeña para subcategorías */
+        font-size: 0.9em; /* Texto ligeramente más pequeño */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    hr.compact {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -144,50 +156,119 @@ with tab2:
     st.markdown("Selecciona el tipo de población para ver los dashboards correspondientes.")
 
     # Definir las etiquetas para los filtros de población
-    COMFENALCO_LABEL = "Formación a estudiantes Comfenalco Antioquia"
+    COMFENALCO_LABEL = "Comfenalco Antioquia"
     DOCENTES_LABEL = "Formación a docentes"
-    COLOMBO_LABEL = "Formación a estudiantes Centro Colombo Americano de Medellín"
+    COLOMBO_LABEL = "Centro Colombo Americano Medellín"
 
     # Inicializar el estado de la sesión para el filtro de población
     if 'population_filter' not in st.session_state:
         st.session_state.population_filter = COMFENALCO_LABEL
+    # Inicializar el estado de la sesión para las subcategorías
+    if 'comfenalco_subcategory' not in st.session_state:
+        st.session_state.comfenalco_subcategory = "Años 2016 al 2019"
+    if 'colombo_subcategory' not in st.session_state:
+        st.session_state.colombo_subcategory = "Formación a estudiantes"
 
     def set_population(pop_type):
         st.session_state.population_filter = pop_type
 
     # Crear botones para seleccionar la población
-    pop_options = [COMFENALCO_LABEL, DOCENTES_LABEL, COLOMBO_LABEL]
-    cols = st.columns(len(pop_options))
-    for i, pop in enumerate(pop_options):
-        with cols[i]:
-            st.button(pop, key=f"pop_btn_{pop}", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if st.session_state.population_filter == pop else "secondary")
+    with st.container(border=False):
+        st.markdown('<div class="main-category-btns">', unsafe_allow_html=True)
+        pop_options = [COMFENALCO_LABEL, COLOMBO_LABEL]
+        cols_pop = st.columns(len(pop_options))
+        for i, pop in enumerate(pop_options):
+            with cols_pop[i]:
+                st.button(pop, key=f"pop_btn_{pop}", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if st.session_state.population_filter == pop else "secondary")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
+    st.markdown('<hr class="compact">', unsafe_allow_html=True)
     
     # Mostrar enlaces de dashboards según la población seleccionada
     if st.session_state.population_filter == COMFENALCO_LABEL:
-        st.markdown("#### 📊 Análisis de Matrículas")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.page_link("pages/1p-estudiantes_por_jornada_dia.py", label="Matriculados por Jornada y Día", icon="📅")
-            st.page_link("pages/2p-estudiantes_por_poblacion.py", label="Matriculados por Tipo de Población", icon="👥")
-            st.page_link("pages/3p-estudiantes_por_sede_nodal_etapa1_2.py", label="Participación % por sede nodal", icon="⚖️")
-            st.page_link("pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Matriculados por sede nodal", icon="📊")
-        with col2:
-            st.page_link("pages/5p-estudiantes_por_institucion.py", label="Estudiantes por Institución\n(Escuela Nueva)", icon="🏛️")
-            st.page_link("pages/10p-estudiantes_por_institucion_2021_2025.py", label="Estudiantes por Institución (2021-2025)", icon="🏫")
-            st.page_link("pages/11p-estudiantes_por_grado_2021_2025.py", label="Estudiantes por Grado (2021-2025)", icon="🎓")
-            
-    elif st.session_state.population_filter == DOCENTES_LABEL:
-        st.markdown("#### 👨‍🏫 Análisis de Docentes")
-        st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por Nivel MCER", icon="🎓")
-        st.page_link("pages/7p-docentes_por_institucion.py", label="Docentes por Institución", icon="🏫")
+        def set_comfenalco_sub(sub_category):
+            st.session_state.comfenalco_subcategory = sub_category
+
+        with st.container(border=False):
+            st.markdown('<div class="subcategory-btns">', unsafe_allow_html=True)
+            sub_categories = ["Años 2016 al 2019", "Años 2021 al 2025", "Intensificación lingüística"]
+            cols_sub = st.columns(len(sub_categories))
+            for i, sub in enumerate(sub_categories):
+                with cols_sub[i]:
+                    st.button(sub, key=f"comfenalco_sub_{i}", on_click=set_comfenalco_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.comfenalco_subcategory == sub else "secondary")
+            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('<hr class="compact">', unsafe_allow_html=True)
+        
+        if st.session_state.comfenalco_subcategory == "Años 2016 al 2019":
+            st.markdown("#### 📊 Dashboards del periodo 2016-2019")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.page_link("pages/1p-estudiantes_por_jornada_dia.py", label="Estudiantes por Jornada y día", icon="📅")
+                st.page_link("pages/2p-estudiantes_por_poblacion.py", label="Estudiantes por Población", icon="👥")
+                st.page_link("pages/5p-estudiantes_por_institucion.py", label="Estudiantes Escuela Nueva", icon="🏫")
+            with col2:
+                st.page_link("pages/3p-estudiantes_por_sede_nodal_etapa1_2.py", label="Participación % por Sede nodal", icon="⚖️")
+                st.page_link("pages/4p-estudiantes_por_sede_nodal_barras_etp1_2.py", label="Estudiantes por Sede nodal", icon="📊")
+
+        elif st.session_state.comfenalco_subcategory == "Años 2021 al 2025":
+            st.markdown("#### 📊 Dashboards del periodo 2021-2025")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.page_link("pages/10p-estudiantes_por_jornada_dia_2021_2025.py", label="Estudiantes por Jornada y día", icon="📅")
+                st.page_link("pages/11p-estudiantes_por_poblacion_2021_2025.py", label="Estudiantes por Población", icon="👥")
+                st.page_link("pages/12p-estudiantes_por_sede_nodal_etapa1_2_2021_2025.py", label="Participación % por Sede nodal", icon="⚖️")
+                
+            with col2:
+                st.page_link("pages/13p-estudiantes_por_sede_nodal_barras_etp1_2_2021_2025.py", label="Estudiantes por Sede nodal", icon="📊")
+                st.page_link("pages/14p-grados_2021_2025.py", label="Estudiantes por Grado y Etapa", icon="🎓")
+                st.page_link("pages/15p-estudiantes_por_institucion_2021_2025.py", label="Matriculados por Institución", icon="🏫")
+                
+
+
+        elif st.session_state.comfenalco_subcategory == "Intensificación lingüística":
+            st.markdown("#### 📊 Dashboards de Intensificación Lingüística")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.page_link("pages/16p-estudiantes_por_jornada_intensificacion.py", label="Estudiantes por Jornada - Intensificación", icon="📅")
+                st.page_link("pages/17p-estudiantes_por_poblacion_intensificacion.py", label="Estudiantes por Población - Intensificación", icon="👥")
+                st.page_link("pages/18p-estudiantes_por_sede_nodal_intensificacion.py", label="Estudiantes por Sede Nodal - Intensificación", icon="📊")
+                st.page_link("pages/19p-grados_intensificacion.py", label="Grados por Sede Nodal - Intensificación", icon="🎓")
+            with col2:  
+                st.page_link("pages/20p-frances_intensificacion_jornada_dia.py", label="Matriculados por Jornada (Francés)", icon="🕒")
+                st.page_link("pages/21p-frances_intensificacion_grados.py", label="Nivel MCER por Grado (Francés)", icon="📈")
+                st.page_link("pages/22p-horas_frances_intensificacion.py", label="Horas de Formación por Sede (Francés)", icon="🏫")
+                st.page_link("pages/23p-grados_frances_intensificacion_jmg.py", label="Matriculados por Grado y Sede (Francés)", icon="🎓")
+             
 
     elif st.session_state.population_filter == COLOMBO_LABEL:
-        st.markdown("#### Análisis Colombo Americano")
-        st.page_link("pages/8p-colombo_por_institucion.py", label="Colombo - Estudiantes por Institución", icon="🏫")
-        st.page_link("pages/9p-colombo_por_nivel.py", label="Colombo - Estudiantes por Nivel", icon="📈")
+        def set_colombo_sub(sub_category):
+            st.session_state.colombo_subcategory = sub_category
 
+        with st.container(border=False):
+            st.markdown('<div class="subcategory-btns">', unsafe_allow_html=True)
+            sub_categories = ["Formación a estudiantes", "Formación a docentes"]
+            cols_sub = st.columns(len(sub_categories))
+            for i, sub in enumerate(sub_categories):
+                with cols_sub[i]:
+                    st.button(sub, key=f"colombo_sub_{i}", on_click=set_colombo_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.colombo_subcategory == sub else "secondary")
+            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('<hr class="compact">', unsafe_allow_html=True)
+
+        if st.session_state.colombo_subcategory == "Formación a estudiantes":
+            st.markdown("#### 📈 Dashboards de Formación a Estudiantes")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.page_link("pages/8p-colombo_por_institucion.py", label="Estudiantes por Institución Educativa", icon="🏫")
+            with col2:
+                st.page_link("pages/9p-colombo_por_nivel.py", label="Estudiantes por nivel MCER", icon="📈")
+
+        elif st.session_state.colombo_subcategory == "Formación a docentes":
+            st.markdown("#### 👨‍🏫 Dashboards de Formación a Docentes")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.page_link("pages/7p-docentes_por_institucion.py", label="Docentes por Institución Educativa", icon="🏫")
+            with col2:
+                st.page_link("pages/6p-docentes_por_nivel.py", label="Docentes por nivel MCER", icon="🎓")
 
 with tab3:
     st.markdown("### 📥 Centro de Descargas")
@@ -225,9 +306,9 @@ st.sidebar.markdown("""
 
 def add_interest_links():
     st.markdown("---")
-    st.markdown("### 🔗 Enlaces de Interés")
+    st.markdown("### 🔗 Oportunidades laborales")
     st.markdown("""
-    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    - [Agencia pública de empleo – Comfenalco Antioquia](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
     - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
     - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx) 
     """)

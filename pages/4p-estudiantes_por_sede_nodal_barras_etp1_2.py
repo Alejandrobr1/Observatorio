@@ -5,7 +5,8 @@ import numpy as np
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import COLOMBO_LABEL, COMFENALCO_LABEL, DOCENTES_LABEL, create_nav_buttons
+from dashboard_config import create_nav_buttons, get_current_page_category
+from dashboard_config import COMFENALCO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -134,7 +135,7 @@ def create_bar_chart_and_table(df_data, total_etapa, title):
 
     ax.set_xlabel('Sede Nodal', fontsize=12, fontweight='bold')
     ax.set_ylabel('Cantidad de Matriculados', fontsize=12, fontweight='bold')
-    ax.set_title('Matriculados por Sede Nodal', fontsize=14, fontweight='bold', pad=20)
+    ax.set_title('Estudiantes por Sede nodal', fontsize=14, fontweight='bold', pad=20)
     plt.xticks(rotation=45, ha="right")
     max_val = df_data['cantidad'].max() if not df_data.empty else 1
     ax.set_ylim(0, float(max_val) * 1.2)
@@ -183,7 +184,6 @@ try:
 
     # --- Visualización ---
     st.sidebar.header("📈 Estadísticas Generales")
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
     st.sidebar.metric(f"Matriculados Etapa 1 ({selected_year})", f"{int(total_etapa1):,}")
     st.sidebar.metric(f"Matriculados Etapa 2 ({selected_year})", f"{int(total_etapa2):,}")
     st.sidebar.divider()
@@ -215,9 +215,9 @@ except Exception as e:
 
 def add_interest_links():
     st.markdown("---")
-    st.markdown("### 🔗 Enlaces de Interés")
+    st.markdown("### 🔗 Oportunidades laborales")
     st.markdown("""
-    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    - [Agencia pública de empleo – Comfenalco Antioquia](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
     - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
     - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx) 
     """)

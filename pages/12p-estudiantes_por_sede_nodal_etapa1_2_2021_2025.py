@@ -5,7 +5,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import create_nav_buttons, get_current_page_category
+from dashboard_config import create_nav_buttons
 from dashboard_config import COMFENALCO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -67,7 +67,7 @@ except Exception as e:
 
 @st.cache_data
 def get_available_years(_engine, prefix):
-    table_name = "Estudiantes_2016_2019" # Tabla consolidada
+    table_name = "Estudiantes_2021_2025" # Tabla consolidada
     if prefix == "Estudiantes":
         with _engine.connect() as connection:
             if _engine.dialect.has_table(connection, table_name):
@@ -141,7 +141,6 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
         autotext.set_color('white')
     
     ax.set_title('Distribución por Sede Nodal', fontsize=14, fontweight='bold', pad=20)
-    ax.axis('equal')  # Asegura que el gráfico sea un círculo perfecto y de tamaño consistente
     plt.tight_layout()
     st.pyplot(fig)
 
@@ -159,7 +158,7 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
 @st.cache_data
 def load_data_by_stage(_engine, prefix, year, stage):
     # Si son estudiantes, usar la tabla consolidada. Si no, mantener la lógica anterior.
-    table_name = "Estudiantes_2016_2019" if prefix == "Estudiantes" else f"{prefix}_{year}"
+    table_name = "Estudiantes_2021_2025" if prefix == "Estudiantes" else f"{prefix}_{year}"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(columns=["SEDE_NODAL", "cantidad"]), 0

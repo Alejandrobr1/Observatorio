@@ -5,7 +5,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 import sys
 import os
-from dashboard_config import COMFENALCO_LABEL, DOCENTES_LABEL, COLOMBO_LABEL, create_nav_buttons
+from dashboard_config import create_nav_buttons, get_current_page_category, COLOMBO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -15,7 +15,7 @@ st.title("📊 Docentes por Nivel MCER")
 
 # --- State and Navigation ---
 if 'population_filter' not in st.session_state:
-    st.session_state.population_filter = DOCENTES_LABEL
+    st.session_state.population_filter = COLOMBO_LABEL
 
 create_nav_buttons(st.session_state.population_filter)
 st.markdown("---")
@@ -158,7 +158,7 @@ try:
     
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning(f"⚠️ No se encontraron datos para {DOCENTES_LABEL}.")
+        st.warning(f"⚠️ No se encontraron datos para docentes.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
@@ -197,9 +197,9 @@ except Exception as e:
 
 def add_interest_links():
     st.markdown("---")
-    st.markdown("### 🔗 Enlaces de Interés")
+    st.markdown("### 🔗 Oportunidades laborales")
     st.markdown("""
-    - [Agencia Pública de Empleo Municipio de Comfenalco](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
+    - [Agencia pública de empleo – Comfenalco Antioquia](https://www.comfenalcoantioquia.com.co/personas/sedes/oficina-de-empleo-oriente)
      - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
      - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx) 
     """)

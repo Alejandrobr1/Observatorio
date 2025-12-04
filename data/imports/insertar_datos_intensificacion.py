@@ -1,6 +1,5 @@
 """
-Script para insertar datos de tabla_2016_2019.csv en la tabla Estudiantes_2016_2019
-Nueva estructura: Tablas independientes por años sin valores vacíos ni nulos
+Script para insertar datos de Tabla_datos_intensificacion.csv en la tabla Estudiantes_intensificacion
 """
 
 import pandas as pd
@@ -8,6 +7,10 @@ import os
 import sys
 from sqlalchemy import text
 
+
+
+# Añadir el directorio raíz del proyecto ('Observatorio') al path de Python
+# Se suben dos niveles desde 'data/imports' para llegar a la raíz.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from src.database.conexion import engine
@@ -15,12 +18,13 @@ from src.config.logger_config import get_logger
 
 logger = get_logger(__name__)
 
-# Definir la ruta del archivo CSV
+# Definir la ruta del archivo CSV de forma robusta desde la raíz del proyecto
+# El script está en 'data/imports', así que subimos dos niveles para llegar a 'Observatorio'
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-ruta_archivo = os.path.join(project_root, "data", "csv", "Tabla_2016_2019.csv")
+ruta_archivo = os.path.join(project_root, "data", "csv", "Tabla_intensificacion.csv")
 
 print("\n" + "="*70)
-print("INSERCIÓN DE DATOS - TABLA ESTUDIANTES_2016_2019")
+print("INSERCIÓN DE DATOS - TABLA ESTUDIANTES_INTENSIFICACION")
 print("="*70)
 
 try:
@@ -74,29 +78,11 @@ try:
             fecha = int(row['Año']) if pd.notna(row['Año']) else None
             sede_nodal = str(row['Sede Nodal']).strip() if pd.notna(row['Sede Nodal']) else None
             poblacion = str(row['Población']).strip() if pd.notna(row['Población']) else None
-            nivel = int(row['Nivel']) if pd.notna(row['Nivel']) else None
+            nivel = str(row['Nivel']).strip() if pd.notna(row['Nivel']) else None
             dia = str(row['Día']).strip() if pd.notna(row['Día']) else None
             jornada = str(row['Jornada']).strip() if pd.notna(row['Jornada']) else None
             matriculados = int(row['Matriculados']) if pd.notna(row['Matriculados']) else None
             etapa = int(row['Etapa']) if pd.notna(row['Etapa']) else None
-            
-            # Validar que los campos requeridos tengan valor
-            if None in [fecha, sede_nodal, poblacion, nivel, dia, jornada, matriculados, etapa]:
-                errores.append({
-                    'fila': idx + 2,
-                    'razon': 'Valores nulos o vacíos',
-                    'valores': {
-                        'FECHA': fecha,
-                        'SEDE_NODAL': sede_nodal,
-                        'POBLACION': poblacion,
-                        'NIVEL': nivel,
-                        'DIA': dia,
-                        'JORNADA': jornada,
-                        'MATRICULADOS': matriculados,
-                        'ETAPA': etapa
-                    }
-                })
-                continue
             
             registros.append({
                 'FECHA': fecha,
@@ -131,6 +117,19 @@ try:
     # Insertar en la base de datos
     print(f"\n💾 Insertando {len(registros)} registros en la base de datos...")
     
+    # --- INICIO: Eliminar datos existentes ---
+    with engine.connect() as connection:
+        transaction = connection.begin()
+        try:
+            print(f"   • Limpiando datos antiguos de la tabla 'Estudiantes_intensificacion'...")
+            connection.execute(text("DELETE FROM Estudiantes_intensificacion"))
+            transaction.commit()
+            print(f"   ✓ Datos antiguos eliminados.")
+        except Exception as e:
+            transaction.rollback()
+            raise e  # Re-lanzar la excepción para detener el script si la limpieza falla
+    # --- FIN: Eliminar datos existentes ---
+
     with engine.connect() as connection:
         inseridos = 0
         
@@ -139,7 +138,7 @@ try:
                 # Insertar registro sin verificar duplicados
                 # Se permiten valores duplicados tal como vienen en el Excel
                 connection.execute(text(
-                    """INSERT INTO Estudiantes_2016_2019 
+                    """INSERT INTO Estudiantes_intensificacion
                        (FECHA, SEDE_NODAL, POBLACION, NIVEL, DIA, JORNADA, MATRICULADOS, ETAPA)
                        VALUES (:fecha, :sede_nodal, :poblacion, :nivel, :dia, :jornada, :matriculados, :etapa)"""
                 ), {
@@ -177,23 +176,23 @@ try:
     # Mostrar estadísticas de los datos insertados
     with engine.connect() as connection:
         # Total de registros
-        total_query = connection.execute(text("SELECT COUNT(*) FROM Estudiantes_2016_2019"))
+        total_query = connection.execute(text("SELECT COUNT(*) FROM Estudiantes_intensificacion"))
         total = total_query.scalar()
         
         # Distribución por año
-        print(f"\n📈 Distribución de datos en Estudiantes_2016_2019:")
+        print(f"\n📈 Distribución de datos en Estudiantes_intensificacion:")
         print(f"   • Total de registros: {total}")
         
         # Verificar año
         año_query = connection.execute(text(
-            "SELECT DISTINCT FECHA, COUNT(*) as cantidad FROM Estudiantes_2016_2019 GROUP BY FECHA"
+            "SELECT DISTINCT FECHA, COUNT(*) as cantidad FROM Estudiantes_intensificacion GROUP BY FECHA"
         ))
         for row in año_query:
             print(f"   • Año {row[0]}: {row[1]} registros")
         
         # Distribución por población
         pob_query = connection.execute(text(
-            "SELECT POBLACION, COUNT(*) as cantidad FROM Estudiantes_2016_2019 GROUP BY POBLACION ORDER BY cantidad DESC LIMIT 5"
+            "SELECT POBLACION, COUNT(*) as cantidad FROM Estudiantes_intensificacion GROUP BY POBLACION ORDER BY cantidad DESC LIMIT 5"
         ))
         print(f"\n   Población (top 5):")
         for i, row in enumerate(pob_query):
@@ -201,25 +200,25 @@ try:
         
         # Distribución por nivel
         nivel_query = connection.execute(text(
-            "SELECT NIVEL, COUNT(*) as cantidad FROM Estudiantes_2016_2019 GROUP BY NIVEL ORDER BY NIVEL"
+            "SELECT NIVEL, COUNT(*) as cantidad FROM Estudiantes_intensificacion GROUP BY NIVEL ORDER BY NIVEL"
         ))
         print(f"\n   Niveles:")
         for row in nivel_query:
             print(f"      • Nivel {row[0]}: {row[1]} registros")
         
-        # Distribución por día
-        dia_query = connection.execute(text(
-            "SELECT DIA, COUNT(*) as cantidad FROM Estudiantes_2016_2019 GROUP BY DIA ORDER BY cantidad DESC"
+        # Distribución por jornada
+        jornada_query = connection.execute(text(
+            "SELECT JORNADA, COUNT(*) as cantidad FROM Estudiantes_intensificacion GROUP BY JORNADA ORDER BY cantidad DESC"
         ))
-        print(f"\n   Días:")
-        for row in dia_query:
+        print(f"\n   Jornadas:")
+        for row in jornada_query:
             print(f"      • {row[0]}: {row[1]}")
     
     print("\n" + "="*70)
     print("✅ PROCESO COMPLETADO EXITOSAMENTE")
     print("="*70)
     
-    logger.info(f"Successfully inserted {inseridos} records into Estudiantes_2016_2019")
+    logger.info(f"Successfully inserted {inseridos} records into Estudiantes_intensificacion")
 
 except FileNotFoundError:
     print(f"\n❌ Error: Archivo no encontrado")

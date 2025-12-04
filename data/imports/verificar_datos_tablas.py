@@ -19,7 +19,7 @@ from sqlalchemy import create_engine, text, inspect
 from dotenv import load_dotenv
 
 # Añadir el directorio raíz del proyecto a sys.path para encontrar el .env
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.append(project_root)
 
 # Cargar variables de entorno desde el archivo .env en la raíz del proyecto
