@@ -75,7 +75,7 @@ except Exception as e:
 
 @st.cache_data
 def get_available_years(_engine):
-    table_name = "Frances_intensificacion"
+    table_name = "Frances_intensificacion_horas"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             st.warning(f"La tabla '{table_name}' no existe.")
@@ -113,7 +113,7 @@ st.sidebar.divider()
 # --- Carga de Datos ---
 @st.cache_data
 def load_data(_engine, year):
-    table_name = "Frances_intensificacion"
+    table_name = "Frances_intensificacion_horas"
     with _engine.connect() as connection:
         if not _engine.dialect.has_table(connection, table_name):
             return pd.DataFrame(columns=["GRADO", "NIVEL_MCER", "cantidad"]), 0
@@ -123,13 +123,13 @@ def load_data(_engine, year):
         # Query simple sin filtros complejos - dejar que pandas filtre
         query = text(f"""
             SELECT 
-                GRADO, NIVEL_MCER, ID
+                GRADO, NIVEL_MCER, MATRICULADOS
             FROM {table_name}
             WHERE FECHA = :year
         """)
         
         result = connection.execute(query, params)
-        df = pd.DataFrame(result.fetchall(), columns=["GRADO", "NIVEL_MCER", "ID"])
+        df = pd.DataFrame(result.fetchall(), columns=["GRADO", "NIVEL_MCER", "MATRICULADOS"])
         
         if df.empty:
             return pd.DataFrame(columns=["GRADO", "NIVEL_MCER", "cantidad"]), 0
@@ -137,14 +137,15 @@ def load_data(_engine, year):
         # Limpiar y filtrar con pandas
         df['GRADO'] = df['GRADO'].astype(str).str.strip()
         df['NIVEL_MCER'] = df['NIVEL_MCER'].astype(str).str.strip()
-        
+        df['MATRICULADOS'] = pd.to_numeric(df['MATRICULADOS'], errors='coerce').fillna(0)
+
         # Filtrar valores no válidos
         df = df[
             (df['GRADO'].notna()) & 
             (df['GRADO'] != '') & 
             (df['GRADO'] != 'None') &
             (df['GRADO'].str.upper() != 'SIN INFORMACION') &
-            (df['GRADO'].str.upper() != 'SIN INFORMACIÓN') &
+            (df['GRADO'].str.upper() != 'SIN INFORMACIÓN') &            
             (df['NIVEL_MCER'].notna()) & 
             (df['NIVEL_MCER'] != '') & 
             (df['NIVEL_MCER'] != 'None') &
@@ -153,53 +154,68 @@ def load_data(_engine, year):
         ]
         
         # Agrupar y contar
-        df_grouped = df.groupby(['GRADO', 'NIVEL_MCER']).size().reset_index(name='cantidad')
+        df_grouped = df.groupby(['GRADO', 'NIVEL_MCER'])['MATRICULADOS'].sum().reset_index(name='cantidad')
         
         # Contar total de matriculados
-        query_total = text(f"SELECT COUNT(ID) FROM {table_name} WHERE FECHA = :year")
-        total_matriculados = connection.execute(query_total, params).scalar() or 0
+        # Se recalcula la suma desde el dataframe ya filtrado y limpio para consistencia
+        total_matriculados = df['MATRICULADOS'].sum()
         
         return df_grouped, total_matriculados
 
 
-def create_grouped_bar_chart(df, title):
-    """Función para crear un gráfico de barras agrupadas de Nivel MCER por Grado."""
-    st.header(title)
+def create_data_table(df):
+    """Función para crear y mostrar una tabla detallada de los datos."""
+    st.header("📋 Tabla Detallada")
     if df.empty:
-        st.warning("No hay datos de niveles MCER por grado para el año seleccionado.")
+        st.warning("No hay datos para mostrar en la tabla.")
         return
 
+    df_pivot = df.pivot(index='GRADO', columns='NIVEL_MCER', values='cantidad').fillna(0).astype(int)
+    df_pivot['Total por Grado'] = df_pivot.sum(axis=1)
+    
+    # Añadir fila de totales
+    total_row = df_pivot.sum().rename('Total General').to_frame().T
+    df_display = pd.concat([df_pivot, total_row])
+
+    st.dataframe(df_display, use_container_width=True)
+
+
+def create_stacked_bar_chart(df, title):
+    """Función para crear un gráfico de barras apiladas de Nivel MCER por Grado."""
 
     # Pivotear los datos para tener grados como índice y niveles como columnas
     df_pivot = df.pivot(index='GRADO', columns='NIVEL_MCER', values='cantidad').fillna(0)
 
-
-    # Crear gráfico de barras verticales agrupadas
+    # Crear gráfico de barras verticales apiladas
     fig, ax = plt.subplots(figsize=(14, 8))
     grados = df_pivot.index
     niveles = df_pivot.columns
     n_grados = len(grados)
     n_niveles = len(niveles)
     x = np.arange(n_grados)
-    width = 0.8 / n_niveles
+    width = 0.7  # Ancho de las barras
     colors = plt.cm.viridis(np.linspace(0.3, 0.9, n_niveles))
     
+    bottom = np.zeros(n_grados)
+
     for i, nivel in enumerate(niveles):
-        offset = width * (i - (n_niveles - 1) / 2)
         valores = df_pivot[nivel]
-        bars = ax.bar(x + offset, valores, width, label=nivel, color=colors[i], edgecolor='black', linewidth=1)
+        bars = ax.bar(x, valores, width, label=nivel, color=colors[i], bottom=bottom, edgecolor='black', linewidth=0.5)
+        
+        # Añadir etiquetas en el centro de cada segmento
         for bar in bars:
             height = bar.get_height()
             if height > 0:
+                y_pos = bar.get_y() + height / 2
                 ax.annotate(f'{int(height):,}',
-                            xy=(bar.get_x() + bar.get_width() / 2, height),
-                            xytext=(0, 3), textcoords="offset points",
-                            ha='center', va='bottom', fontsize=8, rotation=90)
-
+                            xy=(bar.get_x() + bar.get_width() / 2, y_pos),
+                            ha='center', va='center', fontsize=9, color='white', fontweight='bold')
+        
+        bottom += valores.values
 
     ax.set_xlabel('Grado', fontsize=13, fontweight='bold')
     ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-    ax.set_title('Estudiantes por Nivel MCER en cada Grado', fontsize=16, fontweight='bold', pad=20)
+    ax.set_title('Composición de Estudiantes por Nivel MCER en cada Grado', fontsize=16, fontweight='bold', pad=20)
     ax.set_xticks(x)
     ax.set_xticklabels(grados, rotation=45, ha='right', fontsize=11)
     ax.legend(title='Nivel MCER', bbox_to_anchor=(1.05, 1), loc='upper left')
@@ -208,15 +224,6 @@ def create_grouped_bar_chart(df, title):
     ax.set_ylim(0, float(max_val) * 1.2)
     plt.tight_layout()
     st.pyplot(fig)
-
-
-    # Tabla de datos detallada
-    df_display = df_pivot.copy().astype(int)
-    total_general = df_display.sum().sum()
-    df_display['Total por Grado'] = df_display.sum(axis=1)
-    st.header("📋 Tabla Detallada")
-    st.dataframe(df_display, use_container_width=True)
-
 
 try:
     df_data, total_matriculados = load_data(engine, selected_year)
@@ -246,8 +253,15 @@ try:
 
     st.markdown('<hr class="compact">', unsafe_allow_html=True)
     
-    # Mostrar el gráfico
-    create_grouped_bar_chart(df_data, f"Año {selected_year}")
+    if df_data.empty:
+        st.warning(f"No hay datos de niveles MCER por grado para el año {selected_year}.")
+    else:
+        # Mostrar la tabla de datos primero
+        create_data_table(df_data)
+
+        # Mostrar el gráfico
+        st.header(f"📊 Gráfico: Año {selected_year}")
+        create_stacked_bar_chart(df_data, f"Año {selected_year}")
 
 
 except Exception as e:

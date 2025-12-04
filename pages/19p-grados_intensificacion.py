@@ -112,7 +112,7 @@ def create_grouped_bar_chart_and_table(df_data, title):
                             xy=(bar.get_x() + bar.get_width() / 2, height),
                             xytext=(0, 3),
                             textcoords="offset points",
-                            ha='center', va='bottom', fontsize=8, rotation=90)
+                            ha='center', va='bottom', fontsize=8)
     
     ax.set_xlabel('Grado', fontsize=12, fontweight='bold')
     ax.set_ylabel('Cantidad de Matriculados', fontsize=12, fontweight='bold')

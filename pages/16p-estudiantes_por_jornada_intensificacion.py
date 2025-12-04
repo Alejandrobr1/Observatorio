@@ -196,13 +196,11 @@ def create_day_journey_chart(df, title):
     st.dataframe(df_display, use_container_width=True)
 
 try:
-    df_etapa1, total_matriculados_etapa1, _, _ = load_data_by_stage(engine, population_prefix, selected_year, '1')
-    df_etapa2, total_matriculados_etapa2, _, _ = load_data_by_stage(engine, population_prefix, selected_year, '2')
+    df_data, total_matriculados, _, _ = load_data_by_stage(engine, population_prefix, selected_year, '1')
 
     # --- Visualización ---
     st.sidebar.header("📈 Estadísticas Generales")
-    st.sidebar.metric(f"Matriculados Etapa 1 ({selected_year})", f"{int(total_matriculados_etapa1):,}")
-    st.sidebar.metric(f"Matriculados Etapa 2 ({selected_year})", f"{int(total_matriculados_etapa2):,}")
+    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
     st.sidebar.divider()
     # Añadir el logo al final del sidebar
     if os.path.exists("assets/Logo_rionegro.png"):
@@ -220,14 +218,8 @@ try:
             st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,)) # type: ignore
     st.markdown('<hr class="compact">', unsafe_allow_html=True)
 
-    # Layout en dos columnas para los gráficos
-    col1, col2 = st.columns(2)
-
-    with col1:
-        create_day_journey_chart(df_etapa1, f"📊 Etapa 1 - Año {selected_year}")
-
-    with col2:
-        create_day_journey_chart(df_etapa2, f"📊 Etapa 2 - Año {selected_year}")
+    # Mostrar solo un gráfico, sin especificar la etapa
+    create_day_journey_chart(df_data, f"📊 Matriculados por Jornada y Día - Año {selected_year}")
 
 except Exception as e:
     st.error("❌ Error al cargar los datos")

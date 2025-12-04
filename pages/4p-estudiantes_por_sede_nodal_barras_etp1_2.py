@@ -184,7 +184,6 @@ try:
 
     # --- Visualización ---
     st.sidebar.header("📈 Estadísticas Generales")
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
     st.sidebar.metric(f"Matriculados Etapa 1 ({selected_year})", f"{int(total_etapa1):,}")
     st.sidebar.metric(f"Matriculados Etapa 2 ({selected_year})", f"{int(total_etapa2):,}")
     st.sidebar.divider()

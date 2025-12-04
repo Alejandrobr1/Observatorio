@@ -141,6 +141,7 @@ def create_pie_chart_and_table(df_data, total_etapa, title):
         autotext.set_color('white')
     
     ax.set_title('Distribución por Sede Nodal', fontsize=14, fontweight='bold', pad=20)
+    ax.axis('equal')  # Asegura que el gráfico sea un círculo perfecto y de tamaño consistente
     plt.tight_layout()
     st.pyplot(fig)
 
@@ -181,11 +182,9 @@ def load_data_by_stage(_engine, prefix, year, stage):
 try:
     df_etapa1, total_etapa1 = load_data_by_stage(engine, population_prefix, selected_year, '1')
     df_etapa2, total_etapa2 = load_data_by_stage(engine, population_prefix, selected_year, '2')
-    total_matriculados = total_etapa1 + total_etapa2
 
     # --- Visualización ---
     st.sidebar.header("📈 Estadísticas Generales")
-    st.sidebar.metric(f"Total Matriculados ({selected_year})", f"{int(total_matriculados):,}")
     st.sidebar.metric(f"Matriculados Etapa 1 ({selected_year})", f"{int(total_etapa1):,}")
     st.sidebar.metric(f"Matriculados Etapa 2 ({selected_year})", f"{int(total_etapa2):,}")
     st.sidebar.divider()

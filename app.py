@@ -232,12 +232,13 @@ with tab2:
                 st.page_link("pages/16p-estudiantes_por_jornada_intensificacion.py", label="Estudiantes por Jornada - Intensificación", icon="📅")
                 st.page_link("pages/17p-estudiantes_por_poblacion_intensificacion.py", label="Estudiantes por Población - Intensificación", icon="👥")
                 st.page_link("pages/18p-estudiantes_por_sede_nodal_intensificacion.py", label="Estudiantes por Sede Nodal - Intensificación", icon="📊")
-            with col2:  
                 st.page_link("pages/19p-grados_intensificacion.py", label="Grados por Sede Nodal - Intensificación", icon="🎓")
-                st.page_link("pages/20p-frances_intensificacion.py", label="Matriculados por Jornada (Francés)", icon="🕒")
+            with col2:  
+                st.page_link("pages/20p-frances_intensificacion_jornada_dia.py", label="Matriculados por Jornada (Francés)", icon="🕒")
                 st.page_link("pages/21p-frances_intensificacion_grados.py", label="Nivel MCER por Grado (Francés)", icon="📈")
                 st.page_link("pages/22p-horas_frances_intensificacion.py", label="Horas de Formación por Sede (Francés)", icon="🏫")
-                st.page_link("pages/23p-grados_frances_intensificacion.py", label="Matriculados por Grado y Sede (Francés)", icon="🎓")
+                st.page_link("pages/23p-grados_frances_intensificacion_jmg.py", label="Matriculados por Grado y Sede (Francés)", icon="🎓")
+             
 
     elif st.session_state.population_filter == COLOMBO_LABEL:
         def set_colombo_sub(sub_category):

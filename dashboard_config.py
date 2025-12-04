@@ -29,10 +29,11 @@ DASHBOARD_CATEGORIES = {
                 ("17p-estudiantes_por_poblacion_intensificacion.py", "Estudiantes por Población", "👥"),
                 ("18p-estudiantes_por_sede_nodal_intensificacion.py", "Estudiantes por Sede Nodal", "📊"),
                 ("19p-grados_intensificacion.py", "Grados por Sede Nodal", "🎓"),
-                ("20p-frances_intensificacion.py", "Matriculados por Jornada (Francés)", "🕒"),
+                ("20p-frances_intensificacion_jornada_dia.py", "Matriculados por Jornada (Francés)", "🕒"),
                 ("21p-frances_intensificacion_grados.py", "Nivel MCER por Grado (Francés)", "📈"),
                 ("22p-horas_frances_intensificacion.py", "Horas de Formación por Sede (Francés)", "🏫"),
-                ("23p-grados_frances_intensificacion.py", "Matriculados por Grado y Sede (Francés)", "🎓"),
+                ("23p-grados_frances_intensificacion_jmg.py", "Matriculados por Grado y Sede (Francés)", "🎓"),
+              
             ]
         }
     },
