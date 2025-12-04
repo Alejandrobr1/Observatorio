@@ -6,7 +6,7 @@ import traceback
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import create_nav_buttons, get_current_page_category
+from dashboard_config import create_nav_buttons
 from dashboard_config import COMFENALCO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -139,7 +139,7 @@ def create_population_chart(df, total_matriculados, title):
     """Función para crear un gráfico de barras y una tabla para una etapa específica."""
     st.header(title)
     if df.empty:
-        st.warning(f"No hay datos de matriculados por población para esta etapa.")
+        st.warning("No hay datos de matriculados por población para esta etapa.")
         return
 
     # Gráfico de barras verticales
@@ -158,7 +158,7 @@ def create_population_chart(df, total_matriculados, title):
 
     ax.set_xlabel('Tipo de Población', fontsize=13, fontweight='bold')
     ax.set_ylabel('Cantidad de Estudiantes Matriculados', fontsize=13, fontweight='bold')
-    ax.set_title(f'Estudiantes por Población', fontsize=16, fontweight='bold', pad=20)
+    ax.set_title('Estudiantes por Población', fontsize=16, fontweight='bold', pad=20)
     plt.xticks(rotation=45, ha="right")
 
     max_val = df['cantidad'].max() if not df.empty else 1
@@ -176,7 +176,7 @@ def create_population_chart(df, total_matriculados, title):
     df_display = df_display[['#', 'POBLACION', 'cantidad', 'porcentaje']]
     df_display.columns = ['#', 'Población', 'Matriculados', 'Porcentaje']
     st.header("📋 Tabla Detallada")
-    st.dataframe(df_display, use_container_width=True, hide_index=True)
+    st.dataframe(df_display, width='stretch', hide_index=True)
 
 try:
     df_etapa1, total_matriculados_etapa1, total_poblacion_etapa1 = load_data_by_stage(engine, population_prefix, selected_year, '1')
@@ -200,7 +200,7 @@ try:
     for i, year in enumerate(available_years):
         with cols_buttons[i]:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+            st.button(str(year), key=f"year_{year}", type=button_type, on_click=set_year, args=(year,), width='stretch')
     st.divider()
 
     # Layout en dos columnas para los gráficos

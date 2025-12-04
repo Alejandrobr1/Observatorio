@@ -179,7 +179,7 @@ with tab2:
         cols_pop = st.columns(len(pop_options))
         for i, pop in enumerate(pop_options):
             with cols_pop[i]:
-                st.button(pop, key=f"pop_btn_{pop}", on_click=set_population, args=(pop,), use_container_width=True, type="primary" if st.session_state.population_filter == pop else "secondary")
+                st.button(pop, key=f"pop_btn_{pop}", on_click=set_population, args=(pop,), width='stretch', type="primary" if st.session_state.population_filter == pop else "secondary")
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<hr class="compact">', unsafe_allow_html=True)
@@ -195,7 +195,7 @@ with tab2:
             cols_sub = st.columns(len(sub_categories))
             for i, sub in enumerate(sub_categories):
                 with cols_sub[i]:
-                    st.button(sub, key=f"comfenalco_sub_{i}", on_click=set_comfenalco_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.comfenalco_subcategory == sub else "secondary")
+                    st.button(sub, key=f"comfenalco_sub_{i}", on_click=set_comfenalco_sub, args=(sub,), width='stretch', type="primary" if st.session_state.comfenalco_subcategory == sub else "secondary")
             st.markdown('</div>', unsafe_allow_html=True)
         st.markdown('<hr class="compact">', unsafe_allow_html=True)
         
@@ -250,7 +250,7 @@ with tab2:
             cols_sub = st.columns(len(sub_categories))
             for i, sub in enumerate(sub_categories):
                 with cols_sub[i]:
-                    st.button(sub, key=f"colombo_sub_{i}", on_click=set_colombo_sub, args=(sub,), use_container_width=True, type="primary" if st.session_state.colombo_subcategory == sub else "secondary")
+                    st.button(sub, key=f"colombo_sub_{i}", on_click=set_colombo_sub, args=(sub,), width='stretch', type="primary" if st.session_state.colombo_subcategory == sub else "secondary")
             st.markdown('</div>', unsafe_allow_html=True)
         st.markdown('<hr class="compact">', unsafe_allow_html=True)
 

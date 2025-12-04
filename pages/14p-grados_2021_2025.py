@@ -117,7 +117,7 @@ def create_donut_chart_and_table(df_data, total_matriculados, title):
     df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
     df_display = df_display[['#', 'grado', 'cantidad', 'porcentaje']]
     df_display.columns = ['#', 'Grado', 'Matriculados', 'Porcentaje']
-    st.dataframe(df_display, use_container_width=True, hide_index=True)
+    st.dataframe(df_display, width='stretch', hide_index=True)
 
 @st.cache_data
 def load_data_by_stage(_engine, year, stage):
@@ -148,7 +148,7 @@ def load_data_by_stage(_engine, year, stage):
 try:
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning(f"⚠️ No se encontraron datos en la tabla Grados_2021_2025.")
+        st.warning("⚠️ No se encontraron datos en la tabla Grados_2021_2025.")
         st.stop()
 
     if 'selected_year' not in st.session_state or st.session_state.selected_year not in available_years:
@@ -178,7 +178,7 @@ try:
     for i, year in enumerate(available_years):
         with cols_buttons[i]:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+            st.button(str(year), key=f"year_{year}", type=button_type, on_click=set_year, args=(year,), width='stretch')
     st.markdown('<hr class="compact">', unsafe_allow_html=True)
 
     # --- Layout de Gráficos ---

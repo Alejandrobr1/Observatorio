@@ -6,7 +6,7 @@ import traceback
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import create_nav_buttons, get_current_page_category
+from dashboard_config import create_nav_buttons
 from dashboard_config import COMFENALCO_LABEL
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -177,7 +177,7 @@ def create_data_table(df):
     total_row = df_pivot.sum().rename('Total General').to_frame().T
     df_display = pd.concat([df_pivot, total_row])
 
-    st.dataframe(df_display, use_container_width=True)
+    st.dataframe(df_display, width='stretch')
 
 
 def create_stacked_bar_chart(df, title):
@@ -248,7 +248,7 @@ try:
     for i, year in enumerate(available_years):
         with cols_buttons[i]:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+            st.button(str(year), key=f"year_{year}", on_click=set_year, args=(year,), type=button_type, width='stretch')
 
 
     st.markdown('<hr class="compact">', unsafe_allow_html=True)

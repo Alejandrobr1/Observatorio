@@ -6,8 +6,9 @@ import traceback
 from sqlalchemy import create_engine, text
 import sys 
 import os
-from dashboard_config import create_nav_buttons, get_current_page_category
+from dashboard_config import create_nav_buttons
 from dashboard_config import COMFENALCO_LABEL
+
 # Añadir el directorio raíz del proyecto a sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -188,12 +189,12 @@ def create_day_journey_chart(df, title):
     plt.tight_layout()
     st.pyplot(fig)
 
-    # Tabla de datos detallada
+    # Tabla de datos detallada (CORREGIDO: applymap -> map)
     df_display = df_pivot.copy()
-    df_display = df_display.astype(int).applymap('{:,}'.format)
-    df_display['Total por Día'] = df_pivot.sum(axis=1).astype(int).apply('{:,}'.format)
+    df_display = df_display.astype(int).map(lambda x: f'{x:,}')
+    df_display['Total por Día'] = df_pivot.sum(axis=1).astype(int).apply(lambda x: f'{x:,}')
     st.header("📋 Tabla Detallada")
-    st.dataframe(df_display, use_container_width=True)
+    st.dataframe(df_display, width='stretch')  # CORREGIDO: use_container_width -> width
 
 try:
     df_etapa1, total_matriculados_etapa1, _, _ = load_data_by_stage(engine, population_prefix, selected_year, '1')
@@ -211,13 +212,15 @@ try:
     # --- Selección de Año con Botones Horizontales ---
     st.write("📅 **Seleccionar Año para Visualizar**")
     cols_buttons = st.columns(len(available_years))
+    
     def set_year(year):
         st.session_state.selected_year = year
 
     for i, year in enumerate(available_years):
         with cols_buttons[i]:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,)) # type: ignore
+            st.button(str(year), key=f"year_{year}", width='stretch', type=button_type, on_click=set_year, args=(year,))  # CORREGIDO: use_container_width -> width
+    
     st.markdown('<hr class="compact">', unsafe_allow_html=True)
 
     # Layout en dos columnas para los gráficos
@@ -243,4 +246,5 @@ def add_interest_links():
     - [Agencia Pública de Empleo Municipio de Rionegro](https://www.comfenalcoantioquia.com.co/personas/servicios/agencia-de-empleo/ofertas)
     - [Agencia Pública de Empleo SENA](https://ape.sena.edu.co/Paginas/Inicio.aspx)    
     """)
+
 add_interest_links()

@@ -159,7 +159,7 @@ def create_bar_chart_and_table(df_data, total_horas, title, sede_nodal):
     df_display['porcentaje'] = df_display['porcentaje'].apply(lambda x: f"{x:.2f}%")
     df_display = df_display[['#', 'sede', 'total_horas', 'porcentaje']]
     df_display.columns = ['#', 'Sede', 'Total Horas', 'Porcentaje']
-    st.dataframe(df_display, use_container_width=True, hide_index=True)
+    st.dataframe(df_display, width='stretch', hide_index=True)
 
 
 @st.cache_data
@@ -201,7 +201,7 @@ def load_data(_engine, year, sede_nodal):
 try:
     available_years = get_available_years(engine)
     if not available_years:
-        st.warning(f"⚠️ No se encontraron datos en la tabla 'Frances_intensificacion_horas'.")
+        st.warning("⚠️ No se encontraron datos en la tabla 'Frances_intensificacion_horas'.")
         st.stop()
 
 
@@ -247,7 +247,7 @@ try:
             st.session_state.selected_year = year
         for year in available_years:
             button_type = "primary" if year == selected_year else "secondary"
-            st.button(str(year), key=f"year_{year}", use_container_width=True, type=button_type, on_click=set_year, args=(year,))
+            st.button(str(year), key=f"year_{year}", width='stretch', type=button_type, on_click=set_year, args=(year,))
 
 
 except Exception as e:
